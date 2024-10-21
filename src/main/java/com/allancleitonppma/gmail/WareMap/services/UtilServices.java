@@ -51,7 +51,7 @@ public interface UtilServices {
 		return listProducts;
 	}
 
-	default LoadOrder getloadOrder(String path) {
+	default LoadOrder getloadOrder(String path) throws Exception{
 		List<LoadOrder.Product> orders = new ArrayList<>();
 		String line;
 		String[] fields;
@@ -63,15 +63,12 @@ public interface UtilServices {
 	
 			}
 			
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
 		
 		return new LoadOrder(orders);
 	}
 	
-	default LoadOrder getloadOrder(String path, Integer orederCharger) {
+	default LoadOrder getloadOrder(String path, String orederCharger) throws Exception{
 		List<LoadOrder.Product> orders = new ArrayList<>();
 		String line;
 		String[] fields;
@@ -83,29 +80,11 @@ public interface UtilServices {
 	
 			}
 			
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			e.printStackTrace();
 		}
 		
 		return new LoadOrder(orders, orederCharger);
 	}
 	
-	default void printRoadOfChamber(List<Chamber> chambers, Predicate<Chamber> filter){
-
-		for (Chamber c : chambers) {
-			if(filter.test(c)) {
-				for (Road r : c.getAllRoads()) {
-					if(r != null) {
-						System.out.println(r.toString());
-					}
-				}
-			}else {
-				System.out.println("N/A\n");
-			}
-		}
-	}
-
 	default List<Chamber> chargeCameras(String path, int numberOfChambers, Scanner scanner) {
 		List<Chamber> chambers = new ArrayList<>();
 		int cause = 0;
@@ -129,4 +108,18 @@ public interface UtilServices {
 		
 		return chambers;
 	}
+
+	default void printRoadOfChamber(List<Chamber> chambers, Predicate<Chamber> filter){
+
+		for (Chamber c : chambers) {
+			if(filter.test(c)) {
+				for (Road r : c.getAllRoads()) {
+					if(r != null) {
+						System.out.println(r.toString());
+					}
+				}
+			}
+		}
+	}
+
 }

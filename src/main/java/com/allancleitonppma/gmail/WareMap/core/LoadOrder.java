@@ -4,7 +4,7 @@ package com.allancleitonppma.gmail.WareMap.core;
 import java.util.List;
 
 public class LoadOrder {
-	private Integer orderCharger;
+	private String orderCharger;
 	private List<Product> products; 
 	
 	public LoadOrder(List<Product> listproducts) {
@@ -16,7 +16,7 @@ public class LoadOrder {
 		
 	}
 	
-	public LoadOrder(List<Product> listproducts, Integer orderCharger) {
+	public LoadOrder(List<Product> listproducts, String orderCharger) {
 		if(!listproducts.isEmpty()) {
 			this.products = listproducts;
 			this.orderCharger = orderCharger;
@@ -29,11 +29,11 @@ public class LoadOrder {
 	public LoadOrder() {}
 	
 	
-	public Integer getOrderCharger() {
+	public String getOrderCharger() {
 		return orderCharger;
 	}
 
-	public void setOrderCharger(Integer orderCharger) {
+	public void setOrderCharger(String orderCharger) {
 		this.orderCharger = orderCharger;
 	}
 

@@ -1,6 +1,8 @@
 package com.allancleitonppma.gmail.WareMap.services;
 
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+
 
 import com.allancleitonppma.gmail.WareMap.DTO.ChamberDto;
 import com.allancleitonppma.gmail.WareMap.DTO.Position;
@@ -22,9 +25,15 @@ import com.allancleitonppma.gmail.WareMap.entities.Road;
 
 
 public class UtilService implements UtilServices{
-
+	private Map<Integer, List<Product>> partialProducts = new HashMap<>();
+	
 	public UtilService() {}
 	
+	public Map<Integer, List<Product>> getPartialProducts() {
+		return partialProducts;
+	}
+
+
 
 	@Override
 	public Separation customSeparation(LoadOrder order, List<Chamber> chambers) {
@@ -34,82 +43,23 @@ public class UtilService implements UtilServices{
 
 	@Override
 	public Separation simpleSeparation(LoadOrder order, List<Chamber> chambers) {
-		Map<Integer, List<Product>> partialProducts = new HashMap<>();
+		
 		
 		for (LoadOrder.Product p : order.getProducts()) {
 			partialProducts.put(p.note(), filterChamber(p.note(), chambers));
 		}
 		
+		/*int SumQuantity = 0;
+		List<Product> filter = null;
+ 		for (LoadOrder.Product p : order.getProducts()) {
+			filter = filterChamber(p.note(), chambers);
+			
+			
+			
+			partialProducts.put(p.note(),null);
+		}*/
 		
-																		System.out.println("Lista de Produtos Apos as filtragens:\n");
-																		for (LoadOrder.Product lp : order.getProducts()) {
-																			for (Product p : partialProducts.get(lp.note())) {
-																				System.out.println(p);
-																			}
-																		}
-																		System.out.println("\n\n\n");
-		
-		//----------------------AQUI EU PEGO A LISTA DE PRODUTOS DEVIDAMENTE FILTRADAS E GERO A SEPARACAO-----------------------------
-		Set<ProductDto> finalListOfProducts = new HashSet<>();
-		Set<Position> positions = new HashSet<>();
-		Set<RoadDto> roads = new HashSet<>();
-		Set<ChamberDto> chams = new HashSet<>();
-		
-		
-		for (LoadOrder.Product lp : order.getProducts()) {
-			for (Product product : partialProducts.get(lp.note())) {
-				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
-				chams.add(new ChamberDto(product.getChamber(), product.getNote()));
-				roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
-				positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber()));
-
-			}
-		}
-		
-
-						
-		for (ProductDto product : finalListOfProducts) {
-			for (ChamberDto chamberDto : chams) {
-				if(chamberDto.getNote() == product.getNote()) {
-					product.setChamber(chamberDto);
-				}
-			}
-		}
-		
-		for(ProductDto product : finalListOfProducts) {
-			for (ChamberDto chamberDto : product.getChambers()) {
-				for (RoadDto road : roads) {
-					if(road.getChamber() == chamberDto.getChamber() && road.getNote() == product.getNote()) {
-						chamberDto.setRoad(road);
-					}
-				}
-			}
-		}
-		
-		for(ProductDto product : finalListOfProducts) {
-			for (ChamberDto chamberDto : product.getChambers()) {
-				for (RoadDto road : chamberDto.getRoads()) {
-					for (Position position : positions) {
-						if(position.getRoad() == road.getRoad() && position.getProduct() == product.getNote() && position.getChamber() == chamberDto.getChamber()) {
-							road.setPosition(position);
-						}
-					}
-				}
-			}
-		}
-		
-		System.out.println("finalListOfProducts");
-		for (ProductDto product : finalListOfProducts) {
-			System.out.println(product);
-		}
-		System.out.println();
-		
-		
-		
-		List<ProductDto> ListOfProducts = new ArrayList<>(finalListOfProducts);
-		
-		Separation s = new ForkliftSeparation(ListOfProducts, order.getOrderCharger());
-		return s;
+		return new ForkliftSeparation(this.processPartialProducts(partialProducts, order), order.getOrderCharger());
 	}
 
 
@@ -233,17 +183,23 @@ public class UtilService implements UtilServices{
 			}
 		}
 		
-		System.out.println("finalListOfProducts");
+		/*System.out.println("finalListOfProducts");
 		for (ProductDto product : finalListOfProducts) {
 			System.out.println(product);
 		}
-		System.out.println();
+		System.out.println();*/
 		
-		
-		
-		List<ProductDto> ListOfProducts = new ArrayList<>(finalListOfProducts);
+		return new ArrayList<>(finalListOfProducts);
+	}
 
-		
-		return ListOfProducts;
+	public static void fileGenerator(String path, List<? extends Object> list) {
+		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
+			for (Object obj : list) {
+				bW.write(obj.toString());
+			}
+		} catch (Exception e) {
+			System.out.println(e.getLocalizedMessage());
+			e.printStackTrace();
+		}
 	}
 }
