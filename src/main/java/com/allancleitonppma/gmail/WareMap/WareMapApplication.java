@@ -1,6 +1,8 @@
 package com.allancleitonppma.gmail.WareMap;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -19,10 +21,10 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		//SpringApplication.run(WareMapApplication.class, args);
 
-		final int numberOfChambers = 6;
-		int choice = 0;
+		final int numberOfChambers = 5;
 		String path;
-
+		int choice = 0;
+		
 		UtilService service = new UtilService();
 		Scanner sc = new Scanner(System.in);
 
@@ -33,10 +35,23 @@ public class WareMapApplication {
 						+ "\n contem a copia das posições dos "
 						+ "\n produtos: ");
 		path = sc.nextLine();
-		List<Chamber> chambers = service.chargeCameras(path, numberOfChambers, sc);
+		List<Chamber> chambers = null;
+		do {
+			try {
+				chambers = service.chargeCameras(path, numberOfChambers, sc);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(" " + e.getMessage());
+			}
+			if(chambers == null) {
+				System.out.print(" O caminho informado nao foi encontrado.\n Informe o caminho: ");
+				path = sc.nextLine();
+			}
+		} while (chambers == null);
 		
 		
-		// limpar("cmd", "/c", "cls");
+		
+		//clearScreen();
 
 		do {
 			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      "+ Color.ANSI_RESET);
@@ -49,11 +64,11 @@ public class WareMapApplication {
 			switch (choice) {
 			
 			case 1: {
-				gerarSeparacao(service, chambers, sc);
+				gerarSeparacao(service, chambers, sc, path);
 				break;
 			}
 			case 2: {
-				configuracao(sc);
+				configuracao(path ,sc);
 				break;
 			}
 			case 3: {
@@ -67,36 +82,26 @@ public class WareMapApplication {
 
 		sc.close();
 
-		/*
-		 * Scanner sc = new Scanner(System.in);
-		 * 
-		 * UtilService service = new UtilService();
-		 * 
-		 * LoadOrder order = service.getloadOrder("c://temp//ordemdecarga.txt", 8689);
-		 * 
-		 * Separation fS = service.simpleSeparation(order,service.chargeCameras("c://temp//test.txt", 5, sc));
-		 * 
-		 * System.out.println(fS);
-		 * 
-		 * 
-		 * fS.createArquiveWithSeparation("c://temp//separacao.txt");
-		 * 
-		 * sc.close();
-		 */
 
-		/*try {
-			ConfigManager config = new ConfigManager("\\WareMap\\src\\main\\resources\\config.properties");
-			int days = 300;
-			config.setProperty("congelado", "x -> x.getDays < " + days);
-			config.setProperty("qtdecamaras", "300");
-
-			System.out.println(config.getProperty("congelado"));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 	}
 
-	public static void limpar(String arg0, String arg1, String arg2) {
+	public static void clearScreen() {
+        try {
+            String os = System.getProperty("os.name");
+
+            if (os.contains("Windows")) {
+                // Comando para Windows
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                // Comando para Linux e macOS
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao limpar o terminal: " + e.getMessage());
+        }
+     }
+	
+	public static void comandTerminal(String arg0, String arg1, String arg2) {
 		try {
 			ProcessBuilder builder = new ProcessBuilder(arg0, arg1, arg2);
 			Process processo = builder.start();
@@ -122,49 +127,136 @@ public class WareMapApplication {
 
 	}
 
-	public static void tipycalSeparation(UtilService service, List<Chamber> chambers, Scanner sc) {
+	public static void tipycalSeparation(UtilService service, List<Chamber> chambers, Scanner sc, String defaultPath) {
 		Separation separation = null;
-		String orderCharger, path;
+		String orderCharger;
+		String prefix;
+		String finalPath;
 		boolean verify = false;
+		boolean success = false; 
 	
 		while (!verify) {
 			try {
-				System.out.print("\nInsira o caminho do arquivo de ordem de carga: ");
-				path = sc.nextLine();
 				
-				System.out.print("\nInsira o número da ordem de carga: ");
-				orderCharger = sc.nextLine();
+				String os = System.getProperty("os.name");
+				if (os.contains("Windows")) {
+					
+					success = new File(defaultPath + "//separations").mkdir();
+					
+					if(success) {
+						prefix = defaultPath +  "//separations//";
+
+						System.out.print("\n Número da ordem de carga: ");
+						orderCharger = sc.nextLine().trim();
+						
+						String oc = orderCharger.concat(".txt"); 
+						finalPath = prefix + oc;
+						
+					}else {
+						System.out.print("\n Número da ordem de carga: ");
+						orderCharger = sc.nextLine().trim();
+						
+						String oc = orderCharger.concat(".txt"); 
+						finalPath = defaultPath + "//separations//" + oc;				
+						}
+
+				} else {
+					success = new File(defaultPath + "/separations").mkdir();
+					
+					if(success) {
+						prefix = defaultPath + "/separations/";		
+
+						System.out.print("\n Número da ordem de carga: ");
+						orderCharger = sc.nextLine().trim();
+						
+						String oc = orderCharger.concat(".txt"); 
+						finalPath = prefix + oc;
+						
+					}else {
+						System.out.print("\n Número da ordem de carga: ");
+						orderCharger = sc.nextLine().trim();
+						
+						String oc = orderCharger.concat(".txt"); 
+						finalPath = defaultPath + "/separations/" + oc;				
+						}
+
+				}
+			
+								
+				separation = service.simpleSeparation(service.getloadOrder(defaultPath, orderCharger), chambers);  //"c://temp//ordemdecarga.txt"				  
+
+								
 				
-				separation = service.simpleSeparation(service.getloadOrder(path, orderCharger), chambers);  //"c://temp//ordemdecarga.txt"				  
+				verify = separation.createArquiveWithSeparation(finalPath);
 				
-				System.out.print("\nCaminho de Onde deseja salvar o arquivo: ");
-				path = sc.nextLine();
-				
-				verify = separation.createArquiveWithSeparation(path); //"c://temp//separacao.txt"
 				if(verify) {
-					System.out.println("Separação gerada com sucesso!");
-					System.out.println("\tDisponivel em: " + path);
+					System.out.println(" Separação gerada com sucesso!");
+					System.out.println("\tDisponivel em: " + finalPath);
 					
 				}
 			} catch (Exception e) {
-				System.out.println("O caminho informado não foi encontrado.");
-				continue;
+				e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 		} 
 	}
 
-	public static void parametrosGerais(Scanner sc) {
-		String path;
+	public static void parametrosGerais(String defaultPath ,Scanner sc) {
 		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                          " + Color.ANSI_RESET);
 		ConfigManager config = null;
 		int choiceGeralConfig = 0, valor;
 		
-		System.out.print(" Informe o caminho do arquivo\n"
-						+ " de configuração: ");
-		path = sc.nextLine();
+		String  finalFile;
+
+		FileWriter writer = null;
+		
+
+			
+			//verify if no exist a folder CONFIG
+			if( !(new File(defaultPath + "/config").exists())) {
+				
+				if(new File(defaultPath + "/config").mkdir()) {
+					try {
+						writer = new FileWriter(defaultPath + "/config/geralparameters.properties");
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(e.getMessage());
+					}finally {
+						if(writer != null) {
+							try {
+								writer.close();
+							} catch (IOException e) {
+								e.printStackTrace();
+								System.out.println(e.getMessage());
+							}
+						}
+					}
+				}
+			}
+			//verify if no exist a file GERALPARAMETERS.PROPERTIES
+			else if(!(new File(defaultPath + "/config/geralparameters.properties").exists())) {
+				try {
+					writer = new FileWriter(defaultPath + "/config/geralparameters.properties");
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println(e.getMessage());
+				}finally {
+					if(writer != null) {
+						try {
+							writer.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+							System.out.println(e.getMessage());
+						}
+					}
+				}
+			}
+			
+			finalFile = defaultPath +  "/config/geralparameters.properties";
+		
 	
 		try {
-			config = new ConfigManager(path);
+			config = new ConfigManager(finalFile);
 			
 			do {
 				System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      " + Color.ANSI_RESET);
@@ -182,35 +274,35 @@ public class WareMapApplication {
 						System.out.print(" Informe o novo valor: ");
 						valor = sc.nextInt();
 						config.setProperty("congelado_suino", "x -> x.getDays <" + valor);
-						System.out.println("Sucesso.");
+						System.out.println(" Sucesso.");
 						break;
 						}
 					case 2: {
 						System.out.print(" Informe o novo valor: ");
 						valor = sc.nextInt();
 						config.setProperty("congelado_aviario", "x -> x.getDays <" + valor);
-						System.out.println("Sucesso.");
+						System.out.println(" Sucesso.");
 						break;
 						}
 					case 3: {
 						System.out.print(" Informe o novo valor: ");
 						valor = sc.nextInt();
 						config.setProperty("resfri_suino_fora_estado", "x -> x.getDays <" + valor);
-						System.out.println("Sucesso.");
+						System.out.println(" Sucesso.");
 						break;
 						}
 					case 4: {
 						System.out.print(" Informe o novo valor: ");
 						valor = sc.nextInt();
 						config.setProperty("resfri_suino_dentro_estado", "x -> x.getDays <" + valor);
-						System.out.println("Sucesso.");
+						System.out.println(" Sucesso.");
 						break;
 						}
 					case 5: {
 						System.out.print(" Informe o novo valor: ");
 						valor = sc.nextInt();
 						config.setProperty("separacao_chao", String.valueOf(valor));
-						System.out.println("Sucesso.");
+						System.out.println(" Sucesso.");
 						break;
 						}
 					default:
@@ -222,14 +314,15 @@ public class WareMapApplication {
 			} while (choiceGeralConfig != 6);
 			
 
-			System.out.println(config.getProperty("congelado"));
+			//System.out.println(config.getProperty(" congelado"));
 		} catch (IOException e) {
 			System.out.println(" Erro ao carregar o arquivo: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 	}
 
-	public static void configuracao(Scanner sc) {
+	public static void configuracao(String defaultPath, Scanner sc) {
 		int choiceConfig = 0;
 		do {
 			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      " + Color.ANSI_RESET);
@@ -242,20 +335,23 @@ public class WareMapApplication {
 			
 			switch (choiceConfig) {
 			case 1: {
-				parametrosGerais(sc);
+				parametrosGerais(defaultPath ,sc);
 				break;
 			}case 2: {
-				parametrosDeProduto(sc);
+				parametrosDeProduto(defaultPath, sc);
+				break;
+			}
+			case 3: {
 				break;
 			}
 			default:
-				System.out.println("Opção inválida! " + choiceConfig);
+				System.out.println(" Opção inválida! " + choiceConfig);
 			}
 			
 		} while (choiceConfig != 3);
 	}
 	
-	public static void gerarSeparacao(UtilService service, List<Chamber> chambers, Scanner sc) {
+	public static void gerarSeparacao(UtilService service, List<Chamber> chambers, Scanner sc, String defaultPath) {
 		int choiceSeparation = 0;
 		do {
 			System.out.println(Color.ANSI_GREEEN_BACKGROUND + " ESCOLHA O TIPO DE CARGA.               "+ Color.ANSI_RESET);
@@ -275,7 +371,7 @@ public class WareMapApplication {
 				
 				break;
 			}case 3: {
-				tipycalSeparation(service, chambers, sc);
+				tipycalSeparation(service, chambers, sc, defaultPath);
 				break;
 			}case 4:{
 				break;
@@ -287,24 +383,65 @@ public class WareMapApplication {
 		} while (choiceSeparation != 4);
 	}
 
-	public static void parametrosDeProduto(Scanner sc) {
-		String path;
+	public static void parametrosDeProduto(String defaultPath ,Scanner sc) {
 		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                          " + Color.ANSI_RESET);
 		ConfigManager config = null;
 		int valor;
 		
-		System.out.print(" Informe o caminho do arquivo\n"
-						+ " de configuração: ");
-		path = sc.nextLine();
+		String  finalFile;
+		FileWriter writer = null;
+			//verify if exist a folder CONFIG
+			if( !(new File(defaultPath + "/config").exists())) {
+				
+				if(new File(defaultPath + "/config").mkdir()) {
+					try {
+						writer = new FileWriter(defaultPath + "/config/productparameters.properties");
+					} catch (Exception e) {
+						e.printStackTrace();
+						System.out.println(e.getMessage());
+					}finally {
+						if(writer != null) {
+							try {
+								writer.close();
+							} catch (IOException e) {
+								e.printStackTrace();
+								System.out.println(e.getMessage());
+							}
+						}
+					}
+				}
+			}else if(!(new File(defaultPath + "/config/productparameters.properties").exists())) {
+				try {
+					writer = new FileWriter(defaultPath + "/config/productparameters.properties");
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println(e.getMessage());
+				}finally {
+					if(writer != null) {
+						try {
+							writer.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+							System.out.println(e.getMessage());
+						}
+					}
+				}
+			}
+			
+			finalFile = defaultPath +  "/config/productparameters.properties";
+		
+
 		
 		try {
 			String key;
-			config = new ConfigManager(path);
+			config = new ConfigManager(finalFile);
 			System.out.print(" Informe o codigo do produto: ");
 			key = sc.nextLine();
 			System.out.println(" Para definir como congelado:......(1).");
 			System.out.println(" Para definir como resfriado:......(2).");
+			System.out.print(" -> ");
 			valor = sc.nextInt();
+			
 			if(valor == 1) {
 				config.setProperty(key, "congelado");
 				System.out.println("Sucesso!");
@@ -318,6 +455,7 @@ public class WareMapApplication {
 			
 		} catch (IOException e) {
 			System.out.println(" Erro ao carregar o arquivo: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

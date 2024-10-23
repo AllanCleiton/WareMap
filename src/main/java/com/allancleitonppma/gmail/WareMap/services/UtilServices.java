@@ -45,18 +45,24 @@ public interface UtilServices {
 			
 			
 			
-		} catch (Exception e) {
-				throw new Exception("1");
-		}
+		} 
 		return listProducts;
 	}
 
 	default LoadOrder getloadOrder(String path) throws Exception{
+		String os = System.getProperty("os.name");
+		String defaultPath;
+		if (os.contains("Windows")) {
+			defaultPath = "//ordercharger.txt";
+		} else {
+			defaultPath = "/ordercharger.txt";
+        }
+		
 		List<LoadOrder.Product> orders = new ArrayList<>();
 		String line;
 		String[] fields;
 		
-		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+		try(BufferedReader br = new BufferedReader(new FileReader(path + defaultPath))) {
 			while((line = br.readLine()) != null) {
 				fields = line.split(",");
 				orders.add(new LoadOrder.Product(Integer.parseInt(fields[0]), Integer.parseInt(fields[2])));
@@ -69,11 +75,18 @@ public interface UtilServices {
 	}
 	
 	default LoadOrder getloadOrder(String path, String orederCharger) throws Exception{
+		String os = System.getProperty("os.name");
+		String defaultPath;
+		if (os.contains("Windows")) {
+			defaultPath = "//ordercharger.txt";
+		} else {
+			defaultPath = "/ordercharger.txt";
+        }
 		List<LoadOrder.Product> orders = new ArrayList<>();
 		String line;
 		String[] fields;
 		
-		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+		try(BufferedReader br = new BufferedReader(new FileReader(path + defaultPath))) {
 			while((line = br.readLine()) != null) {
 				fields = line.split(",");
 				orders.add(new LoadOrder.Product(Integer.parseInt(fields[0]), Integer.parseInt(fields[2])));
@@ -85,25 +98,23 @@ public interface UtilServices {
 		return new LoadOrder(orders, orederCharger);
 	}
 	
-	default List<Chamber> chargeCameras(String path, int numberOfChambers, Scanner scanner) {
+	default List<Chamber> chargeCameras(String path, int numberOfChambers, Scanner scanner) throws Exception{
+		String os = System.getProperty("os.name");
+		String defaultPath;
+		if (os.contains("Windows")) {
+			defaultPath = "//chambers.txt";
+		} else {
+			defaultPath = "/chambers.txt";
+        }
+		
 		List<Chamber> chambers = new ArrayList<>();
-		int cause = 0;
-		do {
-			cause = 0;
-			for(int i = 0; i < numberOfChambers; i++) {
-				try {
-					chambers.add(new Chamber((i+1), 20, loadListOfProduct(path)));
-				} catch (Exception e) {
-					cause = Integer.parseInt(e.getMessage());
-				}
-			}
-			 if(cause == 1) {
-				 System.out.println("Arquivo não encontrado: " + path);
-	             System.out.print("Por favor, insira um novo caminho: ");
-	             path = scanner.nextLine(); // Solicita novo caminho
-			 }
+		
+
+		for(int i = 0; i < numberOfChambers; i++) {
+			chambers.add(new Chamber((i+1), 20, loadListOfProduct(path + defaultPath)));
+		}
+			 
 			
-		}while(cause == 1);
 		chambers.removeIf(x -> x.isEmpty());
 		
 		return chambers;

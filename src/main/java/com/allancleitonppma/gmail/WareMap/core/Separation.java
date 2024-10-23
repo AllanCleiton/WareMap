@@ -37,6 +37,7 @@ public abstract class Separation {
 	}
 	
 	public boolean createArquiveWithSeparation(String path) throws Exception{
+
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
 			for (ProductDto productDto : products) {
 				bW.write(productDto.toString());
