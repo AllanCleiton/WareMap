@@ -49,15 +49,42 @@ public class UtilService implements UtilServices{
 			partialProducts.put(p.note(), filterChamber(p.note(), chambers));
 		}
 		
-		/*int SumQuantity = 0;
-		List<Product> filter = null;
- 		for (LoadOrder.Product p : order.getProducts()) {
-			filter = filterChamber(p.note(), chambers);
+		
+		int SumQuantity = 0;
+		
+		
+		List<Product> filter = new ArrayList<>();
+		List<Product> auxFilter = null;
+		Product actualProduct = null;
+		
+		for (LoadOrder.Product lp : order.getProducts()) {
+			boolean control01 = true;
+			boolean control02 = false;
+			auxFilter = new ArrayList<>(partialProducts.get(lp.note()));
+
 			
+			for(int i = 0; i < auxFilter.size(); i++) {
+				actualProduct = moreEasy(lp.note(), auxFilter);
 			
+				SumQuantity += actualProduct.getBoxes();
+				
+				if(control01) {
+					filter.add(actualProduct);
+					control01 = false;
+					
+				}
+				if(!(SumQuantity > lp.qtdeBoxes()) && control02 == true) {
+					filter.add(actualProduct);
+				}
+				
+				control02 = true;
+				
+				auxFilter.remove(actualProduct);
+			}
+			SumQuantity = 0;
+			partialProducts.replace(lp.note(),filter);
 			
-			partialProducts.put(p.note(),null);
-		}*/
+		}
 		
 		return new ForkliftSeparation(this.processPartialProducts(partialProducts, order), order.getOrderCharger());
 	}
@@ -130,8 +157,7 @@ public class UtilService implements UtilServices{
 		
 		return product;
 	}
-	
-	
+		
 	//Metodo para processar o map com uma lista de produtos filtrados para cada produto, e gerar a relacao de separacao.
 	public List<ProductDto> processPartialProducts(Map<Integer, List<Product>> partialProducts, LoadOrder order){
 		

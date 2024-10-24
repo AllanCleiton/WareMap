@@ -81,6 +81,9 @@ public class RoadDto {
 
 	@Override
 	public String toString() {
+		positions.sort(Position::compareTo);
+		
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("Rua " + road + "= { ");
 			int count = 0;

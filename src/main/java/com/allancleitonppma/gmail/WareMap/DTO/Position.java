@@ -2,7 +2,9 @@ package com.allancleitonppma.gmail.WareMap.DTO;
 
 import java.util.Objects;
 
-public class Position{
+import com.allancleitonppma.gmail.WareMap.enums.Deoth;
+
+public class Position implements Comparable<Position>{
 	int chamber;
 	int product; 
 	int road;
@@ -91,5 +93,16 @@ public class Position{
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("%d%c ", heigth,deoth) );
 		return sb.toString();
+	}
+
+
+	@Override
+	public int compareTo(Position other) {
+		Deoth d1 = Deoth.valueOf(String.valueOf(this.deoth));
+		Deoth d2 = Deoth.valueOf(String.valueOf(other.deoth));
+		Integer D1 = d1.getValue();
+		Integer D2 = d2.getValue();
+		
+		return D1.compareTo(D2);
 	}
 }

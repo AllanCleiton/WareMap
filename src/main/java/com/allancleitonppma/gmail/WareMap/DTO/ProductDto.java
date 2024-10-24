@@ -83,6 +83,8 @@ public class ProductDto {
 		
 		if(!chambers.isEmpty()) {
 			sb.append(chambers.get(0).toString());
+		}else {
+			sb.append(" Produto não encontrado!\n\n");
 		}
 		if(chambers.size() > 0) {
 			for(int i = 1; i < chambers.size(); i++) {
