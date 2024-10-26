@@ -83,8 +83,6 @@ public class UtilService implements UtilServices{
 				}
 				
 				if(acumulation >= lp.qtdeBoxes()) {
-					System.out.println("break! " + acumulation);
-
 					break;
 				}
 			    

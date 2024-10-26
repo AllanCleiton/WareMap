@@ -9,5 +9,4 @@ class WareMapApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

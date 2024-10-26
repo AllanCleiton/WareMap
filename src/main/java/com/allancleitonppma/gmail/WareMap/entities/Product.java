@@ -63,7 +63,7 @@ public class Product {
 
 	@Override
 	public String toString() {
-		return "codigo: " + note + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth;
+		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + " pacotes: " + packages;
 	}
 
 	@Override

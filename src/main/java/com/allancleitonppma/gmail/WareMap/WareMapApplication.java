@@ -38,7 +38,7 @@ public class WareMapApplication {
 		List<Chamber> chambers = null;
 		do {
 			try {
-				chambers = service.chargeCameras(path, numberOfChambers, sc);
+				chambers = service.chargeCameras(path, numberOfChambers);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println(" " + e.getMessage());
@@ -457,5 +457,6 @@ public class WareMapApplication {
 			System.out.println(" Erro ao carregar o arquivo: " + e.getMessage());
 			e.printStackTrace();
 		}
+
 	}
 }
