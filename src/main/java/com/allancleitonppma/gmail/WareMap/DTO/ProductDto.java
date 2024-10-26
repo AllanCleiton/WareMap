@@ -10,6 +10,8 @@ import java.util.Objects;
 public class ProductDto {
 	int note; 
 	int quantity;
+	int somatorio;
+
 	List<ChamberDto> chambers = new ArrayList<>();
 	
 	public ProductDto(int note, int quantity) {
@@ -47,6 +49,35 @@ public class ProductDto {
 		return chambers;
 	}
 	
+	public int getSomatorio() {
+		return this.somatorio;
+	}
+	
+	private void somatorioEndMoreNew() {
+		int sum = 0;
+		boolean verified = false;
+		Position moreNew = null;
+		for (ChamberDto chamberDto : chambers) {
+			for (RoadDto roadDto : chamberDto.getRoads()) {
+				for (Position pos : roadDto.getPositions()) {
+					sum += pos.getBoxes();
+					if(!verified) {
+						moreNew = pos;
+						verified = true;
+					}
+					if(pos.getDays() > moreNew.getDays()) {
+						moreNew = pos;
+					}
+					
+				}
+			}
+		}
+		this.somatorio = sum;
+		
+		moreNew.setMoreNew(somatorio - quantity);	
+		
+		//System.out.println("produto: " + note + " somatorio: " + somatorio + " quantidade: " + quantity + " diferenca: "  + (somatorio-quantity));
+	}
 	
 
 	@Override
@@ -68,6 +99,8 @@ public class ProductDto {
 
 	@Override
 	public String toString() {
+		somatorioEndMoreNew();
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append(note +" " + quantity);
 		

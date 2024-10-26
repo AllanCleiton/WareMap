@@ -2,6 +2,7 @@ package com.allancleitonppma.gmail.WareMap.DTO;
 
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -18,6 +19,7 @@ public class RoadDto {
 		this.note = note;
 		
 	}
+	
 
 	public int getRoad() {
 		return road;
@@ -59,7 +61,6 @@ public class RoadDto {
 	public void setNote(int note) {
 		this.note = note;
 	}
-
 	
 	
 	@Override
@@ -90,10 +91,19 @@ public class RoadDto {
 			
 			for (Position position : positions) {
 				if(count > 7) {
-					sb.append("\n\t\t\t  " + position.toString());
+					if(position.moreNew) {
+						sb.append("\n\t\t\t  " + position.toString() + "-> " + position.sobra + " ");
+					}else {	
+						sb.append("\n\t\t\t  " + position.toString());
+					}
 					count = 0;
 				}else {
-					sb.append(position.toString());
+					if(position.moreNew) {
+						sb.append(position.toString() + "-> " + position.sobra + " ");
+					}else {
+						sb.append(position.toString());
+					}
+
 				}
 		
 				count++;

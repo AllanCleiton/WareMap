@@ -10,15 +10,21 @@ public class Position implements Comparable<Position>{
 	int road;
 	int heigth; 
 	char deoth; 
+	int days;
+	int boxes;
+	boolean moreNew = false;
+	int sobra;
 	
 	
 	
-	public Position(int heigth, char deoth, int road, int product, int chamber) {
+	public Position(int heigth, char deoth, int road, int product, int chamber, int days, int boxes) {
 		this.heigth = heigth;
 		this.deoth = deoth;
 		this.road = road;
 		this.product = product;
 		this.chamber = chamber;
+		this.days = days;
+		this.boxes = boxes;
 	}
 
 	
@@ -78,7 +84,9 @@ public class Position implements Comparable<Position>{
 		this.road = road;
 	}
 	
-	
+	public int getDays() {
+		return this.days;
+	}
 	
 	public int getProduct() {
 		return product;
@@ -86,6 +94,15 @@ public class Position implements Comparable<Position>{
 
 	public void setProduct(int product) {
 		this.product = product;
+	}
+	
+	public void setMoreNew(int sobra) {
+		this.moreNew = true;
+		this.sobra = sobra;
+	}
+	
+	public int getBoxes() {
+		return this.boxes;
 	}
 
 	@Override

@@ -68,6 +68,24 @@ public class Product {
 
 	@Override
 	public int hashCode() {
+		return Objects.hash(chamber, deoth, height, note, road);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Product other = (Product) obj;
+		return Objects.equals(chamber, other.chamber) && deoth == other.deoth && Objects.equals(height, other.height)
+				&& Objects.equals(note, other.note) && Objects.equals(road, other.road);
+	}
+
+	/*@Override
+	public int hashCode() {
 		return Objects.hash(deoth, height, road);
 	}
 
@@ -81,7 +99,7 @@ public class Product {
 			return false;
 		Product other = (Product) obj;
 		return deoth == other.deoth && Objects.equals(height, other.height) && Objects.equals(road, other.road);
-	}
+	}*/
 	
 	
 	

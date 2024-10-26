@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
-
 
 import com.allancleitonppma.gmail.WareMap.DTO.ChamberDto;
 import com.allancleitonppma.gmail.WareMap.DTO.Position;
@@ -22,6 +22,7 @@ import com.allancleitonppma.gmail.WareMap.core.Separation;
 import com.allancleitonppma.gmail.WareMap.entities.Chamber;
 import com.allancleitonppma.gmail.WareMap.entities.Product;
 import com.allancleitonppma.gmail.WareMap.entities.Road;
+import java.util.AbstractMap.SimpleEntry;
 
 
 public class UtilService implements UtilServices{
@@ -48,48 +49,68 @@ public class UtilService implements UtilServices{
 		for (LoadOrder.Product p : order.getProducts()) {
 			partialProducts.put(p.note(), filterChamber(p.note(), chambers));
 		}
-		
-		
-		int SumQuantity = 0;
-		
-		
-		List<Product> filter = new ArrayList<>();
-		List<Product> auxFilter = null;
-		Product actualProduct = null;
-		
+		/*
 		for (LoadOrder.Product lp : order.getProducts()) {
-			boolean control01 = true;
-			boolean control02 = false;
-			auxFilter = new ArrayList<>(partialProducts.get(lp.note()));
+			System.out.println("product: " + lp.note());
+			partialProducts.get(lp.note()).forEach(System.out::println);
+			System.out.println();
+		}
+		System.out.println("Antes do filtro de quantidade.");*/
+		
+		
+		
+		List<Product> aux = new ArrayList<>();
+		List<Product> listActual = null;
+		Entry<Integer, Product> result = null;
+ 		int acumulation = 0;
+		Product actual = null;
+ 		for (LoadOrder.Product lp : order.getProducts()) {
+ 			listActual = partialProducts.get(lp.note());
+ 			
+			for(int i = 0; i <= listActual.size(); i++) {	
+				result = moreEasy(lp.note(), listActual);
+				
+				actual = result.getValue();
+				
+				if(actual != null) {
+					acumulation += actual.getBoxes(); 
+					aux.add(actual);
+				}
+				
+				
+				if(result.getKey() != -1) {
+					listActual.remove((int) result.getKey());
+					i--;
+				}
+				
+				if(acumulation >= lp.qtdeBoxes()) {
+					System.out.println("break! " + acumulation);
 
-			
-			for(int i = 0; i < auxFilter.size(); i++) {
-				actualProduct = moreEasy(lp.note(), auxFilter);
-			
-				SumQuantity += actualProduct.getBoxes();
-				
-				if(control01) {
-					filter.add(actualProduct);
-					control01 = false;
-					
+					break;
 				}
-				if(!(SumQuantity > lp.qtdeBoxes()) && control02 == true) {
-					filter.add(actualProduct);
-				}
-				
-				control02 = true;
-				
-				auxFilter.remove(actualProduct);
+			    
 			}
-			SumQuantity = 0;
-			partialProducts.replace(lp.note(),filter);
 			
+			
+			partialProducts.replace(lp.note(), new ArrayList<>(aux));
+			aux.clear();
+			acumulation = 0;
 		}
 		
+		
+ 		
+		for (LoadOrder.Product lp : order.getProducts()) {
+			System.out.println("product: " + lp.note());
+			partialProducts.get(lp.note()).forEach(System.out::println);
+			System.out.println();
+		}
+		System.out.println("depois do filtro de quantidade.");
+
+ 		
 		return new ForkliftSeparation(this.processPartialProducts(partialProducts, order), order.getOrderCharger());
 	}
-
-
+	
+	
 	public List<Product> filterChamber(int code, List<Chamber> chambers, Predicate<Product> filter){
 		List<Product> products = new ArrayList<>();
 		
@@ -123,6 +144,7 @@ public class UtilService implements UtilServices{
 		}
 		return products;
 	}
+	
 
 	public List<Product> filterProducts(List<Product> products, Predicate<Product> filter){
 		List<Product> list = new ArrayList<>();
@@ -134,28 +156,36 @@ public class UtilService implements UtilServices{
 		return list;
 	}
 
-	public Product moreEasy(int code, List<Product> products) {
-		int max = 8;
+	public Entry<Integer, Product> moreEasy(int code, List<Product> products) {
+		int index = -1;
+		
+		int max = 10;
 		int aux;
-		boolean exists;
+		boolean exists = false;
 		Product product=null;
-			
+		
+		System.out.println("listAux moreEasy ");
+		for (Product p : products) {
+			System.out.println(p + "|  index " + products.indexOf(p));
+		}
+		
 		do {
 			exists = false;
 			
 			for (Product p : products) {
 				aux = p.getHeight() + p.getDeoth();
+				
 				if(aux < max ) {
 					max = aux;
 					product = p;
 					exists = true;
+					index = products.indexOf(p);
 					
 				}
 			}
-		}while(exists); 
-				
-		
-		return product;
+		}while(exists);  
+
+		return new SimpleEntry<>(index, product);
 	}
 		
 	//Metodo para processar o map com uma lista de produtos filtrados para cada produto, e gerar a relacao de separacao.
@@ -172,7 +202,7 @@ public class UtilService implements UtilServices{
 				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
 				chams.add(new ChamberDto(product.getChamber(), product.getNote()));
 				roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
-				positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber()));
+				positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber(), product.getDays() , product.getBoxes()));
 
 			}
 		}
@@ -209,11 +239,11 @@ public class UtilService implements UtilServices{
 			}
 		}
 		
-		/*System.out.println("finalListOfProducts");
+		System.out.println("finalListOfProducts");
 		for (ProductDto product : finalListOfProducts) {
 			System.out.println(product);
 		}
-		System.out.println();*/
+		System.out.println();
 		
 		return new ArrayList<>(finalListOfProducts);
 	}
