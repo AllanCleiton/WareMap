@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
-
 import com.allancleitonppma.gmail.WareMap.DTO.ChamberDto;
 import com.allancleitonppma.gmail.WareMap.DTO.Position;
 import com.allancleitonppma.gmail.WareMap.DTO.ProductDto;
@@ -97,15 +96,6 @@ public class UtilService implements UtilServices{
 			acumulation = 0;
 		}
 		
-		
- 		
-		for (LoadOrder.Product lp : order.getProducts()) {
-			System.out.println("product: " + lp.note());
-			partialProducts.get(lp.note()).forEach(System.out::println);
-			System.out.println();
-		}
-		System.out.println("depois do filtro de quantidade.");
-
  		
 		return new ForkliftSeparation(this.processPartialProducts(partialProducts, order), order.getOrderCharger());
 	}
@@ -157,23 +147,21 @@ public class UtilService implements UtilServices{
 	}
 
 	public Entry<Integer, Product> moreEasy(int code, List<Product> products) {
-		int index = -1;
-		
+		int index = -1;		
 		int max = 10;
 		int aux;
 		boolean exists = false;
 		Product product=null;
-		
-		System.out.println("listAux moreEasy ");
-		for (Product p : products) {
-			System.out.println(p + "|  index " + products.indexOf(p));
-		}
 		
 		do {
 			exists = false;
 			
 			for (Product p : products) {
 				aux = p.getHeight() + p.getDeoth();
+				
+				if (p.getDeoth() == 0) {
+					return new SimpleEntry<>(products.indexOf(p), p);
+				}
 				
 				if(aux < max ) {
 					max = aux;
@@ -239,11 +227,11 @@ public class UtilService implements UtilServices{
 			}
 		}
 		
-		System.out.println("finalListOfProducts");
+		/*System.out.println("finalListOfProducts");
 		for (ProductDto product : finalListOfProducts) {
 			System.out.println(product);
 		}
-		System.out.println();
+		System.out.println();*/
 		
 		return new ArrayList<>(finalListOfProducts);
 	}

@@ -91,15 +91,15 @@ public class RoadDto {
 			
 			for (Position position : positions) {
 				if(count > 7) {
-					if(position.moreNew) {
-						sb.append("\n\t\t\t  " + position.toString() + "-> " + position.sobra + " ");
+					if(position.moreNew && position.sobra != 0) {
+						sb.append("\n\t\t\t  " + position.toString() + "->" + position.sobra + " ");
 					}else {	
 						sb.append("\n\t\t\t  " + position.toString());
 					}
 					count = 0;
 				}else {
-					if(position.moreNew) {
-						sb.append(position.toString() + "-> " + position.sobra + " ");
+					if(position.moreNew && position.sobra != 0) {
+						sb.append(position.toString() + "->" + position.sobra + " ");
 					}else {
 						sb.append(position.toString());
 					}

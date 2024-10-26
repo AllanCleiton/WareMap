@@ -76,7 +76,6 @@ public class ProductDto {
 		
 		moreNew.setMoreNew(somatorio - quantity);	
 		
-		//System.out.println("produto: " + note + " somatorio: " + somatorio + " quantidade: " + quantity + " diferenca: "  + (somatorio-quantity));
 	}
 	
 
