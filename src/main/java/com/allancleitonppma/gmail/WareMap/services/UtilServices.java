@@ -1,18 +1,18 @@
 package com.allancleitonppma.gmail.WareMap.services;
 
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
 import com.allancleitonppma.gmail.WareMap.core.Separation;
 import com.allancleitonppma.gmail.WareMap.entities.Chamber;
@@ -28,77 +28,71 @@ public interface UtilServices {
 	Separation simpleSeparation(LoadOrder order, List<Chamber> chambers);
 	
 	
-	default List<Product> loadListProductOfTxt(String path) throws Exception{
-		List<Product> listProducts = new ArrayList<>();
-		String line;
-		String[] fields;
-		
-		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-			while((line = br.readLine()) != null) {
-				fields = line.split(",");
-				listProducts.add(
-						new Product(
-								Integer.parseInt(fields[0]), 
-								Integer.parseInt(fields[1]), 
-								Integer.parseInt(fields[2]), 
-								Integer.parseInt(String.valueOf(fields[3].charAt(3))), 
-								Integer.parseInt(fields[4]), 
-								Integer.parseInt(String.valueOf(fields[5].charAt(2))), 
-								fields[6], 
-								Integer.parseInt(fields[7])));
-			}
-			
-			
-			
-		} 
-		return listProducts;
-	}
 
-	default LoadOrder getloadOrder(String path) throws Exception{
-		String os = System.getProperty("os.name");
-		String defaultPath;
-		if (os.contains("Windows")) {
-			defaultPath = "//ordercharger.txt";
-		} else {
-			defaultPath = "/ordercharger.txt";
-        }
+	default LoadOrder getloadOrder(String path) throws IOException{
+		final String defaultPath = "//ordercharger.xlsx";
 		
 		List<LoadOrder.Product> orders = new ArrayList<>();
-		String line;
-		String[] fields;
 		
-		try(BufferedReader br = new BufferedReader(new FileReader(path + defaultPath))) {
-			while((line = br.readLine()) != null) {
-				fields = line.split(",");
-				orders.add(new LoadOrder.Product(Integer.parseInt(fields[0]), Integer.parseInt(fields[2])));
-	
-			}
-			
-		}
+		
+		 try (FileInputStream file = new FileInputStream(path + defaultPath);
+		            Workbook workbook = new XSSFWorkbook(file)) {
+
+		            Sheet sheet = workbook.getSheetAt(0);
+		            Iterator<Row> rowIterator = sheet.iterator();
+
+
+
+		            while (rowIterator.hasNext()) {
+		                Row row = rowIterator.next();
+		                
+		        		String[] fields = {
+		        				String.valueOf(row.getCell(0).getNumericCellValue()).replace(".0", ""),
+		        				String.valueOf(row.getCell(1).getNumericCellValue()).replace(".0", ""),
+		        				
+		        	};
+		                
+					orders.add(new LoadOrder.Product(
+										Integer.parseInt(fields[0]), 
+										Integer.parseInt(fields[2])
+										));
+
+		            }
+		 }
 		
 		return new LoadOrder(orders);
 	}
 	
 	default LoadOrder getloadOrder(String path, String orederCharger) throws Exception{
-		String os = System.getProperty("os.name");
-		String defaultPath;
-		if (os.contains("Windows")) {
-			defaultPath = "//ordercharger.txt";
-		} else {
-			defaultPath = "/ordercharger.txt";
-        }
-		List<LoadOrder.Product> orders = new ArrayList<>();
-		String line;
-		String[] fields;
+		final String defaultPath = "//ordercharger.xlsx";
 		
-		try(BufferedReader br = new BufferedReader(new FileReader(path + defaultPath))) {
-			while((line = br.readLine()) != null) {
-				fields = line.split(",");
-				orders.add(new LoadOrder.Product(Integer.parseInt(fields[0]), Integer.parseInt(fields[2])));
-	
-			}
-			
-		}
+		List<LoadOrder.Product> orders = new ArrayList<>();
+		
+		
+		 try (FileInputStream file = new FileInputStream(path + defaultPath);
+		            Workbook workbook = new XSSFWorkbook(file)) {
+
+		            Sheet sheet = workbook.getSheetAt(0);
+		            Iterator<Row> rowIterator = sheet.iterator();
+
+
+
+		            while (rowIterator.hasNext()) {
+		                Row row = rowIterator.next();
+		                
+		        		String[] fields = {
+		        				String.valueOf(row.getCell(0).getNumericCellValue()).replace(".0", ""),
+		        				String.valueOf(row.getCell(2).getNumericCellValue()).replace(".0", ""),
+		        				
+		        	};
+		                
+					orders.add(new LoadOrder.Product(
+										Integer.parseInt(fields[0]), 
+										Integer.parseInt(fields[1])
+										));
+
+		            }
+		 }
 		
 		return new LoadOrder(orders, orederCharger);
 	}
