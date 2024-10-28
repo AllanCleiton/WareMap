@@ -11,16 +11,37 @@ import java.util.Scanner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.allancleitonppma.gmail.WareMap.config.ConfigManager;
+import com.allancleitonppma.gmail.WareMap.core.FloorSeparation;
+import com.allancleitonppma.gmail.WareMap.core.ForkliftSeparation;
 import com.allancleitonppma.gmail.WareMap.core.Separation;
+import com.allancleitonppma.gmail.WareMap.core.Separations;
 import com.allancleitonppma.gmail.WareMap.entities.Chamber;
 import com.allancleitonppma.gmail.WareMap.services.UtilService;
+
 
 @SpringBootApplication
 public class WareMapApplication {
 
 	public static void main(String[] args) {
 		//SpringApplication.run(WareMapApplication.class, args);
-
+		
+		
+		UtilService servicef = new UtilService();
+		Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> s = null;
+ 		try {
+			List<Chamber> chambers = servicef.chargeCameras("C:\\temp", 5);
+			
+			s = servicef.stateSeparation(servicef.getloadOrder("C:\\temp", "45884"), chambers,
+					new ConfigManager("C:\\temp\\config\\geralparameters.properties"));
+			
+			s.getForklift().getDtoProducts().forEach(System.out::println);
+			s.getFloor().getDtoProducts().forEach(System.out::println);
+			s.getCold().getDtoProducts().forEach(System.out::println);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
 		final int numberOfChambers = 5;
 		String path;
 		int choice = 0;
@@ -201,10 +222,62 @@ public class WareMapApplication {
 		} 
 	}
 
+	public static void stateSeparation(UtilService service, List<Chamber> chambers, Scanner sc, String defaultPath) {
+		Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> separations = null;
+		ConfigManager propert = null;
+		String orderCharger;
+		String prefix;
+		String finalPath;
+		boolean verify = false;
+		boolean success = false; 
+		boolean p,q,r;
+	
+		while (!verify) {
+			try {
+				
+				success = new File(defaultPath + "/separations").mkdir();
+				
+				if(success) {
+					prefix = defaultPath + "/separations/";		
+	
+					System.out.print("\n Número da ordem de carga: ");
+					orderCharger = sc.nextLine().trim();
+					
+					String oc = orderCharger.concat(".txt"); 
+					finalPath = prefix + oc;
+					
+				}else {
+					System.out.print("\n Número da ordem de carga: ");
+					orderCharger = sc.nextLine().trim();
+					
+					String oc = orderCharger.concat(".txt"); 
+					finalPath = defaultPath + "/separations/" + oc;				
+				}
+
+				propert = new ConfigManager(defaultPath + "/config/geralparameters.properties");
+				separations = service.stateSeparation(service.getloadOrder(defaultPath, orderCharger), chambers, propert);  //"c://temp//ordemdecarga.txt"				  
+
+				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_forklift") + ".txt");
+				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_floor") + ".txt");
+				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_cold") + ".txt");
+				
+				if(p || q || r) {
+					System.out.println(" Separação gerada com sucesso!");
+					System.out.println("\tDisponivel em: " + finalPath);
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(e.getMessage());
+			}
+		} 
+	}
+	
 	public static void parametrosGerais(String defaultPath ,Scanner sc) {
 		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                          " + Color.ANSI_RESET);
 		ConfigManager config = null;
-		int choiceGeralConfig = 0, valor;
+		int choiceGeralConfig = 0; 
+		String valor;
 		
 		String  finalFile;
 
@@ -260,58 +333,53 @@ public class WareMapApplication {
 			
 			do {
 				System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      " + Color.ANSI_RESET);
-				System.out.println(" Fifo congelados suíno:.............(1).");
-				System.out.println(" Fifo congelados aviário:...........(2).");
-				System.out.println(" Fifo r/ suíno fora do estado:......(3).");
-				System.out.println(" Fifo r/ suíno dentro do estado:....(4).");
-				System.out.println(" Qtde max p/ separação chão:........(5).");
-				System.out.println(" Voltar:............................(6).");
+				System.out.println(" Fifo congelados:...................(1).");
+				System.out.println(" Fifo resfriado fora do estado:.....(2).");
+				System.out.println(" Fifo resfriado dentro do estado:...(3).");
+				System.out.println(" Qtde max p/ separação chão:........(4).");
+				System.out.println(" Voltar:............................(5).");
 				System.out.print(" -> ");
 				choiceGeralConfig = sc.nextInt();
 				sc.nextLine();
 				switch (choiceGeralConfig) {
 					case 1: {
 						System.out.print(" Informe o novo valor: ");
-						valor = sc.nextInt();
-						config.setProperty("congelado_suino", "x -> x.getDays <" + valor);
+						valor = sc.next();
+						config.setProperty("congelado", valor);
 						System.out.println(" Sucesso.");
 						break;
 						}
 					case 2: {
 						System.out.print(" Informe o novo valor: ");
-						valor = sc.nextInt();
-						config.setProperty("congelado_aviario", "x -> x.getDays <" + valor);
+						valor = sc.next();
+						config.setProperty("resfri_fora_estado", valor);
 						System.out.println(" Sucesso.");
 						break;
 						}
 					case 3: {
 						System.out.print(" Informe o novo valor: ");
-						valor = sc.nextInt();
-						config.setProperty("resfri_suino_fora_estado", "x -> x.getDays <" + valor);
+						valor = sc.next();
+						config.setProperty("resfri_dentro_estado", valor);
 						System.out.println(" Sucesso.");
 						break;
 						}
 					case 4: {
 						System.out.print(" Informe o novo valor: ");
-						valor = sc.nextInt();
-						config.setProperty("resfri_suino_dentro_estado", "x -> x.getDays <" + valor);
+						valor = sc.next();
+						config.setProperty("separacao_chao",valor);
 						System.out.println(" Sucesso.");
 						break;
 						}
-					case 5: {
-						System.out.print(" Informe o novo valor: ");
-						valor = sc.nextInt();
-						config.setProperty("separacao_chao", String.valueOf(valor));
-						System.out.println(" Sucesso.");
-						break;
-						}
+					case 5:{
+						System.out.println("Voltar.");
+					}
 					default:
 						System.out.println(" Opção inválida! " + choiceGeralConfig);
 					}
 				
 				
 				
-			} while (choiceGeralConfig != 6);
+			} while (choiceGeralConfig != 5);
 			
 
 			//System.out.println(config.getProperty(" congelado"));
@@ -365,7 +433,7 @@ public class WareMapApplication {
 			
 			switch (choiceSeparation) {
 			case 1: {
-				
+				stateSeparation(service, chambers, sc, defaultPath);
 				break;
 			}case 2: {
 				
@@ -457,6 +525,6 @@ public class WareMapApplication {
 			System.out.println(" Erro ao carregar o arquivo: " + e.getMessage());
 			e.printStackTrace();
 		}
-
-	}
+		
+	}	
 }

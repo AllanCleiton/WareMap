@@ -3,6 +3,7 @@ package com.allancleitonppma.gmail.WareMap.core;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.allancleitonppma.gmail.WareMap.DTO.ProductDto;
@@ -10,7 +11,7 @@ import com.allancleitonppma.gmail.WareMap.DTO.ProductDto;
 
 public abstract class Separation {
 	protected String orderCharger;
-	protected List<ProductDto> products;
+	protected List<ProductDto> products = new ArrayList<>();
 	
 	public Separation(List<ProductDto> products, String orderCharger) {
 		this.products = products;
@@ -36,13 +37,16 @@ public abstract class Separation {
 		return sb.toString();
 	}
 	
+	public List<ProductDto> getDtoProducts(){
+		return this.products;
+	}
+	
 	public boolean createArquiveWithSeparation(String path) throws Exception{
 
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
 			for (ProductDto productDto : products) {
 				bW.write(productDto.toString());
 			}
-			
 			return true;
 		}
 	}

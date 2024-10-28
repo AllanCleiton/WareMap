@@ -9,6 +9,8 @@ import com.allancleitonppma.gmail.WareMap.enums.Deoth;
 public class Product {
 	private Integer note, days, boxes, chamber, road, height, packages;
 	private Deoth deoth;
+	public boolean visited;
+	public boolean isFrozen;
 	
 	
 	public Product(Integer note, Integer days, Integer boxes, Integer chamber, Integer road, Integer height, String deoth, Integer packages) {

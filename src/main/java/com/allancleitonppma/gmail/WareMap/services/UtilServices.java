@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -13,8 +14,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.allancleitonppma.gmail.WareMap.config.ConfigManager;
+import com.allancleitonppma.gmail.WareMap.core.FloorSeparation;
+import com.allancleitonppma.gmail.WareMap.core.ForkliftSeparation;
 import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
 import com.allancleitonppma.gmail.WareMap.core.Separation;
+import com.allancleitonppma.gmail.WareMap.core.Separations;
 import com.allancleitonppma.gmail.WareMap.entities.Chamber;
 import com.allancleitonppma.gmail.WareMap.entities.Product;
 import com.allancleitonppma.gmail.WareMap.entities.Road;
@@ -23,7 +28,7 @@ import com.allancleitonppma.gmail.WareMap.entities.Road;
 
 public interface UtilServices {
 	
-	Separation customSeparation(LoadOrder order, List<Chamber> chambers);
+	Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> stateSeparation(LoadOrder order, List<Chamber> chambers, ConfigManager propert);
 	
 	Separation simpleSeparation(LoadOrder order, List<Chamber> chambers);
 	
@@ -63,7 +68,7 @@ public interface UtilServices {
 		return new LoadOrder(orders);
 	}
 	
-	default LoadOrder getloadOrder(String path, String orederCharger) throws Exception{
+	default LoadOrder getloadOrder(String path, String orederCharger) throws IOException{
 		final String defaultPath = "//ordercharger.xlsx";
 		
 		List<LoadOrder.Product> orders = new ArrayList<>();
@@ -129,6 +134,8 @@ public interface UtilServices {
 
 	default List<Product> LoadProductsOfxlsx(String path) throws IOException{
 		List<Product> listProducts = new ArrayList<>();
+		ConfigManager parameter = new ConfigManager(path.replace("/chambers.xlsx", "") + "/config/productparameters.properties");
+		
 		
 		 try (FileInputStream file = new FileInputStream(path);
 	            Workbook workbook = new XSSFWorkbook(file)) {
@@ -162,15 +169,29 @@ public interface UtilServices {
 										fields[6], 
 										Integer.parseInt(fields[7])));
 					
-	                
 	            }
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
 				
+		 
+		 for (Product product : listProducts) {
+			 for (Map.Entry<Object, Object> entry : parameter.entrySet()) {
+					String key = (String) entry.getKey();
+					String value = (String) entry.getValue();
+					
+					if(String.valueOf(product.getNote()).equals(key)) {
+						if(value.equals("congelado")) {
+							product.isFrozen = true;
+						}else {
+							product.isFrozen = false;
+						}
+					}
+			 }
+		}
+		 
 		
-		
-		return listProducts;
+		 return listProducts;
 	}
 	
 }

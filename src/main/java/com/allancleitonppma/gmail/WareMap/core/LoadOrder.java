@@ -44,7 +44,6 @@ public class LoadOrder {
 	//------------------------------------------------------------------//
 
 	public record Product(Integer note, Integer qtdeBoxes) {
-
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
