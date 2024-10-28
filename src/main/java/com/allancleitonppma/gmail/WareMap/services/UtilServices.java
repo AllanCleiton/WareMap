@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
-
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
 import com.allancleitonppma.gmail.WareMap.core.Separation;
 import com.allancleitonppma.gmail.WareMap.entities.Chamber;
