@@ -22,6 +22,7 @@ import com.allancleitonppma.gmail.WareMap.config.ConfigManager;
 import com.allancleitonppma.gmail.WareMap.config.Floor_separation;
 import com.allancleitonppma.gmail.WareMap.config.Frozen;
 import com.allancleitonppma.gmail.WareMap.config.Generalparameter;
+import com.allancleitonppma.gmail.WareMap.config.NotFloor_separation;
 import com.allancleitonppma.gmail.WareMap.core.FloorSeparation;
 import com.allancleitonppma.gmail.WareMap.core.ForkliftSeparation;
 import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
@@ -35,53 +36,50 @@ import com.allancleitonppma.gmail.WareMap.entities.Road;
 public class UtilService implements UtilServices{
 	private Map<Integer, List<Product>> partialProducts = new HashMap<>();
 	private Generalparameter frozen = null;
-	private Generalparameter cold_out = null;
-	private Generalparameter floorSeparation = null;
+	private Generalparameter cold_in = null;
+	private Floor_separation floorSeparation = null;
+	private NotFloor_separation notFloor = null;
+	private LoadOrder floorOrder = null;
+	private LoadOrder forkliftOrder = null;
 	
 	
 	public UtilService() {}
 
 	@Override
 	public Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> stateSeparation(LoadOrder order, List<Chamber> chambers, ConfigManager propert ) {
-		boolean executed = false;
-		boolean qtdeSatisfiend = false;
-		int sum = 0;
-		
 		for (Map.Entry<Object, Object> entry : propert.entrySet()) {
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
 			
-			switch (key) {
-			case "congelado": {
-				frozen = new Frozen(value);
-				break;
-			}
-			case "resfri_dentro_estado": {
-				cold_out = new Cold_in_state(value);
-				break;
-			}
-			case "separacao_chao": {
-				floorSeparation = new Floor_separation(value);
-				break;
-			}
-			default:
-				continue;
-			}
+			switch (key) {	
+				case "congelado": {	frozen = new Frozen(value); break;}
+				case "resfri_dentro_estado": {cold_in = new Cold_in_state(value); break;}
+				case "separacao_chao": {floorSeparation = new Floor_separation(value); notFloor = new NotFloor_separation(value); break;}
+				default:
+					continue;
+				}
         }
 		
-		for (LoadOrder.Product p : order.getProducts()) {
-			partialProducts.put(p.note(), filterChamber(p.note(), chambers));
-		}
+		floorOrder = new LoadOrder(order.getProducts().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger()); 
+		//forkliftOrder = new LoadOrder(order.getProducts().stream().filter(notFloor).collect(Collectors.toList()), order.getOrderCharger());
+	
 		
+		order.getProducts().forEach(p -> {
+											partialProducts.put(p.note(), filterChamber(p.note(), chambers));
+										});
+										
+										/*
 										System.out.println("Antes do filtro de quantidade.");
 										for (LoadOrder.Product lp : order.getProducts()) {
 											partialProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = nao")));
-										
-										}
+										}*/
 		
 		Map<Integer, List<Product>> frozenProducts = new HashMap<>();
+			order.getProducts().forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
 		Map<Integer, List<Product>> coldProducts = new HashMap<>();
+			order.getProducts().forEach(x -> {coldProducts.put(x.note(), new ArrayList<>());});
 		Map<Integer, List<Product>> floorProducts = new HashMap<>();
+			order.getProducts().forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
 		List<Product> frozenList = new ArrayList<>();
 		List<Product> coldList = new ArrayList<>();
 		List<Product> floorList = new ArrayList<>();
@@ -89,36 +87,91 @@ public class UtilService implements UtilServices{
 		Product temporary = null;
 		
 		for (LoadOrder.Product lp : order.getProducts()) {
+			LoadOrder.Product lpFlor = floorOrder.getProducts().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
+			boolean executed = false;
+			boolean frozenIsOk = false;
+			boolean coldIsOk = false;
+			boolean floorIsOk = false;
+			int sumfloor = 0;
+			int sumFrozen = 0;
+			int sumCold = 0;
+			frozenList.clear();
+			coldList.clear();
+			floorList.clear();
+			externo:
 			do {
 				if(!(executed)) {
-					executed = true;
-					/*LOOP FOR PARA PERCORRER AS LISTAS DE PRODUTOS CONTIDAS NO MAP DE LISTAS DE PRODUTOS DENOMINADTO PARTIAL_PRODUCTS, TESTANDO
-					 * E ADICIONANDO AS LISTAS FROZENLIST, COLDLIST E FLOORLIST, SEGUNDO OS TESTE DAS CONDICIONAIS. E DEPOIS ADICIONANDO OS RESULTADOS 
-					 * AOS MAP'S RELACIONADOS.*/ 
+					//INICIO LAÇO FOR-----------------------------------------------
 					for (Product product : partialProducts.get(lp.note())) {
-						if((product.getHeight() == 1) && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && !(product.visited) && floorSeparation.test(product) ) {
-							product.visited  = true;
-							floorList.add(product);
-						}		
-						if(!(floorList.isEmpty())) {
-							floorList = floorList.stream().filter(floorSeparation).collect(Collectors.toList());
-						}
+						boolean ok = false;
 						if(product.isFrozen && !(product.visited)) {
-							frozenList.add(product);
+							if(!(product.visited) && product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2)) {
+								ok = floorList.add(product);
+							}
+							if(!(ok)){ frozenList.add(product);}
 						}
 						if(!(product.isFrozen) && !(product.visited)){
-							coldList.add(product);
+							if(!(product.visited) && product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2)) {
+								ok = floorList.add(product);
+							}
+							if(!(ok)){ coldList.add(product);}
+						}
+					}//FIM LAÇO FOR-------------------------------------------------
+					
+					//ATUALIZANDO OS MAP'S frozenProducts e coldProducts
+					if(!(floorList.isEmpty()) && !(floorIsOk) && lpFlor != null) {
+						for (Product p : floorList) {
+							result = older(lp.note(), floorList);
+							temporary = result.getValue();
+							
+							if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+								
+								boolean x = floorProducts.get(lp.note()).add(temporary);  
+								
+								if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+								
+								
+								if(sumfloor >= lpFlor.qtdeBoxes() ) {
+									floorIsOk = true;
+									break;
+								}
+							}
 						}
 					}
-					if(!(frozenList.isEmpty())) {
-						frozenList = frozenList.stream().filter(frozen).collect(Collectors.toList());
-						frozenProducts.put(lp.note(), new ArrayList<>(frozenList));
+					if(!(frozenList.isEmpty()) && !(frozenIsOk) && !(floorIsOk)) {
+						
+						for (Product p : frozenList) {
+							result = older(lp.note(), frozenList);
+							temporary = result.getValue();
+							if(frozen.test(temporary) && temporary != null && !(frozenIsOk)) {
+								
+								sumFrozen += p.getBoxes() + sumfloor;
+								frozenProducts.get(lp.note()).add(temporary);
+								
+								if(sumFrozen >= lp.qtdeBoxes()) {
+									frozenIsOk = true;
+									break;
+								}
+							}
+						}
+						
+						
 					}
-					if(!(coldList.isEmpty())) {
-						coldList = coldList.stream().filter(cold_out).collect(Collectors.toList());
-						coldProducts.put(lp.note(), new ArrayList<>(coldList));
+					if(!(coldList.isEmpty()) && !(coldIsOk)) {
+						for (Product p : coldList) {
+							result = older(lp.note(), coldList);
+							temporary = result.getValue();
+							if(cold_in.test(p) && temporary != null && !(coldIsOk)) {
+								sumCold += p.getBoxes();
+								coldProducts.get(lp.note()).add(temporary);
+								if(sumCold >= lp.qtdeBoxes()) {
+									coldIsOk = true;
+									break;
+								}
+							}
+						}
 					}
-					floorProducts.put(lp.note(), new ArrayList<>(floorList));
+					
 				}
 				
 				//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
@@ -126,58 +179,51 @@ public class UtilService implements UtilServices{
 					result = older(lp.note(), partialProducts.get(lp.note()));
 					temporary = result.getValue();
 					
-					if(temporary != null) {
-						
-						partialProducts.get(lp.note()).get(result.getKey()).visited = true;
-						if(temporary.isFrozen) {
-							frozenProducts.get(lp.note()).add(temporary);
+					if(temporary != null && temporary.isFrozen && !(frozenIsOk)) {
+						sumFrozen += temporary.getBoxes();
+						frozenProducts.get(lp.note()).add(temporary);
+						if(sumFrozen >= lp.qtdeBoxes()) {
+							frozenIsOk = true;
 						}
-						if(!(temporary.isFrozen)){
-							coldProducts.get(lp.note()).add(temporary);
+					}if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
+						sumCold += temporary.getBoxes();
+						coldProducts.get(lp.note()).add(temporary);
+						if(sumCold >= lp.qtdeBoxes()) {
+							coldIsOk = true;
 						}
 					}
 				}
+				executed = true;
 				
-				//CALCULANDO A QUANTIDADE DO PRODUTO CORRENTE.
-				if(!(frozenProducts.isEmpty())) {
-					for (Product product : frozenProducts.get(lp.note())) {
-						sum += product.getBoxes();
-					}
+				if(sumFrozen >= lp.qtdeBoxes()) {
+					frozenIsOk = true;
+					break externo;
 				}
-				if(!(coldProducts.isEmpty()))
-					for (Product product : coldProducts.get(lp.note())) {
-						sum += product.getBoxes();
-					}
-				if(!(floorProducts.isEmpty())) {
-					for (Product product : floorProducts.get(lp.note())) {
-						sum += product.getBoxes();
-					}
+				if(sumCold >= lp.qtdeBoxes()) {
+					coldIsOk = true;
+					break externo;
 				}
-				if(sum >= lp.qtdeBoxes()) {
-					qtdeSatisfiend = true;
-				}
-				
-				sum = 0;
-				//CONTINUAR...
-			} while (!(qtdeSatisfiend || !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false))));	
+			
+			} while (!((frozenIsOk || coldIsOk || floorIsOk)|| !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false))));	
 		}
+		
 										/*
-										for (LoadOrder.Product lp : order.getProducts()) {
-											if(!(frozenProducts.isEmpty())) { 
-												System.out.println("lista congelados");
-												frozenProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = não")));
-											}
-											if(!(coldProducts.isEmpty())) {
-												System.out.println("lista resfriados");
-												coldProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = não")));
-											}
+										for (LoadOrder.Product lp : floorOrder.getProducts()) {
 											if(!(floorProducts.isEmpty())) {
 												System.out.println("lista do chao");
 												floorProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = não")));
 											}
 										}
+										System.out.println();
+										for (LoadOrder.Product lp : forkliftOrder.getProducts()) {
+											if(!(frozenProducts.isEmpty())) { 
+												System.out.println("lista congelados");
+												frozenProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = não")));
+											}
+										}*/
 										
-										System.out.println("depois do filtro de quantidade.");
+										
+										/*System.out.println("depois do filtro de quantidade.");
 										for (LoadOrder.Product lp : order.getProducts()) {
 											partialProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = nao")));
 										
@@ -310,7 +356,8 @@ public class UtilService implements UtilServices{
 				}	
 			}
 		}while(exists);  
-
+		
+		products.get(index).visited = true;
 		return new SimpleEntry<>(index, product);
 	}
 	
@@ -364,8 +411,8 @@ public class UtilService implements UtilServices{
 				}
 			}
 		}
-		
-		/*System.out.println("finalListOfProducts");
+		/*
+		System.out.println("finalListOfProducts");
 		for (ProductDto product : finalListOfProducts) {
 			System.out.println(product);
 		}

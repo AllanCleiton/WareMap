@@ -25,7 +25,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		//SpringApplication.run(WareMapApplication.class, args);
 		
-		
+		/*1
 		UtilService servicef = new UtilService();
 		Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> s = null;
  		try {
@@ -40,7 +40,7 @@ public class WareMapApplication {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		
 		final int numberOfChambers = 5;
 		String path;

@@ -73,8 +73,7 @@ public class ProductDto {
 			}
 		}
 		this.somatorio = sum;
-		
-		moreNew.setMoreNew(somatorio - quantity);	
+		if(moreNew != null) moreNew.setMoreNew(somatorio - quantity);	
 		
 	}
 	

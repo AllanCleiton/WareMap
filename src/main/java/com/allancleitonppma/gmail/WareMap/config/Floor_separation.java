@@ -1,18 +1,20 @@
 package com.allancleitonppma.gmail.WareMap.config;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
-import com.allancleitonppma.gmail.WareMap.entities.Product;
+import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
 
-public class Floor_separation extends Generalparameter{
+public class Floor_separation implements Predicate<LoadOrder.Product>{
 	final String name = "Separacao_chao";
+	protected Integer parameter;
 	public Floor_separation(String parameter) {
-		super(parameter);
+		this.parameter = Integer.parseInt(parameter);
 	}
 	
 	@Override
-	public boolean test(Product product) {
-		return product.getBoxes() < parameter;
+	public boolean test(LoadOrder.Product product) {
+		return product.qtdeBoxes() <= parameter;
 	}
 
 	@Override
@@ -31,7 +33,5 @@ public class Floor_separation extends Generalparameter{
 		Floor_separation other = (Floor_separation) obj;
 		return Objects.equals(name, other.name);
 	}
-	
-	
 
 }
