@@ -22,7 +22,6 @@ import com.allancleitonppma.gmail.WareMap.config.ConfigManager;
 import com.allancleitonppma.gmail.WareMap.config.Floor_separation;
 import com.allancleitonppma.gmail.WareMap.config.Frozen;
 import com.allancleitonppma.gmail.WareMap.config.Generalparameter;
-import com.allancleitonppma.gmail.WareMap.config.NotFloor_separation;
 import com.allancleitonppma.gmail.WareMap.core.FloorSeparation;
 import com.allancleitonppma.gmail.WareMap.core.ForkliftSeparation;
 import com.allancleitonppma.gmail.WareMap.core.LoadOrder;
@@ -38,9 +37,7 @@ public class UtilService implements UtilServices{
 	private Generalparameter frozen = null;
 	private Generalparameter cold_in = null;
 	private Floor_separation floorSeparation = null;
-	private NotFloor_separation notFloor = null;
 	private LoadOrder floorOrder = null;
-	private LoadOrder forkliftOrder = null;
 	
 	
 	public UtilService() {}
@@ -54,7 +51,7 @@ public class UtilService implements UtilServices{
 			switch (key) {	
 				case "congelado": {	frozen = new Frozen(value); break;}
 				case "resfri_dentro_estado": {cold_in = new Cold_in_state(value); break;}
-				case "separacao_chao": {floorSeparation = new Floor_separation(value); notFloor = new NotFloor_separation(value); break;}
+				case "separacao_chao": {floorSeparation = new Floor_separation(value); break;}
 				default:
 					continue;
 				}
@@ -158,12 +155,15 @@ public class UtilService implements UtilServices{
 						
 					}
 					if(!(coldList.isEmpty()) && !(coldIsOk)) {
+						
 						for (Product p : coldList) {
 							result = older(lp.note(), coldList);
 							temporary = result.getValue();
-							if(cold_in.test(p) && temporary != null && !(coldIsOk)) {
-								sumCold += p.getBoxes();
+							if(cold_in.test(temporary) && temporary != null && !(coldIsOk)) {
+								
+								sumCold += p.getBoxes() + sumfloor;
 								coldProducts.get(lp.note()).add(temporary);
+								
 								if(sumCold >= lp.qtdeBoxes()) {
 									coldIsOk = true;
 									break;

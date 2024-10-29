@@ -228,11 +228,10 @@ public class WareMapApplication {
 		String orderCharger;
 		String prefix;
 		String finalPath;
-		boolean verify = false;
 		boolean success = false; 
-		boolean p,q,r;
+		boolean p = false,q = false,r = false;
 	
-		while (!verify) {
+		while (!(p || q || r)) {
 			try {
 				
 				success = new File(defaultPath + "/separations").mkdir();
