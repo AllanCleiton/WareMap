@@ -1,10 +1,8 @@
 package com.allancleitonppma.gmail.WareMap;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Scanner;
 
@@ -23,7 +21,6 @@ import com.allancleitonppma.gmail.WareMap.services.UtilService;
 public class WareMapApplication {
 
 	public static void main(String[] args) {
-		//SpringApplication.run(WareMapApplication.class, args);
 		
 		/*1
 		UtilService servicef = new UtilService();
@@ -41,49 +38,44 @@ public class WareMapApplication {
 			e.printStackTrace();
 		}
 		*/
-		
 		final int numberOfChambers = 5;
 		String path;
 		int choice = 0;
 		
 		UtilService service = new UtilService();
 		Scanner sc = new Scanner(System.in);
-
-		System.out.println(Color.ANSI_PURPLE_BACKGROUND + " WELCOME TO THE WAREMAPE APLICATION      " + Color.ANSI_RESET);
 		
-		System.out.print(" Para continuar é preciso que o usuário\n "
-						+ "informe o cominho do arquivo que"
-						+ "\n contem a copia das posições dos "
-						+ "\n produtos: ");
+		System.out.println(Color.ANSI_PURPLE_BACKGROUND + " WELCOME TO THE WAREMAPE APLICATION          " + Color.ANSI_RESET);
+		
+		System.out.println(" Digite o caminho do diretório:");
+		System.out.print(" -> ");
 		path = sc.nextLine();
 		List<Chamber> chambers = null;
 		do {
 			try {
 				chambers = service.chargeCameras(path, numberOfChambers);
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println(" " + e.getMessage());
+				//e.printStackTrace();
 			}
 			if(chambers == null) {
-				System.out.print(" O caminho informado nao foi encontrado.\n Informe o caminho: ");
+				System.out.print(" O caminho não pode ser encontrado.\n Tente novamente: ");
 				path = sc.nextLine();
 			}
 		} while (chambers == null);
 		
 		
 		
-		//clearScreen();
+		clearScreen();
 
 		do {
-			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      "+ Color.ANSI_RESET);
+			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Menu principal.                             "+ Color.ANSI_RESET);
 			System.out.println(" Gerar Separação:..................(1).");
 			System.out.println(" Configurações:....................(2).");
 			System.out.println(" Sair:.............................(3).");
 			System.out.print(" -> "); 
 			choice = sc.nextInt();
-
+			clearScreen();
 			switch (choice) {
-			
 			case 1: {
 				gerarSeparacao(service, chambers, sc, path);
 				break;
@@ -121,32 +113,6 @@ public class WareMapApplication {
             System.out.println("Erro ao limpar o terminal: " + e.getMessage());
         }
      }
-	
-	public static void comandTerminal(String arg0, String arg1, String arg2) {
-		try {
-			ProcessBuilder builder = new ProcessBuilder(arg0, arg1, arg2);
-			Process processo = builder.start();
-
-			// Aguarda o processo terminar
-			int status = processo.waitFor();
-
-			// Lê a saída do processo
-			BufferedReader reader = new BufferedReader(new InputStreamReader(processo.getInputStream()));
-			String linha;
-			while ((linha = reader.readLine()) != null) {
-				System.out.println(linha);
-			}
-
-			reader.close();
-			if (processo.isAlive()) {
-				System.out.println(status);
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
 
 	public static void tipycalSeparation(UtilService service, List<Chamber> chambers, Scanner sc, String defaultPath) {
 		Separation separation = null;
@@ -167,14 +133,14 @@ public class WareMapApplication {
 					if(success) {
 						prefix = defaultPath +  "//separations//";
 
-						System.out.print("\n Número da ordem de carga: ");
+						System.out.print("Informe a ordem de carga: ");
 						orderCharger = sc.nextLine().trim();
 						
 						String oc = orderCharger.concat(".txt"); 
 						finalPath = prefix + oc;
 						
 					}else {
-						System.out.print("\n Número da ordem de carga: ");
+						System.out.print("Informe a ordem de carga: ");
 						orderCharger = sc.nextLine().trim();
 						
 						String oc = orderCharger.concat(".txt"); 
@@ -187,14 +153,14 @@ public class WareMapApplication {
 					if(success) {
 						prefix = defaultPath + "/separations/";		
 
-						System.out.print("\n Número da ordem de carga: ");
+						System.out.print("Informe a ordem de carga: ");
 						orderCharger = sc.nextLine().trim();
 						
 						String oc = orderCharger.concat(".txt"); 
 						finalPath = prefix + oc;
 						
 					}else {
-						System.out.print("\n Número da ordem de carga: ");
+						System.out.print("Informe a ordem de carga: ");
 						orderCharger = sc.nextLine().trim();
 						
 						String oc = orderCharger.concat(".txt"); 
@@ -211,8 +177,12 @@ public class WareMapApplication {
 				verify = separation.createArquiveWithSeparation(finalPath);
 				
 				if(verify) {
+					System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Separação de carga.                         "+ Color.ANSI_RESET);
 					System.out.println(" Separação gerada com sucesso!");
-					System.out.println("\tDisponivel em: " + finalPath);
+					System.out.println(" Disponivel em: " + finalPath);
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
 					
 				}
 			} catch (Exception e) {
@@ -239,15 +209,17 @@ public class WareMapApplication {
 				if(success) {
 					prefix = defaultPath + "/separations/";		
 	
-					System.out.print("\n Número da ordem de carga: ");
+					System.out.print("Informe a ordem de carga: ");
 					orderCharger = sc.nextLine().trim();
+					clearScreen();
 					
 					String oc = orderCharger.concat(".txt"); 
 					finalPath = prefix + oc;
 					
 				}else {
-					System.out.print("\n Número da ordem de carga: ");
+					System.out.print("Informe a ordem de carga: ");
 					orderCharger = sc.nextLine().trim();
+					clearScreen();
 					
 					String oc = orderCharger.concat(".txt"); 
 					finalPath = defaultPath + "/separations/" + oc;				
@@ -261,9 +233,13 @@ public class WareMapApplication {
 				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_cold") + ".txt");
 				
 				if(p || q || r) {
+					System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Separação de carga.                         "+ Color.ANSI_RESET);
+
 					System.out.println(" Separação gerada com sucesso!");
-					System.out.println("\tDisponivel em: " + finalPath);
-					
+					System.out.println(" Disponivel em:\n " + finalPath);
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -273,7 +249,7 @@ public class WareMapApplication {
 	}
 	
 	public static void parametrosGerais(String defaultPath ,Scanner sc) {
-		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                          " + Color.ANSI_RESET);
+		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                              " + Color.ANSI_RESET);
 		ConfigManager config = null;
 		int choiceGeralConfig = 0; 
 		String valor;
@@ -331,7 +307,6 @@ public class WareMapApplication {
 			config = new ConfigManager(finalFile);
 			
 			do {
-				System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      " + Color.ANSI_RESET);
 				System.out.println(" Fifo congelados:...................(1).");
 				System.out.println(" Fifo resfriado fora do estado:.....(2).");
 				System.out.println(" Fifo resfriado dentro do estado:...(3).");
@@ -340,6 +315,7 @@ public class WareMapApplication {
 				System.out.print(" -> ");
 				choiceGeralConfig = sc.nextInt();
 				sc.nextLine();
+				clearScreen();
 				switch (choiceGeralConfig) {
 					case 1: {
 						System.out.print(" Informe o novo valor: ");
@@ -370,7 +346,7 @@ public class WareMapApplication {
 						break;
 						}
 					case 5:{
-						System.out.println("Voltar.");
+						break;
 					}
 					default:
 						System.out.println(" Opção inválida! " + choiceGeralConfig);
@@ -392,14 +368,14 @@ public class WareMapApplication {
 	public static void configuracao(String defaultPath, Scanner sc) {
 		int choiceConfig = 0;
 		do {
-			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                      " + Color.ANSI_RESET);
+			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                          " + Color.ANSI_RESET);
 			System.out.println(" Parametros Gerais:.................(1).");
 			System.out.println(" Parametros de Produto:.............(2).");
 			System.out.println(" Voltar:............................(3).");
 			System.out.print(" -> ");
 			choiceConfig = sc.nextInt();
 			sc.nextLine();
-			
+			clearScreen();
 			switch (choiceConfig) {
 			case 1: {
 				parametrosGerais(defaultPath ,sc);
@@ -421,7 +397,7 @@ public class WareMapApplication {
 	public static void gerarSeparacao(UtilService service, List<Chamber> chambers, Scanner sc, String defaultPath) {
 		int choiceSeparation = 0;
 		do {
-			System.out.println(Color.ANSI_GREEEN_BACKGROUND + " ESCOLHA O TIPO DE CARGA.               "+ Color.ANSI_RESET);
+			System.out.println(Color.ANSI_GREEEN_BACKGROUND + " ESCOLHA O TIPO DE CARGA.                    "+ Color.ANSI_RESET);
 			System.out.println(" Dentro do estado:.................(1).");
 			System.out.println(" Fora do estado:...................(2).");
 			System.out.println(" Simples:..........................(3).");
@@ -429,6 +405,7 @@ public class WareMapApplication {
 			System.out.print(" -> ");
 			choiceSeparation = sc.nextInt();
 			sc.nextLine();
+			clearScreen();
 			
 			switch (choiceSeparation) {
 			case 1: {
@@ -451,7 +428,7 @@ public class WareMapApplication {
 	}
 
 	public static void parametrosDeProduto(String defaultPath ,Scanner sc) {
-		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                          " + Color.ANSI_RESET);
+		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                             " + Color.ANSI_RESET);
 		ConfigManager config = null;
 		int valor;
 		
