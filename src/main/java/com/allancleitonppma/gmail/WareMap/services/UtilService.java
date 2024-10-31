@@ -102,7 +102,10 @@ public class UtilService implements UtilServices{
 					for (Product product : partialProducts.get(lp.note())) {
 						boolean ok = false;
 						if(product.isFrozen && !(product.visited)) {
-							if(!(product.visited) && product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2)) {
+							if(!(product.visited) 
+									&& product.getHeight() == 1 
+									&& (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2)
+									&& lpFlor != null) {
 								ok = floorList.add(product);
 							}
 							if(!(ok)){ frozenList.add(product);}
@@ -145,7 +148,7 @@ public class UtilService implements UtilServices{
 								sumFrozen += p.getBoxes() + sumfloor;
 								frozenProducts.get(lp.note()).add(temporary);
 								
-								if(sumFrozen >= lp.qtdeBoxes()) {
+								if(sumFrozen > lp.qtdeBoxes()) {
 									frozenIsOk = true;
 									break;
 								}
