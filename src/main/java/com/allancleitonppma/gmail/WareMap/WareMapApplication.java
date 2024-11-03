@@ -21,23 +21,6 @@ import com.allancleitonppma.gmail.WareMap.services.UtilService;
 public class WareMapApplication {
 
 	public static void main(String[] args) {
-		
-		/*1
-		UtilService servicef = new UtilService();
-		Separations<ForkliftSeparation, FloorSeparation, ForkliftSeparation> s = null;
- 		try {
-			List<Chamber> chambers = servicef.chargeCameras("C:\\temp", 5);
-			
-			s = servicef.stateSeparation(servicef.getloadOrder("C:\\temp", "45884"), chambers,
-					new ConfigManager("C:\\temp\\config\\geralparameters.properties"));
-			
-			s.getForklift().getDtoProducts().forEach(System.out::println);
-			s.getFloor().getDtoProducts().forEach(System.out::println);
-			s.getCold().getDtoProducts().forEach(System.out::println);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
 		final int numberOfChambers = 5;
 		String path;
 		int choice = 0;
