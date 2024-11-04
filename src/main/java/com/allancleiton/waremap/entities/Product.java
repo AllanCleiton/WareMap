@@ -57,8 +57,7 @@ public class Product {
 		return deoth.getValue();
 	}
 	
-	public Character getCharDeoth() {
-		
+	protected Character getCharDeoth() {
 		return deoth.getValue(this.getDeoth());
 	}
 	

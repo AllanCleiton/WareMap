@@ -8,16 +8,16 @@ import java.util.Scanner;
 import com.allancleiton.waremap.config.ConfigManager;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
+import com.allancleiton.waremap.services.IntegrationService;
 import com.allancleiton.waremap.services.SeparationFactory;
 
 
 public class WareMapApplication {
-
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
 		final String path = "c:/temp";
 		int choice = 0;
-
+		
 		do {
 			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " WELCOME TO THE WAREMAPE APLICATION          "+ Color.ANSI_RESET);
 			System.out.println(" Gerar Separação:..................(1).");
@@ -97,7 +97,7 @@ public class WareMapApplication {
 				}
 
 				
-				factory = new SeparationFactory(defaultPath);
+				factory = new SeparationFactory(new IntegrationService(defaultPath));
 								
 				separation = factory.simpleSeparation();		 	
 				
@@ -131,7 +131,7 @@ public class WareMapApplication {
 	
 		while (!(p || q || r)) {
 			try {
-				factory = new SeparationFactory(defaultPath);
+				factory = new SeparationFactory(new IntegrationService(defaultPath));
 				success = new File(defaultPath + "/separations").mkdir();
 				
 				if(success) {

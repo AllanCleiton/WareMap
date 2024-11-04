@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
 import com.allancleiton.waremap.config.ConfigManager;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Floor_separation;
@@ -21,17 +20,22 @@ import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.Road;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
-import com.allancleiton.waremap.repository.OrderFactory;
-import com.allancleiton.waremap.repository.ProductFactory;
+import com.allancleiton.waremap.repository.Repository;
 
-public class SeparationFactory implements ProductFactory, OrderFactory{
+
+public class SeparationFactory{
 	private List<Chamber> chambers = new ArrayList<>();
+	public Repository repository;
 	private LoadOrder order = null;
 	private final Integer numberOFChambers = 5;
 	
-	public SeparationFactory(String path) throws IOException{
-		this.order = getloadOrder(path);
-		loadCameras(path, this.numberOFChambers);
+	
+	
+	
+	public SeparationFactory(Repository repository) throws IOException{
+		this.repository = repository;
+		this.order = repository.jsonToLoadOrder(repository.LoadOrder());
+		loadCameras(this.numberOFChambers);
 	}
 	
 	public SeparationSet<Separation, Separation, Separation> stateSeparation(ConfigManager propert ) {
@@ -266,10 +270,10 @@ public class SeparationFactory implements ProductFactory, OrderFactory{
 		return new Separation(partialProducts, order);
 	}
 	
-	private void loadCameras(String path, int numberOfChambers) throws IOException{
-		final String defaultPath = "/chambers.xlsx";
+	private void loadCameras(int numberOfChambers) throws IOException{
+		//final String defaultPath = "/chambers.xlsx";
 		for(int i = 0; i < numberOfChambers; i++) {
-			this.chambers.add(new Chamber((i+1), 20, LoadProductsOfxlsx(path + defaultPath)));
+			this.chambers.add(new Chamber((i+1), 20, repository.jsonToList(repository.LoadProducts())));
 		}
 		this.chambers.removeIf(x -> x.isEmpty());
 		
@@ -360,4 +364,5 @@ public class SeparationFactory implements ProductFactory, OrderFactory{
 	public LoadOrder getLoadOrder() {
 		return this.order;
 	}
+	
 }
