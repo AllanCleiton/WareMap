@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.List;
 import com.allancleiton.waremap.entities.LoadOrder;
 import com.allancleiton.waremap.entities.Product;
-import com.allancleiton.waremap.repository.Repository;
+import com.allancleiton.waremap.repository.DataIntegrationRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class IntegrationService implements Repository{
+public class IntegrationService implements DataIntegrationRepository{
 	private String path;
 	
 	public IntegrationService(String path) {

@@ -19,7 +19,7 @@ import com.allancleiton.waremap.entities.Product;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public interface Repository {
+public interface DataIntegrationRepository {
 	/*TODO: This method must return a String JSON, with the following attributes: 
 	 * code=XXXX, 
 	 * description=String, 

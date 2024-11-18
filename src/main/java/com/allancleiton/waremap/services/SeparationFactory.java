@@ -20,19 +20,19 @@ import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.Road;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
-import com.allancleiton.waremap.repository.Repository;
+import com.allancleiton.waremap.repository.DataIntegrationRepository;
 
 
 public class SeparationFactory{
 	private List<Chamber> chambers = new ArrayList<>();
-	public Repository repository;
+	public DataIntegrationRepository repository;
 	private LoadOrder order = null;
 	private final Integer numberOFChambers = 5;
 	
 	
 	
 	
-	public SeparationFactory(Repository repository) throws IOException{
+	public SeparationFactory(DataIntegrationRepository repository) throws IOException{
 		this.repository = repository;
 		this.order = repository.jsonToLoadOrder(repository.LoadOrder());
 		loadCameras(this.numberOFChambers);
