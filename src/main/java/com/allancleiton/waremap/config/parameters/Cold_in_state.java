@@ -13,7 +13,7 @@ public class Cold_in_state extends GeneralParameter{
 	
 	@Override
 	public boolean test(Product product) {
-		boolean test = product.getDays() >= parameter;
+		boolean test = product.getDays() <= parameter;
 		if(test) {
 			product.visited = true;
 		}

@@ -62,13 +62,15 @@ public class SeparationFactory{
 				}
         }
 		
-		floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger()); 
-		//forkliftOrder = new LoadOrder(order.getProducts().stream().filter(notFloor).collect(Collectors.toList()), order.getOrderCharger());
-	
+		try {
+			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger()); 
+			//forkliftOrder = new LoadOrder(order.getProducts().stream().filter(notFloor).collect(Collectors.toList()), order.getOrderCharger());
+			
+		}catch(IllegalArgumentException e) {
 		
-		order.getOrders().forEach(p -> {
-											partialProducts.put(p.note(), filterChamber(p.note(), chambers));
-										});
+		}
+		
+		order.getOrders().forEach(p -> { partialProducts.put(p.note(), filterChamber(p.note(), chambers)); });
 										
 										/*
 										System.out.println("Antes do filtro de quantidade.");
@@ -87,9 +89,13 @@ public class SeparationFactory{
 		List<Product> floorList = new ArrayList<>();
 		Entry<Integer, Product> result = null;
 		Product temporary = null;
+		Order lpFlor = null;
 		
 		for (Order lp : order.getOrders()) {
-			Order lpFlor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
+			if (floorOrder != null) {
+				lpFlor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);
+			}
+			
 			boolean executed = false;
 			boolean frozenIsOk = false;
 			boolean coldIsOk = false;
@@ -182,7 +188,7 @@ public class SeparationFactory{
 					
 				}
 				
-				//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
+				//PEGA O PRODUTO MAIS VELHO QUE NAO FORAM CONTEMPLADO NO PASSO ANTERIOR.
 				if(executed) {
 					result = older(lp.note(), partialProducts.get(lp.note()));
 					temporary = result.getValue();
