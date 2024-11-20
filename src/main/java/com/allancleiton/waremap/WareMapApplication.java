@@ -11,17 +11,44 @@ import java.util.Scanner;
 
 import com.allancleiton.waremap.config.ConfigManager;
 import com.allancleiton.waremap.config.ParameterProduct;
+import com.allancleiton.waremap.config.parameters.Cold_in_state;
+import com.allancleiton.waremap.config.parameters.Cold_out_state;
+import com.allancleiton.waremap.config.parameters.Floor_separation;
+import com.allancleiton.waremap.config.parameters.Frozen;
+import com.allancleiton.waremap.config.parameters.GeneralParameter;
 import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.services.IntegrationService;
 import com.allancleiton.waremap.services.SeparationFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class WareMapApplication {
 	public static void main(String[] args) {
+		
+		try {
+			List<GeneralParameter> list = new ArrayList<>();
+			Floor_separation fs = new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
+
+			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/frozen.json"), Frozen.class));
+			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/cold_out_state.json"), Cold_out_state.class));
+			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/cold_in_state.json"), Cold_in_state.class));
+			
+			for(GeneralParameter p  : list) {
+				System.out.println("Divisor = " + p.getDivisor() + " Multiplicador = " + p.getMultiplicador());
+			}
+			
+			System.out.println("Valor = " + fs.getParameter());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		Scanner sc = new Scanner(System.in);
-		final String path = "/users/duda/waremap";
+		sc.nextLine();
+		
+		final String path = "c:/temp"; ///users/duda/waremap
 		int choice = 0;
 		
 		do {
@@ -128,7 +155,6 @@ public class WareMapApplication {
 	public static void stateSeparation(Scanner sc, String defaultPath) {
 		SeparationSet<Separation, Separation, Separation> separations = null;
 		SeparationFactory factory = null;
-		ConfigManager propert = null;
 		String orderCharger;
 		String prefix;
 		String finalPath;
@@ -159,8 +185,7 @@ public class WareMapApplication {
 					finalPath = defaultPath + "/separations/" + oc;				
 				}
 
-				propert = new ConfigManager(defaultPath + "/config/geralparameters.properties");
-				separations = factory.stateSeparation(propert); 			  
+				separations = factory.stateSeparation(defaultPath); 			  
 
 				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_forklift") + ".txt");
 				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_floor") + ".txt");
@@ -183,103 +208,116 @@ public class WareMapApplication {
 	}
 	
 	public static void parametrosGerais(String defaultPath ,Scanner sc) {
-		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                              " + Color.ANSI_RESET);
-		ConfigManager config = null;
 		int choiceGeralConfig = 0; 
-		String valor;
+		GeneralParameter cold_out = null;
+		GeneralParameter frozen = null;
+		GeneralParameter cold_in = null;
+		Floor_separation floorSeparation = null;
 		
-		String  finalFile;
-
-		FileWriter writer = null;
-		
-
-			
-			//verify if no exist a folder CONFIG
-			if( !(new File(defaultPath + "/config").exists())) {
-				
-				if(new File(defaultPath + "/config").mkdir()) {
-					try {
-						writer = new FileWriter(defaultPath + "/config/geralparameters.properties");
-					} catch (Exception e) {
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-					}finally {
-						if(writer != null) {
-							try {
-								writer.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-								System.out.println(e.getMessage());
-							}
-						}
-					}
-				}
-			}
-			//verify if no exist a file GERALPARAMETERS.PROPERTIES
-			else if(!(new File(defaultPath + "/config/geralparameters.properties").exists())) {
-				try {
-					writer = new FileWriter(defaultPath + "/config/geralparameters.properties");
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}finally {
-					if(writer != null) {
-						try {
-							writer.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-							System.out.println(e.getMessage());
-						}
-					}
-				}
-			}
-			
-			finalFile = defaultPath +  "/config/geralparameters.properties";
-		
-	
 		try {
-			config = new ConfigManager(finalFile);
 			
 			do {
+				System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                              " + Color.ANSI_RESET);
 				System.out.println(" Fifo congelados:...................(1).");
 				System.out.println(" Fifo resfriado fora do estado:.....(2).");
 				System.out.println(" Fifo resfriado dentro do estado:...(3).");
 				System.out.println(" Qtde max p/ separação chão:........(4).");
-				System.out.println(" Voltar:............................(5).");
+				System.out.println(" Help:..............................(5).");
+				System.out.println(" Voltar:............................(6).");
 				System.out.print(" -> ");
 				choiceGeralConfig = sc.nextInt();
 				sc.nextLine();
 				clearScreen();
 				switch (choiceGeralConfig) {
 					case 1: {
-						System.out.print(" Informe o novo valor: ");
-						valor = sc.next();
-						config.setProperty("congelado", valor);
+						int divisor, multiplicador;
+						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
+						System.out.print(" Informe o valor do divisor: ");
+						divisor = sc.nextInt();
+						System.out.print(" Informe o valor do Multiplicador: ");
+						multiplicador = sc.nextInt();
+						
+						frozen = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/frozen.json"), Frozen.class);
+						frozen.setDivisor(divisor);
+						frozen.setMultiplicador(multiplicador);
+						frozen.salveParameters(defaultPath);
 						System.out.println(" Sucesso.");
+						System.out.println(" Precione Enter para continuar...");
+						sc.nextLine();
+						clearScreen();
 						break;
 						}
 					case 2: {
-						System.out.print(" Informe o novo valor: ");
-						valor = sc.next();
-						config.setProperty("resfri_fora_estado", valor);
+						int divisor, multiplicador;
+						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
+						System.out.print(" Informe o valor do divisor: ");
+						divisor = sc.nextInt();
+						System.out.print(" Informe o valor do Multiplicador: ");
+						multiplicador = sc.nextInt();
+						
+						cold_out = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/cold_out_state.json"), Cold_out_state.class);
+						cold_out.setDivisor(divisor);
+						cold_out.setMultiplicador(multiplicador);
+						cold_out.salveParameters(defaultPath);
 						System.out.println(" Sucesso.");
+						System.out.println(" Precione Enter para continuar...");
+						sc.nextLine();
+						clearScreen();
 						break;
 						}
 					case 3: {
-						System.out.print(" Informe o novo valor: ");
-						valor = sc.next();
-						config.setProperty("resfri_dentro_estado", valor);
+						int divisor, multiplicador;
+						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
+						System.out.print(" Informe o valor do divisor: ");
+						divisor = sc.nextInt();
+						System.out.print(" Informe o valor do Multiplicador: ");
+						multiplicador = sc.nextInt();
+						
+						cold_in = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
+						cold_in.setDivisor(divisor);
+						cold_in.setMultiplicador(multiplicador);
+						cold_in.salveParameters(defaultPath);
 						System.out.println(" Sucesso.");
+						System.out.println(" Precione Enter para continuar...");
+						sc.nextLine();
+						clearScreen();
 						break;
 						}
 					case 4: {
-						System.out.print(" Informe o novo valor: ");
-						valor = sc.next();
-						config.setProperty("separacao_chao",valor);
+						int valor;
+						System.out.println("Padrão do parametro: f(x) -> (x <= V)");
+						System.out.print(" Informe o valor do divisor: ");
+						valor = sc.nextInt();
+						
+						floorSeparation = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
+						floorSeparation.setParameter(valor);
+						floorSeparation.salveParameters(defaultPath);
 						System.out.println(" Sucesso.");
+						System.out.println(" Precione Enter para continuar...");
+						sc.nextLine();
+						clearScreen();
 						break;
 						}
 					case 5:{
+						System.out.println(Color.ANSI_CYAN_BACKGROUND + " HELP-ME.                                    " + Color.ANSI_RESET);
+
+						System.out.println(" Os parâmetros  gerais, segem a função\n"
+								+ " abaixo para determinar o valor do Fifo a ser\n"
+								+ " seguido para cada produto registrado,\n"
+								+ " onde X representa o produto, D representa\n"
+								+ " o divisor e M representa o Multiplicador.\n\n"
+								+ " f(x) -> (x / D) * M)\n\n"
+								+ " Ex: Para um produto com validade de 120 dias.\n"
+								+ " f(120) -> (120 / 3) * 2 = 80\n\n"
+								+ " Neste exemplo, 80 será o valor considerado\n"
+								+ " como Fifo sobre os produtos que tem 120 dias\n"
+								+ " de validade.\n");
+						System.out.println(" Precione Enter para continuar...");
+						sc.nextLine();
+						clearScreen();
+						break;
+					}
+					case 6:{
 						break;
 					}
 					default:
@@ -288,7 +326,7 @@ public class WareMapApplication {
 				
 				
 				
-			} while (choiceGeralConfig != 5);
+			} while (choiceGeralConfig != 6);
 			
 
 			//System.out.println(config.getProperty(" congelado"));
@@ -304,9 +342,8 @@ public class WareMapApplication {
 		do {
 			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                          " + Color.ANSI_RESET);
 			System.out.println(" Parametros Gerais:.................(1).");
-			System.out.println(" Parametros de Produto:.............(2).");
-			System.out.println(" Parametros de Categorias:..........(3).");
-			System.out.println(" Voltar:............................(4).");
+			System.out.println(" Parametros de Categorias:..........(2).");
+			System.out.println(" Voltar:............................(3).");
 			System.out.print(" -> ");
 			choiceConfig = sc.nextInt();
 			sc.nextLine();
@@ -316,14 +353,10 @@ public class WareMapApplication {
 				parametrosGerais(defaultPath ,sc);
 				break;
 			}case 2: {
-				parametrosDeProduto(defaultPath, sc);
-				break;
-			}
-			case 3: {
 				configCategories(defaultPath, sc);
 				break;
 			}
-			case 4: {
+			case 3: {
 				break;
 			}
 			default:
@@ -463,6 +496,7 @@ public class WareMapApplication {
 				clearScreen();
 				switch (choiceConfig) {
 				case 1: {
+					System.out.println(Color.ANSI_CYAN_BACKGROUND + " LISTAR CATEGORIAS.                          " + Color.ANSI_RESET);
 					if(parameterProduct != null) {
 						System.out.println(" Categorias[ ");
 						for(Category category : parameterProduct.getCategories()) {
@@ -480,10 +514,15 @@ public class WareMapApplication {
 				}
 				case 3: {
 					int validity;
-					System.out.println(" Informe o Valor de validade da Categoria: ");
+					System.out.println(Color.ANSI_CYAN_BACKGROUND + " ADICIONAR CATEGORIA.                        " + Color.ANSI_RESET);
+					System.out.println(" Informe o Valor da validade da Categoria.");
+					System.out.println(" Ou digite 0 para cancelar. ");
 					System.out.print(" -> ");
 					validity = sc.nextInt();
 					sc.nextLine();
+					
+					if(validity == 0)break;
+					clearScreen();
 					parameterProduct.createdCategory(new Category(validity, null));
 					parameterProduct.salveParameters(defaultPath);
 					System.out.println(" Categoria "+validity+ " dias Criada.");
@@ -495,6 +534,7 @@ public class WareMapApplication {
 					break;
 				}
 				case 4:{
+					System.out.println(Color.ANSI_CYAN_BACKGROUND + " REMOVER CATEGORIA.                          " + Color.ANSI_RESET);
 					if(parameterProduct != null) {
 						int choice,i = 0;
 						List<Entry<Integer, Integer>> index = new ArrayList<>();
@@ -504,13 +544,17 @@ public class WareMapApplication {
 							index.add(new SimpleEntry<>(i, category.getValidity()));
 							i++;
 						}
-						
+						System.out.println(" Cancelar......................(" + i +")");
+
 						System.out.println();
 						System.out.println(" Informe o número correspondente\n"
-										 + " a categoria que deseja remover.");
+										 + " a categoria que deseja remover.\n"
+										 + " Ou digite 0 para cancelar.");
 						System.out.print(" -> ");
 						choice = sc.nextInt();
 						sc.nextLine();
+						
+						if(choice == 0)break;
 						clearScreen();
 						int validity = 0;
 						
@@ -521,7 +565,7 @@ public class WareMapApplication {
 								validity = value;
 							}
 						}
-						
+						System.out.println(validity);
 						Category cat = null;
 						for (Category c : parameterProduct.getCategories()) {
 							if (c.getValidity() == validity) {

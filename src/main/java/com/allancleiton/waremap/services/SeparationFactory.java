@@ -1,5 +1,6 @@
 package com.allancleiton.waremap.services;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import com.allancleiton.waremap.config.ConfigManager;
+
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.config.parameters.Frozen;
@@ -21,6 +22,7 @@ import com.allancleiton.waremap.entities.Road;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.repository.Repository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class SeparationFactory{
@@ -38,7 +40,7 @@ public class SeparationFactory{
 		loadCameras(this.numberOFChambers);
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> stateSeparation(ConfigManager propert ) {
+	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) {
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
 		GeneralParameter cold_in = null;
@@ -49,22 +51,16 @@ public class SeparationFactory{
 			partialProducts.put(p.note(), filterChamber(p.note(), this.chambers));
 		}
 		
-		for (Map.Entry<Object, Object> entry : propert.entrySet()) {
-			String key = (String) entry.getKey();
-			String value = (String) entry.getValue();
-			
-			switch (key) {	
-				case "congelado": {	frozen = new Frozen(value); break;}
-				case "resfri_dentro_estado": {cold_in = new Cold_in_state(value); break;}
-				case "separacao_chao": {floorSeparation = new Floor_separation(value); break;}
-				default:
-					continue;
-				}
-        }
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
+			cold_in = objectMapper.readValue(new File(path + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
+			floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger()); 
-		//forkliftOrder = new LoadOrder(order.getProducts().stream().filter(notFloor).collect(Collectors.toList()), order.getOrderCharger());
-	
+		floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger()); 	
 		
 		order.getOrders().forEach(p -> {
 											partialProducts.put(p.note(), filterChamber(p.note(), chambers));
