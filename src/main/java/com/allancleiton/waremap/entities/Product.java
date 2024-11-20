@@ -5,15 +5,12 @@ import java.util.Objects;
 
 import com.allancleiton.waremap.entities.enums.Deoth;
 
-
-
-
-
 public class Product {
 	private Integer note, days, boxes, chamber, road, height, packages;
 	private Deoth deoth;
 	public boolean visited;
 	public boolean isFrozen;
+	public Integer validity;
 	
 	
 	public Product(Integer note, Integer days, Integer boxes, Integer chamber, Integer road, Integer height, String deoth, Integer packages) {
@@ -63,6 +60,10 @@ public class Product {
 	
 	public Integer getPackages() {
 		return packages;
+	}
+	
+	public Integer getValiddity() {
+		return this.validity;
 	}
 
 	@Override

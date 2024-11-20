@@ -3,9 +3,15 @@ package com.allancleiton.waremap;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import com.allancleiton.waremap.config.ConfigManager;
+import com.allancleiton.waremap.config.ParameterProduct;
+import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.services.IntegrationService;
@@ -15,7 +21,7 @@ import com.allancleiton.waremap.services.SeparationFactory;
 public class WareMapApplication {
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		final String path = "c:/temp";
+		final String path = "/users/duda/waremap";
 		int choice = 0;
 		
 		do {
@@ -299,7 +305,8 @@ public class WareMapApplication {
 			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                          " + Color.ANSI_RESET);
 			System.out.println(" Parametros Gerais:.................(1).");
 			System.out.println(" Parametros de Produto:.............(2).");
-			System.out.println(" Voltar:............................(3).");
+			System.out.println(" Parametros de Categorias:..........(3).");
+			System.out.println(" Voltar:............................(4).");
 			System.out.print(" -> ");
 			choiceConfig = sc.nextInt();
 			sc.nextLine();
@@ -313,6 +320,10 @@ public class WareMapApplication {
 				break;
 			}
 			case 3: {
+				configCategories(defaultPath, sc);
+				break;
+			}
+			case 4: {
 				break;
 			}
 			default:
@@ -431,4 +442,125 @@ public class WareMapApplication {
 		}
 		
 	}	
+	
+	public static void configCategories(String defaultPath, Scanner sc) {
+		ParameterProduct parameterProduct = null;
+		try {
+			parameterProduct = new ParameterProduct(defaultPath);
+			
+			
+			int choiceConfig = 0;
+			do {
+				System.out.println(Color.ANSI_CYAN_BACKGROUND + " CATEGORIAS DE PRODUTOS.                     " + Color.ANSI_RESET);
+				System.out.println(" Listar Categorias:.................(1).");
+				System.out.println(" Editar Categoria:..................(2).");
+				System.out.println(" Adicionar Categoria:...............(3).");
+				System.out.println(" Remover Categoria:.................(4).");
+				System.out.println(" Voltar:............................(5).");
+				System.out.print(" -> ");
+				choiceConfig = sc.nextInt();
+				sc.nextLine();
+				clearScreen();
+				switch (choiceConfig) {
+				case 1: {
+					if(parameterProduct != null) {
+						System.out.println(" Categorias[ ");
+						for(Category category : parameterProduct.getCategories()) {
+							System.out.println(String.format("  Categoria de %d dias.", category.getValidity()));
+						}
+						System.out.println(" ]");
+					}
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
+
+					break;
+				}case 2: {
+					break;
+				}
+				case 3: {
+					int validity;
+					System.out.println(" Informe o Valor de validade da Categoria: ");
+					System.out.print(" -> ");
+					validity = sc.nextInt();
+					sc.nextLine();
+					parameterProduct.createdCategory(new Category(validity, null));
+					parameterProduct.salveParameters(defaultPath);
+					System.out.println(" Categoria "+validity+ " dias Criada.");
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
+
+					
+					break;
+				}
+				case 4:{
+					if(parameterProduct != null) {
+						int choice,i = 0;
+						List<Entry<Integer, Integer>> index = new ArrayList<>();
+						
+						for(Category category : parameterProduct.getCategories()) {
+							System.out.println(String.format(" Categoria de %d dias..........(%d)", category.getValidity(), i));
+							index.add(new SimpleEntry<>(i, category.getValidity()));
+							i++;
+						}
+						
+						System.out.println();
+						System.out.println(" Informe o número correspondente\n"
+										 + " a categoria que deseja remover.");
+						System.out.print(" -> ");
+						choice = sc.nextInt();
+						sc.nextLine();
+						clearScreen();
+						int validity = 0;
+						
+						for (Entry<Integer, Integer> entry : index) {
+							int key = entry.getKey();
+							int value = entry.getValue();
+							if (choice == key) {
+								validity = value;
+							}
+						}
+						
+						Category cat = null;
+						for (Category c : parameterProduct.getCategories()) {
+							if (c.getValidity() == validity) {
+								cat = c;
+							}
+						}
+						
+						
+						if(cat != null && parameterProduct.removeCategory(cat)) {
+							parameterProduct.salveParameters(defaultPath);
+							System.out.println(" Categoria removida com sucesso.");
+							System.out.println(" Pressione Enter para continuar...");
+						    sc.nextLine();
+						    clearScreen();
+						}else{
+							System.out.println(" Não foi possivel remover a categoria.");
+							System.out.println(" Pressione Enter para continuar...");
+						    sc.nextLine();
+						    clearScreen();
+						};
+						
+						
+					}
+					break;
+				}
+				case 5:{
+					break;
+				}
+				default:
+					System.out.println(" Opção inválida! " + choiceConfig);
+				}
+				
+			} while (choiceConfig != 5);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
 }
