@@ -5,17 +5,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import com.allancleiton.waremap.config.ConfigManager;
+import com.allancleiton.waremap.config.ParameterProduct;
+import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.LoadOrder;
 import com.allancleiton.waremap.entities.Order;
 import com.allancleiton.waremap.entities.Product;
+import com.allancleiton.waremap.entities.DTO.EntryProduct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,7 +40,9 @@ public interface Repository {
 	default List<Product> LoadProductsOfxlsx(String path) throws IOException{
 		List<Product> listProducts = new ArrayList<>();
 		final String defaultPath = "/chambers.xlsx";
-		ConfigManager parameter = new ConfigManager(path + "/config/productparameters.properties"); //.replace("/chambers.xlsx", "")
+		//ConfigManager parameter = new ConfigManager(path + "/config/productparameters.properties"); //.replace("/chambers.xlsx", "")
+		
+		ParameterProduct parameter = new ParameterProduct(path);
 		
 		 try (FileInputStream file = new FileInputStream(path + defaultPath);
 	            Workbook workbook = new XSSFWorkbook(file)) {
@@ -54,7 +55,8 @@ public interface Repository {
 	            while (rowIterator.hasNext()) {
 	                Row row = rowIterator.next();
 	                
-	        		String[] fields = {
+	                if( row.getCell(0).getNumericCellValue() != 0) {
+	                	String[] fields = {
 	        				String.valueOf(row.getCell(0).getNumericCellValue()).replace(".0", ""),
 	        				String.valueOf(row.getCell(1).getNumericCellValue()).replace(".0", ""),
 	        				String.valueOf(row.getCell(2).getNumericCellValue()).replace(".0", ""),
@@ -64,16 +66,19 @@ public interface Repository {
 	        				row.getCell(6).getStringCellValue(),
 	        				String.valueOf(row.getCell(7).getNumericCellValue()).replace(".0", ""),
 	        				
-	        		};
+	                	};
+	                	
+	                	listProducts.add(new Product(Integer.parseInt(fields[0]), 
+								Integer.parseInt(fields[1]), 
+								Integer.parseInt(fields[2]), 
+								Integer.parseInt(String.valueOf(fields[3].substring(3))), 
+								Integer.parseInt(String.valueOf(fields[4].substring(1))), 
+								Integer.parseInt(String.valueOf(fields[5].substring(1))), 
+								fields[6], 
+								Integer.parseInt(fields[7])));
+	                }
 	                
-					listProducts.add(new Product(Integer.parseInt(fields[0]), 
-										Integer.parseInt(fields[1]), 
-										Integer.parseInt(fields[2]), 
-										Integer.parseInt(String.valueOf(fields[3].substring(3))), 
-										Integer.parseInt(String.valueOf(fields[4].substring(1))), 
-										Integer.parseInt(String.valueOf(fields[5].substring(1))), 
-										fields[6], 
-										Integer.parseInt(fields[7])));
+					
 					
 	            }
 	        } catch (IOException e) {
@@ -82,18 +87,16 @@ public interface Repository {
 				
 		 
 		 for (Product product : listProducts) {
-			 for (Map.Entry<Object, Object> entry : parameter.entrySet()) {
-					String key = (String) entry.getKey();
-					String value = (String) entry.getValue();
-					
-					if(String.valueOf(product.getNote()).equals(key)) {
-						if(value.equals("congelado")) {
-							product.isFrozen = true;
-						}else {
-							product.isFrozen = false;
-						}
+			 for (Category category : parameter.getCategories()) {
+				for(EntryProduct entry: category.getEntries()) {
+					if(product.getNote().equals(entry.getCode())) {
+						product.isFrozen = entry.getIsFrozen();
+						product.validity = category.getValidity();
 					}
+				}
 			 }
+			 
+			 //corrigir categoria nao existente aqui!!!
 		}
 		 
 		

@@ -39,7 +39,7 @@ public class Frozen  extends GeneralParameter{
 
 	@Override
 	public boolean test(Product product) {
-		int validity = product.getValiddity();
+		int validity = product.validity;
 		int days = product.getDays();
 		boolean test = days >= ((validity / divisor) * multiplicador);
 		if(test) {
@@ -51,7 +51,7 @@ public class Frozen  extends GeneralParameter{
 	@Override
 	public void salveParameters(String path) throws StreamWriteException, DatabindException, IOException {
 		// TODO Auto-generated method stub
-		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/frozen.json"), Frozen.class);
+		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/frozen.json"), this);
 		System.out.println(" Arquivo JSON criado com sucesso!");
 		
 	}

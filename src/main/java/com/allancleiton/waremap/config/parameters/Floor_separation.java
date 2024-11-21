@@ -44,7 +44,7 @@ public class Floor_separation implements Predicate<Order>{
 
 	public void salveParameters(String path) throws StreamWriteException, DatabindException, IOException {
 		// TODO Auto-generated method stub
-		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/floor_separation.json"), Floor_separation.class);
+		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/floor_separation.json"), this);
 		System.out.println(" Arquivo JSON criado com sucesso!");
 	}
 

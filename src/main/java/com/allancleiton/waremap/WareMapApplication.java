@@ -25,29 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class WareMapApplication {
-	public static void main(String[] args) {
-		
-		try {
-			List<GeneralParameter> list = new ArrayList<>();
-			Floor_separation fs = new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
-
-			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/frozen.json"), Frozen.class));
-			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/cold_out_state.json"), Cold_out_state.class));
-			list.add(new ObjectMapper().readValue(new File("c:/temp/config/geralParameters/cold_in_state.json"), Cold_in_state.class));
-			
-			for(GeneralParameter p  : list) {
-				System.out.println("Divisor = " + p.getDivisor() + " Multiplicador = " + p.getMultiplicador());
-			}
-			
-			System.out.println("Valor = " + fs.getParameter());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public static void main(String[] args) {	
 		Scanner sc = new Scanner(System.in);
-		sc.nextLine();
-		
 		final String path = "c:/temp"; ///users/duda/waremap
 		int choice = 0;
 		
@@ -207,6 +186,61 @@ public class WareMapApplication {
 		} 
 	}
 	
+	public static void outStateSeparation(Scanner sc, String defaultPath) {
+		SeparationSet<Separation, Separation, Separation> separations = null;
+		SeparationFactory factory = null;
+		String orderCharger;
+		String prefix;
+		String finalPath;
+		boolean success = false; 
+		boolean p = false,q = false,r = false;
+	
+		while (!(p || q || r)) {
+			try {
+				factory = new SeparationFactory(new IntegrationService(defaultPath));
+				success = new File(defaultPath + "/separations").mkdir();
+				
+				if(success) {
+					prefix = defaultPath + "/separations/";		
+	
+					System.out.print("Informe a ordem de carga: ");
+					orderCharger = sc.nextLine().trim();
+					clearScreen();
+					
+					String oc = orderCharger.concat(".txt"); 
+					finalPath = prefix + oc;
+					
+				}else {
+					System.out.print("Informe a ordem de carga: ");
+					orderCharger = sc.nextLine().trim();
+					clearScreen();
+					
+					String oc = orderCharger.concat(".txt"); 
+					finalPath = defaultPath + "/separations/" + oc;				
+				}
+
+				separations = factory.outOfStateSeparation(defaultPath); 			  
+
+				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_forklift") + ".txt");
+				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_floor") + ".txt");
+				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_cold") + ".txt");
+				
+				if(p || q || r) {
+					System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Separação de carga.                         "+ Color.ANSI_RESET);
+
+					System.out.println(" Separação gerada com sucesso!");
+					System.out.println(" Disponivel em:\n " + finalPath);
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(e.getMessage());
+			}
+		} 
+	}
+	
 	public static void parametrosGerais(String defaultPath ,Scanner sc) {
 		int choiceGeralConfig = 0; 
 		GeneralParameter cold_out = null;
@@ -230,13 +264,14 @@ public class WareMapApplication {
 				clearScreen();
 				switch (choiceGeralConfig) {
 					case 1: {
+						System.out.println(Color.ANSI_CYAN_BACKGROUND + " FIFO CONGELADOS.                            " + Color.ANSI_RESET);
 						int divisor, multiplicador;
-						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
+						System.out.println(" Padrão do parametro: f(x) -> (x / D) * M");
 						System.out.print(" Informe o valor do divisor: ");
 						divisor = sc.nextInt();
 						System.out.print(" Informe o valor do Multiplicador: ");
 						multiplicador = sc.nextInt();
-						
+						sc.nextLine();
 						frozen = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/frozen.json"), Frozen.class);
 						frozen.setDivisor(divisor);
 						frozen.setMultiplicador(multiplicador);
@@ -248,13 +283,15 @@ public class WareMapApplication {
 						break;
 						}
 					case 2: {
+						System.out.println(Color.ANSI_CYAN_BACKGROUND + " FIFO RESFRIADO P/ FORA DO ESTADO.           " + Color.ANSI_RESET);
 						int divisor, multiplicador;
 						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
 						System.out.print(" Informe o valor do divisor: ");
 						divisor = sc.nextInt();
 						System.out.print(" Informe o valor do Multiplicador: ");
 						multiplicador = sc.nextInt();
-						
+						sc.nextLine();
+
 						cold_out = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/cold_out_state.json"), Cold_out_state.class);
 						cold_out.setDivisor(divisor);
 						cold_out.setMultiplicador(multiplicador);
@@ -266,13 +303,15 @@ public class WareMapApplication {
 						break;
 						}
 					case 3: {
+						System.out.println(Color.ANSI_CYAN_BACKGROUND + " FIFO RESFRIADO P/ DENTRO DO ESTADO.         " + Color.ANSI_RESET);
 						int divisor, multiplicador;
 						System.out.println("Padrão do parametro: f(x) -> (x / D) * M");
 						System.out.print(" Informe o valor do divisor: ");
 						divisor = sc.nextInt();
 						System.out.print(" Informe o valor do Multiplicador: ");
 						multiplicador = sc.nextInt();
-						
+						sc.nextLine();
+
 						cold_in = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
 						cold_in.setDivisor(divisor);
 						cold_in.setMultiplicador(multiplicador);
@@ -284,11 +323,13 @@ public class WareMapApplication {
 						break;
 						}
 					case 4: {
+						System.out.println(Color.ANSI_CYAN_BACKGROUND + " QUANTIDADE MÁXIMA P/ SEPARAÇÃO DO CHÃO      " + Color.ANSI_RESET);
 						int valor;
 						System.out.println("Padrão do parametro: f(x) -> (x <= V)");
 						System.out.print(" Informe o valor do divisor: ");
 						valor = sc.nextInt();
-						
+						sc.nextLine();
+
 						floorSeparation = new ObjectMapper().readValue(new File(defaultPath + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
 						floorSeparation.setParameter(valor);
 						floorSeparation.salveParameters(defaultPath);
@@ -300,7 +341,7 @@ public class WareMapApplication {
 						}
 					case 5:{
 						System.out.println(Color.ANSI_CYAN_BACKGROUND + " HELP-ME.                                    " + Color.ANSI_RESET);
-
+						
 						System.out.println(" Os parâmetros  gerais, segem a função\n"
 								+ " abaixo para determinar o valor do Fifo a ser\n"
 								+ " seguido para cada produto registrado,\n"
@@ -384,7 +425,7 @@ public class WareMapApplication {
 				stateSeparation(sc, defaultPath);
 				break;
 			}case 2: {
-				
+				outStateSeparation(sc, defaultPath);
 				break;
 			}case 3: {
 				tipycalSeparation(sc, defaultPath);

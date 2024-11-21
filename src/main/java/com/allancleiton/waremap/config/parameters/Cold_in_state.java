@@ -23,7 +23,7 @@ public class Cold_in_state extends GeneralParameter implements Predicate<Product
 	
 	@Override
 	public boolean test(Product product) {
-		int validity = product.getValiddity();
+		int validity = product.validity;
 		int days = product.getDays();
 		boolean test = days >= ((validity / divisor) * multiplicador);
 		if(test) {
@@ -51,7 +51,7 @@ public class Cold_in_state extends GeneralParameter implements Predicate<Product
 	@Override
 	public void salveParameters(String path) throws StreamWriteException, DatabindException, IOException {
 		// TODO Auto-generated method stub
-		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
+		new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue( new File( path+"/config/geralParameters/cold_in_state.json"), this);
 		System.out.println(" Arquivo JSON criado com sucesso!");
 	}
 	

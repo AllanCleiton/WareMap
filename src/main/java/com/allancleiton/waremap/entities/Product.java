@@ -62,10 +62,6 @@ public class Product {
 		return packages;
 	}
 	
-	public Integer getValiddity() {
-		return this.validity;
-	}
-
 	@Override
 	public String toString() {
 		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + " pacotes: " + packages;
