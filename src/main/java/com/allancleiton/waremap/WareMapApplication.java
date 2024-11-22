@@ -1,15 +1,13 @@
 package com.allancleiton.waremap;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
-
-import com.allancleiton.waremap.config.ConfigManager;
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
@@ -18,6 +16,7 @@ import com.allancleiton.waremap.config.parameters.Frozen;
 import com.allancleiton.waremap.config.parameters.GeneralParameter;
 import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Separation;
+import com.allancleiton.waremap.entities.DTO.EntryProduct;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.services.IntegrationService;
 import com.allancleiton.waremap.services.SeparationFactory;
@@ -27,7 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WareMapApplication {
 	public static void main(String[] args) {	
 		Scanner sc = new Scanner(System.in);
-		final String path = "c:/temp"; ///users/duda/waremap
+		final String path = "src/main/resources";
 		int choice = 0;
 		
 		do {
@@ -439,83 +438,6 @@ public class WareMapApplication {
 			
 		} while (choiceSeparation != 4);
 	}
-
-	public static void parametrosDeProduto(String defaultPath ,Scanner sc) {
-		System.out.println(Color.ANSI_CYAN_BACKGROUND + " CONFIGURAÇÕES.                             " + Color.ANSI_RESET);
-		ConfigManager config = null;
-		int valor;
-		
-		String  finalFile;
-		FileWriter writer = null;
-			//verify if exist a folder CONFIG
-			if( !(new File(defaultPath + "/config").exists())) {
-				
-				if(new File(defaultPath + "/config").mkdir()) {
-					try {
-						writer = new FileWriter(defaultPath + "/config/productparameters.properties");
-					} catch (Exception e) {
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-					}finally {
-						if(writer != null) {
-							try {
-								writer.close();
-							} catch (IOException e) {
-								e.printStackTrace();
-								System.out.println(e.getMessage());
-							}
-						}
-					}
-				}
-			}else if(!(new File(defaultPath + "/config/productparameters.properties").exists())) {
-				try {
-					writer = new FileWriter(defaultPath + "/config/productparameters.properties");
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}finally {
-					if(writer != null) {
-						try {
-							writer.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-							System.out.println(e.getMessage());
-						}
-					}
-				}
-			}
-			
-			finalFile = defaultPath +  "/config/productparameters.properties";
-		
-
-		
-		try {
-			String key;
-			config = new ConfigManager(finalFile);
-			System.out.print(" Informe o codigo do produto: ");
-			key = sc.nextLine();
-			System.out.println(" Para definir como congelado:......(1).");
-			System.out.println(" Para definir como resfriado:......(2).");
-			System.out.print(" -> ");
-			valor = sc.nextInt();
-			
-			if(valor == 1) {
-				config.setProperty(key, "congelado");
-				System.out.println("Sucesso!");
-			}else if(valor == 2){
-				config.setProperty(key, "resfriado");
-				System.out.println("Sucesso!");
-			}else{
-				System.out.println(" Opção inválida! " + valor);
-			}
-			
-			
-		} catch (IOException e) {
-			System.out.println(" Erro ao carregar o arquivo: " + e.getMessage());
-			e.printStackTrace();
-		}
-		
-	}	
 	
 	public static void configCategories(String defaultPath, Scanner sc) {
 		ParameterProduct parameterProduct = null;
@@ -551,6 +473,210 @@ public class WareMapApplication {
 
 					break;
 				}case 2: {
+					System.out.println(Color.ANSI_CYAN_BACKGROUND + " EDITAR CATEGORIAS.                          " + Color.ANSI_RESET);
+					if(parameterProduct != null) {
+						int choice,i = 1;
+						List<Entry<Integer, Integer>> tuple = new ArrayList<>();
+						
+						for(Category category : parameterProduct.getCategories()) {
+							System.out.println(String.format(" Categoria de %d"+ (category.getValidity() < 100 ? "  " : " ") + "dias.............(%d)", category.getValidity(), i));
+							tuple.add(new SimpleEntry<>(i, category.getValidity()));
+							i++;
+						}
+						System.out.println(" Cancelar..........................(" + i +")");
+
+						System.out.println();
+						System.out.println(" Informe o número correspondente\n"
+										 + " a categoria que deseja editar.\n"
+										 + " Ou digite 0 para cancelar.");
+						System.out.print(" -> ");
+						choice = sc.nextInt();
+						sc.nextLine();
+						
+						if(choice == 0)break;
+						clearScreen();
+						int validity = 0;
+						
+						for (Entry<Integer, Integer> entry : tuple) {
+							int key = entry.getKey();
+							int value = entry.getValue();
+							if (choice == key) {
+								validity = value;
+							}
+						}
+
+						Category cat = null;
+						for (Category c : parameterProduct.getCategories()) {
+							if (c.getValidity() == validity) {
+								cat = c;
+							}
+						}
+						//implements here!
+						choice = 0;
+						do {
+							System.out.println(Color.ANSI_YELLOW_BACKGROUND + " CATEGORIA "+cat.getValidity()+" DIAS.                          " + Color.ANSI_RESET);
+							System.out.println(" Adicionar produto:.................(1).");
+							System.out.println(" Pesquisar produto:.................(2).");
+							System.out.println(" Listar produtos:...................(3).");
+							System.out.println(" Remover produto:...................(4).");
+							System.out.println(" Voltar:............................(5).");
+							System.out.print(" -> ");
+							choice = sc.nextInt();
+							sc.nextLine();
+							clearScreen();
+							
+							switch(choice) {
+								case 1:{
+									int code;
+									boolean isFrozen;
+									System.out.println(Color.ANSI_YELLOW_BACKGROUND + " ADICIONAR PRODUTO.                          " + Color.ANSI_RESET);
+									System.out.print(" Digite o código do produto: ");
+									code = sc.nextInt();
+									
+									int op = 0;
+									do {
+										
+									
+										System.out.println(" Para definir como congelado:.......(1).");
+										System.out.println(" Para definir como resfriado:.......(2).");
+										System.out.print(" -> ");
+										op = sc.nextInt();
+										sc.nextLine();
+										if(op != 1 && op != 2) {
+											System.out.println(" Opção inválida! precione ENTER....");
+											sc.nextLine();
+											clearScreen();
+										}
+									
+									}while(op != 1 && op != 2);
+									
+									if(op == 1) {
+										isFrozen = true;
+										clearScreen();
+										System.out.println(String.format(" Novo produto: %d congelado.", code));
+	
+									}else {
+										isFrozen = false;
+										clearScreen();
+										System.out.println(String.format(" Novo produto: %d resfriado.", code));
+	
+									}
+									
+									op = 0;
+									do {
+										System.out.println(" Para confirmar:....................(1).");
+										System.out.println(" Para cancelar:.....................(2).");
+										System.out.print(" -> ");
+										op = sc.nextInt();
+										sc.nextLine();
+										if(op != 1 && op != 2) {
+											System.out.println(" Opção inválida! precione ENTER....");
+											sc.nextLine();
+											clearScreen();
+										}
+										
+									}while(op != 1 && op != 2);
+									
+									if(op == 2) {break;}
+									
+									System.out.println(cat.toString());
+									
+									if(op == 1) {
+										if(cat.setEntryProduct(new EntryProduct(code, isFrozen))) {
+											parameterProduct.salveParameters(defaultPath);
+											System.out.println(" Novo produto adicionado com sucesso! ");
+											System.out.println(" Precione ENTER para continuar...");
+											sc.nextLine();
+											
+											break;
+										}else{
+											System.out.println(" Não foi possivel adicionar o produto!");
+											System.out.println(" Precione ENTER para continuar...");
+											sc.nextLine();
+											break;
+										}
+									}
+	
+									break;
+								}
+								case 2:{
+									int code;
+									System.out.println(Color.ANSI_YELLOW_BACKGROUND + " PESQUISAR PRODUTO.                          " + Color.ANSI_RESET);
+									System.out.print(" Digite o código: ");
+									code = sc.nextInt();
+									sc.nextLine();
+									
+									EntryProduct p = cat.getEntryProduct(code);
+									if(p != null) {
+										System.out.println(" Encontrado: ");
+										System.out.println(" Produto: " + p.getCode() + " Tipo: " + (p.getIsFrozen() ? "Congelado" : "Resfriado"));
+										System.out.println(" Digite ENTER para continuar...");
+										sc.nextLine();
+										clearScreen();
+									}else {
+										System.out.println(" Não encontrado.");
+										System.out.println(" Digite ENTER para continuar...");
+										sc.nextLine();
+										clearScreen();
+									}
+									break;
+								}
+								case 3:{
+									System.out.println(Color.ANSI_YELLOW_BACKGROUND + " LISTAR PRODUTOS.                             " + Color.ANSI_RESET);
+									
+									for(EntryProduct entry : cat.getEntries()) {
+										System.out.println(" Produto: " + entry.getCode() + " Tipo: " + (entry.getIsFrozen() ? "Congelado" : "Resfriado"));
+
+									}
+									System.out.println(" Digite ENTER para continuar...");
+									sc.nextLine();
+									clearScreen();
+									
+									break;
+								}
+								case 4:{
+									int code;
+									System.out.println(Color.ANSI_YELLOW_BACKGROUND + " REMOVER PRODUTOS.                            " + Color.ANSI_RESET);
+									System.out.println(" Digite código: ");
+									code = sc.nextInt();
+									sc.nextLine();
+									
+									EntryProduct p = cat.getEntryProduct(code);
+									if(p != null) {
+										if(cat.removeEntryProduct(p)) {
+											System.out.println(" Produto removido! ");
+											System.out.println(" Digite ENTER para continuar...");
+											sc.nextLine();
+											clearScreen();
+										}else {
+											System.out.println(" Erro ao remover o produto.");
+											System.out.println(" Produto: " + p.getCode() + " Tipo: " + (p.getIsFrozen() ? "Congelado" : "Resfriado"));
+											System.out.println(" Digite ENTER para continuar...");
+											sc.nextLine();
+											clearScreen();
+										}
+									}else {
+										System.out.println(" Produto não encontrado.");
+										System.out.println(" Produto: " + code);
+										System.out.println(" Digite ENTER para continuar...");
+										sc.nextLine();
+										clearScreen();
+
+									}
+									
+									break;
+								}
+								case 5:{
+									break;
+								}
+								default:{
+									System.out.println("Opção inválida! ");
+									break;
+								}
+							}
+						}while(choice != 5);
+						
+					}
 					break;
 				}
 				case 3: {
@@ -564,7 +690,7 @@ public class WareMapApplication {
 					
 					if(validity == 0)break;
 					clearScreen();
-					parameterProduct.createdCategory(new Category(validity, null));
+					parameterProduct.createdCategory(new Category(validity, new HashSet<EntryProduct>()));
 					parameterProduct.salveParameters(defaultPath);
 					System.out.println(" Categoria "+validity+ " dias Criada.");
 					System.out.println(" Pressione Enter para continuar...");
@@ -577,15 +703,15 @@ public class WareMapApplication {
 				case 4:{
 					System.out.println(Color.ANSI_CYAN_BACKGROUND + " REMOVER CATEGORIA.                          " + Color.ANSI_RESET);
 					if(parameterProduct != null) {
-						int choice,i = 0;
+						int choice,i = 1;
 						List<Entry<Integer, Integer>> index = new ArrayList<>();
 						
 						for(Category category : parameterProduct.getCategories()) {
-							System.out.println(String.format(" Categoria de %d dias..........(%d)", category.getValidity(), i));
+							System.out.println(String.format(" Categoria de %d"+ (category.getValidity() < 100 ? "  " : " ") + "dias.............(%d)", category.getValidity(), i));
 							index.add(new SimpleEntry<>(i, category.getValidity()));
 							i++;
 						}
-						System.out.println(" Cancelar......................(" + i +")");
+						System.out.println(" Cancelar..........................(" + i +")");
 
 						System.out.println();
 						System.out.println(" Informe o número correspondente\n"
@@ -641,7 +767,6 @@ public class WareMapApplication {
 				
 			} while (choiceConfig != 5);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

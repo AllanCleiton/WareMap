@@ -1,15 +1,16 @@
 package com.allancleiton.waremap.entities;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import com.allancleiton.waremap.entities.DTO.EntryProduct;
 
 public class Category {
 	private Integer validity;
-	private List<EntryProduct> entries = null;
+	private Set<EntryProduct> entries = new HashSet<>();
 	
-	public Category(Integer validity, List<EntryProduct> entries) {
+	public Category(Integer validity, Set<EntryProduct> entries) {
 		this.validity = validity;
 		this.entries = entries;
 	}
@@ -21,18 +22,35 @@ public class Category {
 		return this.validity;
 	}
 
-	public List<EntryProduct> getEntries() {
+	public Set<EntryProduct> getEntries() {
 		return entries;
 	}
 
-	public void setEntries(List<EntryProduct> entries) {
+	public void setEntries(Set<EntryProduct> entries) {
 		this.entries = entries;
 	}
 
 	public void setValidity(Integer validity) {
 		this.validity = validity;
 	}
+	
+	public boolean setEntryProduct(EntryProduct p) {
+		return entries.add(p);
+	}
 
+	public EntryProduct getEntryProduct(int code) {
+		for (EntryProduct entryProduct : entries) {
+			if(entryProduct.getCode() == code) {
+				return entryProduct;
+			}
+		}
+		return null;
+	}
+	
+	public boolean removeEntryProduct(EntryProduct p) {
+		return entries.remove(p);
+	}
+	
 	@Override
 	public String toString() {
 		return "Category [validity=" + validity + ", entries=" + entries + "]";

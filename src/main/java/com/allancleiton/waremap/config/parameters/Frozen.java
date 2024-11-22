@@ -41,7 +41,7 @@ public class Frozen  extends GeneralParameter{
 	public boolean test(Product product) {
 		int validity = product.validity;
 		int days = product.getDays();
-		boolean test = days >= ((validity / divisor) * multiplicador);
+		boolean test = days <= ((validity / divisor) * multiplicador);
 		if(test) {
 			product.visited = true;
 		}
