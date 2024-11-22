@@ -8,6 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
@@ -22,12 +26,18 @@ import com.allancleiton.waremap.services.IntegrationService;
 import com.allancleiton.waremap.services.SeparationFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
+@SpringBootApplication
 public class WareMapApplication {
 	public static void main(String[] args) {	
+		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);
 		final String path = "src/main/resources";
 		int choice = 0;
+		
+		System.out.println("\n\nBem vindo ao Sistema de separação automática de carga WareMap.");
+		System.out.println("Precione ENTER para continuar...");
+		sc.nextLine();
+		clearScreen();
 		
 		do {
 			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " WELCOME TO THE WAREMAPE APLICATION          "+ Color.ANSI_RESET);
@@ -732,7 +742,7 @@ public class WareMapApplication {
 								validity = value;
 							}
 						}
-						System.out.println(validity);
+					
 						Category cat = null;
 						for (Category c : parameterProduct.getCategories()) {
 							if (c.getValidity() == validity) {
