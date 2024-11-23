@@ -8,10 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
@@ -31,7 +29,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {	
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);
-		final String path = "src/main/resources";
+		final String path = "src/main/resources/temp";
 		int choice = 0;
 		
 		System.out.println("\n\nBem vindo ao Sistema de separação automática de carga WareMap.");
@@ -118,7 +116,7 @@ public class WareMapApplication {
 				}
 
 				
-				factory = new SeparationFactory(new IntegrationService(defaultPath));
+				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 								
 				separation = factory.simpleSeparation();		 	
 				
@@ -151,7 +149,7 @@ public class WareMapApplication {
 	
 		while (!(p || q || r)) {
 			try {
-				factory = new SeparationFactory(new IntegrationService(defaultPath));
+				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 				success = new File(defaultPath + "/separations").mkdir();
 				
 				if(success) {
@@ -206,7 +204,7 @@ public class WareMapApplication {
 	
 		while (!(p || q || r)) {
 			try {
-				factory = new SeparationFactory(new IntegrationService(defaultPath));
+				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 				success = new File(defaultPath + "/separations").mkdir();
 				
 				if(success) {
@@ -241,7 +239,6 @@ public class WareMapApplication {
 					System.out.println(" Disponivel em:\n " + finalPath);
 					System.out.println(" Pressione Enter para continuar...");
 				    sc.nextLine();
-				    clearScreen();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -427,6 +424,7 @@ public class WareMapApplication {
 			System.out.print(" -> ");
 			choiceSeparation = sc.nextInt();
 			sc.nextLine();
+			
 			clearScreen();
 			
 			switch (choiceSeparation) {

@@ -10,7 +10,7 @@ public class ProductDto {
 	int note; 
 	int quantity;
 	int somatorio;
-
+	public Integer tam = null;
 	List<ChamberDto> chambers = new ArrayList<>();
 	
 	public ProductDto(int note, int quantity) {
@@ -99,7 +99,7 @@ public class ProductDto {
 		somatorioEndMoreNew();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(note +" " + quantity);
+		sb.append(note +" " +(tam != null ? tam+" " : "" )+ quantity);
 		
 		if(quantity < 10) {
 			sb.append("    ");

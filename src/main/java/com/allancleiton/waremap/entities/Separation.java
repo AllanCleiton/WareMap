@@ -24,11 +24,18 @@ public class Separation {
 		Set<Position> positions = new HashSet<>();
 		Set<RoadDto> roads = new HashSet<>();
 		Set<ChamberDto> chams = new HashSet<>();
-		
+		ProductDto productDto = null;
 		
 		for (Order lp : order.getOrders()) {
 			for (Product product : partialProducts.get(lp.note())) {
-				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+				if(product.activePackeg) {
+					productDto = new ProductDto(lp.note(), lp.qtdeBoxes());
+					productDto.tam = product.getPackages();
+					finalListOfProducts.add(productDto);
+
+				}else {
+					finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+				}
 				chams.add(new ChamberDto(product.getChamber(), product.getNote()));
 				roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
 				positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber(), product.getDays() , product.getBoxes()));

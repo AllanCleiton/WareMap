@@ -35,6 +35,10 @@ public class LoadOrder {
 	public void setOrderCharger(String orderCharger) {
 		this.orderCharger = orderCharger;
 	}
+	
+	public void setOrder(Order order) {
+		this.orders.add(order);
+	}
 
 	public List<Order> getOrders() {
 		return orders;

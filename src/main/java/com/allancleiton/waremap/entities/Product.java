@@ -11,7 +11,7 @@ public class Product {
 	public boolean visited;
 	public boolean isFrozen;
 	public Integer validity;
-	
+	public boolean activePackeg = false;
 	
 	public Product(Integer note, Integer days, Integer boxes, Integer chamber, Integer road, Integer height, String deoth, Integer packages) {
 		this.note = note;

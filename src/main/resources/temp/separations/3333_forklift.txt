@@ -1,0 +1,24 @@
+11092 50   Cam: 2 Rua 1= { 5B } 
+
+11076 50   Cam: 3 Rua 1= { 4B } 
+
+11046 8 300  Cam: 3 Rua 6= { 2A 1A 4A 6A 5A 7A 2B 3B 
+			  1B 6B 7B 4B 5B 3C 4C 1C 
+			  2C ->703 7C 5C 6C } 
+
+		  Rua 1= { 7A } 
+
+11015 25   Cam: 3 Rua 1= { 1C ->25 } 
+
+11096 110  Cam: 2 Rua 4= { 1C ->40 } 
+
+		  Rua 1= { 5A } 
+
+	   Cam: 3 Rua 2= { 2C } 
+
+11007 80   Cam: 3 Rua 1= { 1A ->20 } 
+
+		  Rua 3= { 1C } 
+
+11023 10   Cam: 3 Rua 1= { 2C ->40 } 
+
