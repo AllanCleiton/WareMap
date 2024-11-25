@@ -46,7 +46,7 @@ public class SeparationFactory{
 		this.sc = sc;
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) {
+	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) { //TODO Separation in state
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
 		GeneralParameter cold_in = null;
@@ -69,7 +69,6 @@ public class SeparationFactory{
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			// TODO Auto-generated catch block
 			System.out.println("ex...73");		
 		} 	
 		
@@ -153,20 +152,34 @@ public class SeparationFactory{
 						for (Product p : floorList) {
 							result = older(lp.note(), floorList);
 							temporary = result.getValue();
-							
-							if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
-								
-								boolean x = floorProducts.get(lp.note()).add(temporary);  
-								
-								if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
-								
-								
-								if(sumfloor >= lpFlor.qtdeBoxes() ) {
-									floorIsOk = true;
-									break;
+							if(temporary.isFrozen) {
+								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+									
+									boolean x = floorProducts.get(lp.note()).add(temporary);  
+									
+									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									
+									
+									if(sumfloor >= lpFlor.qtdeBoxes() ) {
+										floorIsOk = true;
+										break;
+									}
+								}else {
+									temporary.visited = false;
 								}
 							}else {
-								temporary.visited = false;
+								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+									
+									boolean x = floorProducts.get(lp.note()).add(temporary);  
+									
+									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									
+									
+									if(sumfloor >= lpFlor.qtdeBoxes() ) {
+										floorIsOk = true;
+										break;
+									}
+								}
 							}
 						}
 					}
@@ -264,7 +277,7 @@ public class SeparationFactory{
 		return separations;
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) {
+	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) { //TODO Separation out of state
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
 		GeneralParameter cold_out = null;
@@ -287,7 +300,6 @@ public class SeparationFactory{
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			// TODO Auto-generated catch block
 			System.out.println("ex...260");
 		} 	
 		
@@ -379,20 +391,34 @@ public class SeparationFactory{
 						for (Product p : floorList) {
 							result = older(lp.note(), floorList);
 							temporary = result.getValue();
-							
-							if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
-								
-								boolean x = floorProducts.get(lp.note()).add(temporary);  
-								
-								if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
-								
-								
-								if(sumfloor >= lpFlor.qtdeBoxes() ) {
-									floorIsOk = true;
-									break;
+							if(temporary.isFrozen) {
+								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+									
+									boolean x = floorProducts.get(lp.note()).add(temporary);  
+									
+									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									
+									
+									if(sumfloor >= lpFlor.qtdeBoxes() ) {
+										floorIsOk = true;
+										break;
+									}
+								}else {
+									temporary.visited = false;
 								}
 							}else {
-								temporary.visited = false;
+								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+									
+									boolean x = floorProducts.get(lp.note()).add(temporary);  
+									
+									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									
+									
+									if(sumfloor >= lpFlor.qtdeBoxes() ) {
+										floorIsOk = true;
+										break;
+									}
+								}
 							}
 						}
 					}
@@ -456,6 +482,7 @@ public class SeparationFactory{
 						}
 					}
 				}
+				
 				executed = true;
 				
 				if(sumFrozen >= lp.qtdeBoxes()) {
