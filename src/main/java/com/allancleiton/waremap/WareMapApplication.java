@@ -29,7 +29,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {	
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);
-		final String path = "src/main/resources/temp";
+		final String path = "src/main/resources/temp"; //src/main/resources/temp
 		int choice = 0;
 		
 		System.out.println("\n\nBem vindo ao Sistema de separação automática de carga WareMap.");

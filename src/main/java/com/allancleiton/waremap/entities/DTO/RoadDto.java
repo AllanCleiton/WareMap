@@ -8,14 +8,13 @@ import java.util.Objects;
 public class RoadDto {
 	int note;
 	int chamber;
-	int road; 
+	int road;
 	List<Position> positions = new ArrayList<>();
 	
 	public RoadDto(int road, int chamber, int note) {
 		this.road = road;
 		this.chamber = chamber;
 		this.note = note;
-		
 	}
 	
 
@@ -59,7 +58,6 @@ public class RoadDto {
 	public void setNote(int note) {
 		this.note = note;
 	}
-	
 	
 	@Override
 	public int hashCode() {

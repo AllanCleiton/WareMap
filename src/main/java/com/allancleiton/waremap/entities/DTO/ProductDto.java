@@ -18,6 +18,11 @@ public class ProductDto {
 		this.quantity = quantity;
 	}
 	
+	public ProductDto(int note, int quantity, int qtdeBoxes) {
+		this.note = Integer.parseInt(String.valueOf(note).concat(String.valueOf(qtdeBoxes)));;
+		this.quantity = quantity;
+	}
+	
 	public ProductDto() {}
 	
 	public void setChamber(ChamberDto chamber) {
@@ -29,9 +34,16 @@ public class ProductDto {
 	}
 	
 	public int getNote() {
+		if(tam != null) {
+			return Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), ""));
+		}
 		return note;
 	}
-
+	
+	public int getEspecialNote() {
+		return note;
+	}
+	
 	public void setNote(int note) {
 		this.note = note;
 	}
@@ -99,7 +111,11 @@ public class ProductDto {
 		somatorioEndMoreNew();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(note +" " +(tam != null ? tam+" " : "" )+ quantity);
+		if(tam != null ) {
+			sb.append(Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), "")) +" " + String.valueOf(note).substring(5) + " " + quantity);
+		}else {
+			sb.append(note +" "+ quantity);
+		}
 		
 		if(quantity < 10) {
 			sb.append("    ");

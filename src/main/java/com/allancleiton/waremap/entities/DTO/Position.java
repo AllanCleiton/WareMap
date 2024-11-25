@@ -15,9 +15,7 @@ public class Position implements Comparable<Position>{
 	int days;
 	int boxes;
 	boolean moreNew = false;
-	int sobra;
-	
-	
+	int sobra;	
 	
 	public Position(int heigth, char deoth, int road, int product, int chamber, int days, int boxes) {
 		this.heigth = heigth;
@@ -106,7 +104,7 @@ public class Position implements Comparable<Position>{
 	public int getBoxes() {
 		return this.boxes;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

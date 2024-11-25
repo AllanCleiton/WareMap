@@ -42,8 +42,6 @@ public class ChamberDto {
 		this.roads = roads;
 	}
 	
-	
-	
 	public int getNote() {
 		return note;
 	}

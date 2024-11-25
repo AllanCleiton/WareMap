@@ -25,7 +25,7 @@ public class Cold_out_state extends GeneralParameter implements Predicate<Produc
 	public boolean test(Product product) {
 		int validity = product.validity;
 		int days = product.getDays();
-		boolean test = days >= ((validity / divisor) * multiplicador);
+		boolean test = days >= ((validity / divisor) * multiplicador) + 4;
 		if(test) {
 			product.visited = true;
 		}

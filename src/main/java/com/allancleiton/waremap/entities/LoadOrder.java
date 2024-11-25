@@ -2,6 +2,8 @@ package com.allancleiton.waremap.entities;
 
 import java.util.List;
 
+import com.allancleiton.waremap.exceptions.NoSuchElement;
+
 public class LoadOrder {
 	private String orderCharger;
 	private List<Order> orders; 
@@ -15,12 +17,12 @@ public class LoadOrder {
 		
 	}
 	
-	public LoadOrder(List<Order> listproducts, String orderCharger) {
+	public LoadOrder(List<Order> listproducts, String orderCharger) throws NoSuchElement{
 		if(!listproducts.isEmpty()) {
 			this.orders = listproducts;
 			this.orderCharger = orderCharger;
 		}else {
-			throw new IllegalArgumentException("The list cannot are empty!");
+			throw new NoSuchElement();
 		}
 		
 	}
@@ -44,4 +46,7 @@ public class LoadOrder {
 		return orders;
 	}
 
+	public boolean remeveOrder(Order order) {
+		return orders.remove(order);
+	}
 }

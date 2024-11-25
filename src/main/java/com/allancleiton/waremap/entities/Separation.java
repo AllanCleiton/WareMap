@@ -29,22 +29,24 @@ public class Separation {
 		for (Order lp : order.getOrders()) {
 			for (Product product : partialProducts.get(lp.note())) {
 				if(product.activePackeg) {
-					productDto = new ProductDto(lp.note(), lp.qtdeBoxes());
-					productDto.tam = product.getPackages();
+					productDto = new ProductDto(lp.note(), lp.qtdeBoxes(), lp.packeges);
+					productDto.tam = lp.packeges;
 					finalListOfProducts.add(productDto);
+
+					chams.add(new ChamberDto(product.getChamber(), productDto.getEspecialNote()));
+					roads.add(new RoadDto(product.getRoad(), product.getChamber(), productDto.getEspecialNote()));
+					positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), productDto.getEspecialNote(), product.getChamber(), product.getDays() , product.getBoxes()));
 
 				}else {
 					finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+					chams.add(new ChamberDto(product.getChamber(), product.getNote()));
+					roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
+					positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber(), product.getDays() , product.getBoxes()));
 				}
-				chams.add(new ChamberDto(product.getChamber(), product.getNote()));
-				roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
-				positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber(), product.getDays() , product.getBoxes()));
+				
 
 			}
 		}
-		
-
-						
 		for (ProductDto product : finalListOfProducts) {
 			for (ChamberDto chamberDto : chams) {
 				if(chamberDto.getNote() == product.getNote()) {
@@ -52,7 +54,7 @@ public class Separation {
 				}
 			}
 		}
-		
+
 		for(ProductDto product : finalListOfProducts) {
 			for (ChamberDto chamberDto : product.getChambers()) {
 				for (RoadDto road : roads) {
@@ -62,7 +64,7 @@ public class Separation {
 				}
 			}
 		}
-		
+
 		for(ProductDto product : finalListOfProducts) {
 			for (ChamberDto chamberDto : product.getChambers()) {
 				for (RoadDto road : chamberDto.getRoads()) {
