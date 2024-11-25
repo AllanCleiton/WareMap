@@ -28,7 +28,8 @@ public class Separation {
 		
 		for (Order lp : order.getOrders()) {
 			for (Product product : partialProducts.get(lp.note())) {
-				if(product.activePackeg) {
+				
+				if(product.activePackeg && product.getPackages() == lp.packeges) {
 					productDto = new ProductDto(lp.note(), lp.qtdeBoxes(), lp.packeges);
 					productDto.tam = lp.packeges;
 					finalListOfProducts.add(productDto);
@@ -37,7 +38,7 @@ public class Separation {
 					roads.add(new RoadDto(product.getRoad(), product.getChamber(), productDto.getEspecialNote()));
 					positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), productDto.getEspecialNote(), product.getChamber(), product.getDays() , product.getBoxes()));
 
-				}else {
+				}else if(!(product.activePackeg)){
 					finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
 					chams.add(new ChamberDto(product.getChamber(), product.getNote()));
 					roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
@@ -49,7 +50,7 @@ public class Separation {
 		}
 		for (ProductDto product : finalListOfProducts) {
 			for (ChamberDto chamberDto : chams) {
-				if(chamberDto.getNote() == product.getNote()) {
+				if(chamberDto.getNote() == product.getEspecialNote()) {
 					product.setChamber(chamberDto);
 				}
 			}
@@ -58,7 +59,7 @@ public class Separation {
 		for(ProductDto product : finalListOfProducts) {
 			for (ChamberDto chamberDto : product.getChambers()) {
 				for (RoadDto road : roads) {
-					if(road.getChamber() == chamberDto.getChamber() && road.getNote() == product.getNote()) {
+					if(road.getChamber() == chamberDto.getChamber() && road.getNote() == product.getEspecialNote()) {
 						chamberDto.setRoad(road);
 					}
 				}
@@ -69,7 +70,7 @@ public class Separation {
 			for (ChamberDto chamberDto : product.getChambers()) {
 				for (RoadDto road : chamberDto.getRoads()) {
 					for (Position position : positions) {
-						if(position.getRoad() == road.getRoad() && position.getProduct() == product.getNote() && position.getChamber() == chamberDto.getChamber()) {
+						if(position.getRoad() == road.getRoad() && position.getProduct() == product.getEspecialNote() && position.getChamber() == chamberDto.getChamber()) {
 							road.setPosition(position);
 						}
 					}

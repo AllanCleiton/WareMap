@@ -98,7 +98,7 @@ public class SeparationFactory{
 		for (Order lp : auxOrder) {
 			//TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
 			if(lp.note() == 11046) {
-				TupleListProducts tuple = exclusive11046Separation(frozenProducts, floorProducts, frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
+				TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
 				if (tuple != null) {
 					frozenProducts.get(lp.note()).addAll(tuple.frozenProducts);
 					floorProducts.get(lp.note()).addAll(tuple.floorProducts);
@@ -326,7 +326,7 @@ public class SeparationFactory{
 		for (Order lp : auxOrder) {
 			//TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
 			if(lp.note() == 11046) {
-				TupleListProducts tuple = exclusive11046Separation(frozenProducts, floorProducts, frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
+				TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
 				if (tuple != null) {
 					frozenProducts.get(lp.note()).addAll(tuple.frozenProducts);
 					floorProducts.get(lp.note()).addAll(tuple.floorProducts);
@@ -630,8 +630,6 @@ public class SeparationFactory{
 	}
 	
 	private TupleListProducts exclusive11046Separation(
-			Map<Integer, List<Product>> frozenProducts, 
-			Map<Integer, List<Product>> floorProducts, 
 			List<Product> frozenList,
 			List<Product> floorList,
 			LoadOrder floorOrder,
@@ -659,6 +657,9 @@ public class SeparationFactory{
 			
 		if(choice.equals("S")) {
 			List<Order> orders11046 = new ArrayList<>();
+			Map<Integer, List<Product>> frozenProducts = new HashMap<>();
+			Map<Integer, List<Product>> floorProducts = new HashMap<>();
+
 			Order actual = null;
 			int choice_ = 2;
 			do {
@@ -712,7 +713,11 @@ public class SeparationFactory{
 				// TODO Auto-generated catch block
 				System.out.println("ex...656");
 			} 	
+			
+			orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
+			orders11046.forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
 
+			
 			Order lpFlor = null;
 			for (Order order : orders11046) {
 				if(floorOrder != null) {

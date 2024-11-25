@@ -1,4 +1,8 @@
-11046 8 150   Produto não encontrado!
+11046 8 150  Cam: 3 Rua 2= { 6A 5B 1C 6C } 
 
-11046 7 150   Produto não encontrado!
+		  Rua 11= { 2A 3A 4A ->196 } 
+
+11046 7 150  Cam: 3 Rua 2= { 6A 5B 1C 6C } 
+
+		  Rua 11= { 2A 3A 4A ->196 } 
 

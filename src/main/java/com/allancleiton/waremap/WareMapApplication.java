@@ -728,7 +728,8 @@ public class WareMapApplication {
 						System.out.print(" -> ");
 						choice = sc.nextInt();
 						sc.nextLine();
-						
+						clearScreen();
+
 						if(choice == 0)break;
 						clearScreen();
 						int validity = 0;
