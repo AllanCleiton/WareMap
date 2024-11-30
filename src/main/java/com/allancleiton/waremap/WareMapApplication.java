@@ -8,8 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Scanner;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
@@ -26,12 +28,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootApplication
 public class WareMapApplication {
-	public static void main(String[] args) {	
+	public static void main(String[] args) {
 		SpringApplication.run(WareMapApplication.class, args);
-		Scanner sc = new Scanner(System.in);
+		Scanner sc = new Scanner(System.in);		
 		final String path = "src/main/resources/temp"; //src/main/resources/temp
+		SeparationFactory factory = null;
 		int choice = 0;
 		
+		try {
+			factory = new SeparationFactory(new IntegrationService(path), sc);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("\n\nBem vindo ao Sistema de separação automática de carga WareMap.");
 		System.out.println("Precione ENTER para continuar...");
 		sc.nextLine();
@@ -47,7 +56,7 @@ public class WareMapApplication {
 			clearScreen();
 			switch (choice) {
 			case 1: {
-				gerarSeparacao(sc, path);
+				gerarSeparacao(sc, path, factory);
 				break;
 			}
 			case 2: {
@@ -84,9 +93,9 @@ public class WareMapApplication {
         }
      }
 
-	public static void tipycalSeparation(Scanner sc, String defaultPath) {
+	public static void tipycalSeparation(Scanner sc, String defaultPath, SeparationFactory factory) {
 		Separation separation = null;
-		SeparationFactory factory = null;
+		//SeparationFactory factory = null;
 		String orderCharger;
 		String prefix;
 		String finalPath;
@@ -116,7 +125,7 @@ public class WareMapApplication {
 				}
 
 				
-				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
+				//factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 								
 				separation = factory.simpleSeparation();		 	
 				
@@ -138,9 +147,8 @@ public class WareMapApplication {
 		} 
 	}
 
-	public static void stateSeparation(Scanner sc, String defaultPath) {
+	public static void stateSeparation(Scanner sc, String defaultPath, SeparationFactory factory) {
 		SeparationSet<Separation, Separation, Separation> separations = null;
-		SeparationFactory factory = null;
 		String orderCharger;
 		String prefix;
 		String finalPath;
@@ -149,7 +157,6 @@ public class WareMapApplication {
 	
 		while (!(p || q || r)) {
 			try {
-				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 				success = new File(defaultPath + "/separations").mkdir();
 				
 				if(success) {
@@ -193,9 +200,8 @@ public class WareMapApplication {
 		} 
 	}
 	
-	public static void outStateSeparation(Scanner sc, String defaultPath) {
+	public static void outStateSeparation(Scanner sc, String defaultPath, SeparationFactory factory) {
 		SeparationSet<Separation, Separation, Separation> separations = null;
-		SeparationFactory factory = null;
 		String orderCharger;
 		String prefix;
 		String finalPath;
@@ -204,7 +210,6 @@ public class WareMapApplication {
 	
 		while (!(p || q || r)) {
 			try {
-				factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 				success = new File(defaultPath + "/separations").mkdir();
 				
 				if(success) {
@@ -413,7 +418,7 @@ public class WareMapApplication {
 		} while (choiceConfig != 3);
 	}
 	
-	public static void gerarSeparacao(Scanner sc, String defaultPath) {
+	public static void gerarSeparacao(Scanner sc, String defaultPath, SeparationFactory factory) {
 		int choiceSeparation = 0;
 		do {
 			System.out.println(Color.ANSI_GREEEN_BACKGROUND + " ESCOLHA O TIPO DE CARGA.                    "+ Color.ANSI_RESET);
@@ -429,13 +434,13 @@ public class WareMapApplication {
 			
 			switch (choiceSeparation) {
 			case 1: {
-				stateSeparation(sc, defaultPath);
+				stateSeparation(sc, defaultPath, factory);
 				break;
 			}case 2: {
-				outStateSeparation(sc, defaultPath);
+				outStateSeparation(sc, defaultPath, factory);
 				break;
 			}case 3: {
-				tipycalSeparation(sc, defaultPath);
+				tipycalSeparation(sc, defaultPath, factory);
 				break;
 			}case 4:{
 				break;

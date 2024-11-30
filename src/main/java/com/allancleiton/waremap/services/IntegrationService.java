@@ -30,5 +30,7 @@ public class IntegrationService implements Repository{
 		return mapper.writeValueAsString(order);
 	}
 
-	
+	public String getPath() {
+		return this.path;
+	}
 }

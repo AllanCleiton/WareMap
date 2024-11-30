@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.LoadOrder;
@@ -188,4 +190,5 @@ public interface Repository {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.readValue(json, new TypeReference<List<Product>>() {});
 	}
+
 }

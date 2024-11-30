@@ -42,7 +42,7 @@ public class Separation {
 					finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
 					chams.add(new ChamberDto(product.getChamber(), product.getNote()));
 					roads.add(new RoadDto(product.getRoad(), product.getChamber(), product.getNote()));
-					positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), product.getNote(), product.getChamber(), product.getDays() , product.getBoxes()));
+					positions.add(new Position(product));
 				}
 				
 

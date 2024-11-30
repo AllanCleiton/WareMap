@@ -10,18 +10,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-
 import com.allancleiton.waremap.WareMapApplication;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
 import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.config.parameters.Frozen;
 import com.allancleiton.waremap.config.parameters.GeneralParameter;
-import com.allancleiton.waremap.entities.Chamber;
 import com.allancleiton.waremap.entities.LoadOrder;
 import com.allancleiton.waremap.entities.Order;
 import com.allancleiton.waremap.entities.Product;
-import com.allancleiton.waremap.entities.Road;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.exceptions.NoSuchElement;
@@ -30,20 +27,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class SeparationFactory{
-	private List<Chamber> chambers = null;
+	private List<Product> allProducts = null;
 	public Repository repository;
 	private LoadOrder order = null;
-	private final Integer numberOFChambers = 5;
 	private Scanner sc;
-	
-	
-	
 	
 	public SeparationFactory(Repository repository, Scanner sc) throws IOException{
 		this.repository = repository;
 		this.order = repository.jsonToLoadOrder(repository.LoadOrder());
-		this.chambers = loadCameras(numberOFChambers);
 		this.sc = sc;
+		this.allProducts = repository.jsonToList(repository.LoadProducts());
 	}
 	
 	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) { //TODO Separation in state
@@ -54,7 +47,7 @@ public class SeparationFactory{
 		LoadOrder floorOrder = null;
 		
 		for (Order p : order.getOrders()) {
-			partialProducts.put(p.note(), filterChamber(p.note(), this.chambers));
+			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
 		try {
@@ -73,7 +66,7 @@ public class SeparationFactory{
 		} 	
 		
 		order.getOrders().forEach(p -> {
-											partialProducts.put(p.note(), filterChamber(p.note(), chambers));
+											partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 										});
 										
 										
@@ -285,7 +278,7 @@ public class SeparationFactory{
 		LoadOrder floorOrder = null;
 		
 		for (Order p : order.getOrders()) {
-			partialProducts.put(p.note(), filterChamber(p.note(), this.chambers));
+			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
 		try {
@@ -305,7 +298,7 @@ public class SeparationFactory{
 		
 		//PREENCHE A LISTA partialProducts COM TODOS OS DE CADA PRODUTO DA ORDEM DE CARGA.
 		order.getOrders().forEach(p -> {
-											partialProducts.put(p.note(), filterChamber(p.note(), chambers));
+											partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 										});
 										
 										/*
@@ -518,7 +511,7 @@ public class SeparationFactory{
 	public Separation simpleSeparation() {
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		for (Order p : order.getOrders()) {
-			partialProducts.put(p.note(), filterChamber(p.note(), this.chambers));
+			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
 		List<Product> aux = new ArrayList<>();
@@ -558,20 +551,6 @@ public class SeparationFactory{
 		
  		
 		return new Separation(partialProducts, order);
-	}
-	
-	private List<Chamber> loadCameras(int numberOfChambers) throws IOException{
-		List<Chamber> chambers = new ArrayList<>();
-		//final String defaultPath = "/chambers.xlsx";
-		for(int i = 0; i < numberOfChambers; i++) {
-			chambers.add(new Chamber((i+1), 20, repository.jsonToList(repository.LoadProducts())));
-		}
-		chambers.removeIf(x -> x.isEmpty());
-		return chambers;
-	}
-
-	public List<Chamber> getChambers() {
-		return chambers;
 	}
 	
 	private Entry<Integer, Product> easier(int code, List<Product> products) {
@@ -632,21 +611,14 @@ public class SeparationFactory{
 		products.get(index).visited = true;
 		return new SimpleEntry<>(index, product);
 	}
-
-	private List<Product> filterChamber(int code, List<Chamber> chambers){
-		List<Product> products = new ArrayList<>();
 	
-		for (Chamber chamber : chambers) {
-			for (Road road : chamber.getAllRoads()) {
-				if(road != null) {
-					for (Product product : road.getPositions()) {
-						if(product.getNote() == code) {
-							products.add(product);
-							
-							
-						}
-					}
-				}
+	private List<Product> filterProducts(Integer code, List<Product> allProducts){
+		List<Product> products = new ArrayList<>();
+		for (Product product : allProducts) {
+			if(product.getNote().equals(code)) {
+				products.add(product);
+				
+				
 			}
 		}
 		return products;

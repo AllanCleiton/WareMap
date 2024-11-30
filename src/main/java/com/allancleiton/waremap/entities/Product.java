@@ -4,6 +4,7 @@ package com.allancleiton.waremap.entities;
 import java.util.Objects;
 
 import com.allancleiton.waremap.entities.enums.Deoth;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Product {
 	private Integer note, days, boxes, chamber, road, height, packages;
@@ -54,7 +55,8 @@ public class Product {
 		return deoth.getValue();
 	}
 	
-	protected Character getCharDeoth() {
+	@JsonIgnore
+	public Character getCharDeoth() {
 		return deoth.getValue(this.getDeoth());
 	}
 	

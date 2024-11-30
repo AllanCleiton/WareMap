@@ -9,7 +9,6 @@ import java.util.Objects;
 public class ProductDto {
 	int note; 
 	int quantity;
-	int somatorio;
 	public Integer tam = null;
 	List<ChamberDto> chambers = new ArrayList<>();
 	
@@ -60,10 +59,6 @@ public class ProductDto {
 		return chambers;
 	}
 	
-	public int getSomatorio() {
-		return this.somatorio;
-	}
-	
 	private void somatorioEndMoreNew() {
 		int sum = 0;
 		boolean verified = false;
@@ -83,8 +78,10 @@ public class ProductDto {
 				}
 			}
 		}
-		this.somatorio = sum;
-		if(moreNew != null) moreNew.setMoreNew(somatorio-quantity);	
+		
+		if(moreNew != null) {
+			moreNew.setMoreNew(sum-quantity);	
+		}
 		
 	}
 	

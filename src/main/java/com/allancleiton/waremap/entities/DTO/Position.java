@@ -2,13 +2,15 @@ package com.allancleiton.waremap.entities.DTO;
 
 import java.util.Objects;
 
+import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.enums.Deoth;
 
 
 
 public class Position implements Comparable<Position>{
-	int chamber;
-	int product; 
+	private Product product;
+	private int chamber;
+	int note; 
 	int road;
 	int heigth; 
 	char deoth; 
@@ -17,16 +19,27 @@ public class Position implements Comparable<Position>{
 	boolean moreNew = false;
 	int sobra;	
 	
-	public Position(int heigth, char deoth, int road, int product, int chamber, int days, int boxes) {
+	public Position(int heigth, char deoth, int road, int note, int chamber, int days, int boxes) {
 		this.heigth = heigth;
 		this.deoth = deoth;
 		this.road = road;
-		this.product = product;
+		this.note = note;
 		this.chamber = chamber;
 		this.days = days;
 		this.boxes = boxes;
 	}
-
+	
+	public Position(Product product) {
+		this.product = product;
+		this.heigth = product.getHeight();
+		this.deoth = product.getCharDeoth();
+		this.road = product.getRoad();
+		this.note = product.getNote();
+		this.chamber = product.getChamber();
+		this.days = product.getDays();
+		this.boxes = product.getBoxes();
+	}
+	
 	
 	@Override
 	public int hashCode() {
@@ -89,11 +102,11 @@ public class Position implements Comparable<Position>{
 	}
 	
 	public int getProduct() {
-		return product;
+		return note;
 	}
 
-	public void setProduct(int product) {
-		this.product = product;
+	public void setProduct(int note) {
+		this.note = note;
 	}
 	
 	public void setMoreNew(int sobra) {
@@ -108,7 +121,7 @@ public class Position implements Comparable<Position>{
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%d%c ", heigth,deoth) );
+		sb.append(String.format("%d%c ", product.getHeight(),product.getCharDeoth()) );
 		return sb.toString();
 	}
 
