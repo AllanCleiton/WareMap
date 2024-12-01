@@ -1,17 +1,21 @@
 package com.allancleiton.waremap;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Scanner;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
@@ -31,19 +35,51 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);		
-		final String path = "src/main/resources/temp"; //src/main/resources/temp
+		String path = "src/main/resources/temp"; //src/main/resources/temp
 		SeparationFactory factory = null;
-		int choice = 0;
+		Properties log = new Properties();
 		
+		 try (InputStream input = new FileInputStream(path + "/config/logs/log.properties")) {
+			 log.load(input); 
+	        } catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
+		int choice = 0;		
 		try {
-			factory = new SeparationFactory(new IntegrationService(path), sc);
+			String c;
+			System.out.println("\n\n Bem vindo ao Sistema de separação automática de carga WareMap.");
+			
+			if(!(log.getProperty("exit").equals("true"))) {
+				System.out.print(" Deseja iniciar a partir da ultima cessão? S/N:  ");
+				c = sc.nextLine().toUpperCase();
+
+				if(c.equals("S")) {
+					factory = new SeparationFactory(new IntegrationService(path, 1), sc);
+				}else {
+					factory = new SeparationFactory(new IntegrationService(path, 0), sc);
+				}
+			}else {
+				factory = new SeparationFactory(new IntegrationService(path, 0), sc);
+			}
+			
+			log.setProperty("exit", "false"); 
+			try (OutputStream output = new FileOutputStream(path + "/config/logs/log.properties")) {
+	            // Armazena o objeto Properties no arquivo com uma possível mensagem de comentários (null nesse caso).
+	            log.store(output, null);
+	        }
+			
+			System.out.println(" Presione ENTER para continuar...");
+			sc.nextLine();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("\n\nBem vindo ao Sistema de separação automática de carga WareMap.");
-		System.out.println("Precione ENTER para continuar...");
-		sc.nextLine();
+		
 		clearScreen();
 		
 		do {
@@ -64,7 +100,17 @@ public class WareMapApplication {
 				break;
 			}
 			case 3: {
-				System.out.println(" Sair.");
+				System.out.println(" Saindo.");
+				log.setProperty("exit", "true"); 
+				try (OutputStream output = new FileOutputStream(path + "/config/logs/log.properties")) {
+		            // Armazena o objeto Properties no arquivo com uma possível mensagem de comentários (null nesse caso).
+		            log.store(output, null);
+		        } catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				factory.getRepository().shutDownDb(path);
 				break;
 			}
 			default:
@@ -140,6 +186,9 @@ public class WareMapApplication {
 				    clearScreen();
 					
 				}
+				
+				//SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
+				factory.getRepository().saveChanges(factory.getAllProducts(), defaultPath);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println(e.getMessage());
@@ -193,6 +242,9 @@ public class WareMapApplication {
 				    sc.nextLine();
 				    clearScreen();
 				}
+				
+				//SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
+				factory.getRepository().saveChanges(factory.getAllProducts(), defaultPath);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println(e.getMessage());
@@ -245,6 +297,9 @@ public class WareMapApplication {
 					System.out.println(" Pressione Enter para continuar...");
 				    sc.nextLine();
 				}
+				
+				//SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
+				factory.getRepository().saveChanges(factory.getAllProducts(), defaultPath);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println(e.getMessage());

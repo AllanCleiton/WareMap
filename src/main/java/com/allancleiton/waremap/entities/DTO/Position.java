@@ -59,8 +59,7 @@ public class Position implements Comparable<Position>{
 		return chamber == other.chamber && deoth == other.deoth && heigth == other.heigth && product == other.product
 				&& road == other.road;
 	}
-
-
+	
 	public int getChamber() {
 		return chamber;
 	}
@@ -112,6 +111,10 @@ public class Position implements Comparable<Position>{
 	public void setMoreNew(int sobra) {
 		this.moreNew = true;
 		this.sobra = sobra;
+		if(product.getBoxes() > sobra && sobra > 0) {
+			this.product.setBoxes(sobra);
+			this.product.visited = false;
+		}
 	}
 	
 	public int getBoxes() {

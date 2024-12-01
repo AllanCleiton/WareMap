@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.entities.Category;
@@ -43,8 +47,13 @@ public interface Repository {
 	default List<Product> LoadProductsOfxlsx(String path) throws IOException{
 		List<Product> listProducts = new ArrayList<>();
 		final String defaultPath = "/chambers.xlsx";
-		//ConfigManager parameter = new ConfigManager(path + "/config/productparameters.properties"); //.replace("/chambers.xlsx", "")
-		
+		final String pathFileDb = "/config/cacheproducts/cache.db";
+		DB db = DBMaker.fileDB(path + pathFileDb).make();		
+		@SuppressWarnings("unchecked")
+	        Set<Product> cache = (Set<Product>) db
+	                .hashSet("cache", Serializer.JAVA)  // Nome da coleção + Serializer
+	                .createOrOpen();
+
 		ParameterProduct parameter = new ParameterProduct(path);
 		
 		 try (FileInputStream file = new FileInputStream(path + defaultPath);
@@ -103,8 +112,43 @@ public interface Repository {
 			 //corrigir categoria nao existente aqui!!!
 		}
 		 
+		 cache.addAll(listProducts);
+		 db.commit();
+		 db.close();
+		return listProducts;
+	}
+	
+	default List<Product> LoadProductsOfDb(String path) {		
+		final String pathFileDb = "/config/cacheproducts/cache.db";
+		DB db = DBMaker.fileDB(path + pathFileDb).make();		
+		@SuppressWarnings("unchecked")
+	        Set<Product> cache = (Set<Product>) db.hashSet("cache", Serializer.JAVA).createOrOpen();
+		List<Product> list = new ArrayList<>(cache);
+		db.close();
+		return list;
+	}
+	
+	default void shutDownDb(String path) {
+		final String pathFileDb = "/config/cacheproducts/cache.db";
+		DB db = DBMaker.fileDB(path + pathFileDb).make();		
+		@SuppressWarnings("unchecked")
+	        Set<Product> cache = (Set<Product>) db.hashSet("cache", Serializer.JAVA).createOrOpen();
+		cache.clear();
+		db.commit();
+		db.close();
+	}
+	
+	default void saveChanges(List<Product> allProducts, String path){
+		final String pathFileDb = "/config/cacheproducts/cache.db";
+		DB db = DBMaker.fileDB(path + pathFileDb).make();		
+		@SuppressWarnings("unchecked")
+	        Set<Product> cache = (Set<Product>) db.hashSet("cache", Serializer.JAVA).createOrOpen();
+		cache.clear();
+		cache.addAll(allProducts);
 		
-		 return listProducts;
+		db.commit();
+		db.close();
+
 	}
 	
 	default LoadOrder getloadOrder(String path) throws IOException{
@@ -191,4 +235,5 @@ public interface Repository {
 		return mapper.readValue(json, new TypeReference<List<Product>>() {});
 	}
 
+	
 }

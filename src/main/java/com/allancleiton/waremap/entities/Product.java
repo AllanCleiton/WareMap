@@ -1,12 +1,15 @@
 package com.allancleiton.waremap.entities;
 
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import com.allancleiton.waremap.entities.enums.Deoth;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Product {
+public class Product implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private Integer note, days, boxes, chamber, road, height, packages;
 	private Deoth deoth;
 	public boolean visited;
@@ -39,6 +42,10 @@ public class Product {
 		return boxes;
 	}
 
+	public void setBoxes(Integer boxes) {
+		this.boxes = boxes;
+	}
+	
 	public Integer getChamber() {
 		return chamber;
 	}

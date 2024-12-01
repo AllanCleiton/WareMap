@@ -28,18 +28,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SeparationFactory{
 	private List<Product> allProducts = null;
-	public Repository repository;
+	public Repository repository = null;
 	private LoadOrder order = null;
 	private Scanner sc;
 	
 	public SeparationFactory(Repository repository, Scanner sc) throws IOException{
 		this.repository = repository;
-		this.order = repository.jsonToLoadOrder(repository.LoadOrder());
 		this.sc = sc;
 		this.allProducts = repository.jsonToList(repository.LoadProducts());
+		
+		//allProducts.forEach(System.out::println);
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) { //TODO Separation in state
+	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) throws IOException { //TODO Separation in state
+		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
 		GeneralParameter cold_in = null;
@@ -50,27 +52,21 @@ public class SeparationFactory{
 			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
-			cold_in = objectMapper.readValue(new File(path + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
-			floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		ObjectMapper objectMapper = new ObjectMapper();
+		frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
+		cold_in = objectMapper.readValue(new File(path + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
+		floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
+				
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			System.out.println("ex...73");		
+			//TODO
 		} 	
 		
 		order.getOrders().forEach(p -> {
 											partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 										});
 										
-										
-		
 		Map<Integer, List<Product>> frozenProducts = new HashMap<>();
 			order.getOrders().forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
 		Map<Integer, List<Product>> coldProducts = new HashMap<>();
@@ -270,7 +266,8 @@ public class SeparationFactory{
 		return separations;
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) { //TODO Separation out of state
+	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) throws IOException, NoSuchElement { //TODO Separation out of state
+		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
 		GeneralParameter cold_out = null;
@@ -281,31 +278,22 @@ public class SeparationFactory{
 			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
-			cold_out = objectMapper.readValue(new File(path + "/config/geralParameters/cold_out_state.json"), Cold_out_state.class);
-			floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		ObjectMapper objectMapper = new ObjectMapper();
+		frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
+		cold_out = objectMapper.readValue(new File(path + "/config/geralParameters/cold_out_state.json"), Cold_out_state.class);
+		floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
+
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			System.out.println("ex...260");
-		} 	
+			//TODO
+		} 		
 		
-		//PREENCHE A LISTA partialProducts COM TODOS OS DE CADA PRODUTO DA ORDEM DE CARGA.
+		//PREENCHE A LISTA partialProducts COM TODOS OS  DE CADA PRODUTO DA ORDEM DE CARGA.
 		order.getOrders().forEach(p -> {
 											partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 										});
-										
-										/*
-										System.out.println("Antes do filtro de quantidade.");
-										for (LoadOrder.Product lp : order.getProducts()) {
-											partialProducts.get(lp.note()).forEach( x ->  System.out.println(x + (x.visited ? " = visited" : " = nao")));
-										}*/
+								
 		
 		//LISTAS QUE SERAM RETORNADAS POR ESTE METODO.
 		Map<Integer, List<Product>> frozenProducts = new HashMap<>();	
@@ -508,7 +496,8 @@ public class SeparationFactory{
 		return separations;
 	}
 	
-	public Separation simpleSeparation() {
+	public Separation simpleSeparation() throws IOException {
+		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		for (Order p : order.getOrders()) {
 			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
@@ -607,8 +596,9 @@ public class SeparationFactory{
 				}	
 			}
 		}while(exists);  
-		
-		products.get(index).visited = true;
+		if(index != -1) {
+			products.get(index).visited = true;
+		}
 		return new SimpleEntry<>(index, product);
 	}
 	
@@ -710,8 +700,7 @@ public class SeparationFactory{
 				floorOrder = new LoadOrder(orders11046.stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 			} catch (NoSuchElement e) {
 				// TODO Auto-generated catch block
-				System.out.println("ex...656");
-			} 	
+			} 				
 			
 			orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
 			orders11046.forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
@@ -898,6 +887,14 @@ public class SeparationFactory{
 		}	
 		return null;
 
+	}
+	
+	public Repository getRepository() {
+		return this.repository;
+	}
+	
+	public List<Product> getAllProducts(){
+		return this.allProducts;
 	}
 	
 	private record TupleListProducts(List<Product> floorProducts, List<Product> frozenProducts) {}

@@ -71,7 +71,7 @@ public class ProductDto {
 						moreNew = pos;
 						verified = true;
 					}
-					if(pos.getDays() > moreNew.getDays()) {
+					if(pos.getDays() >= moreNew.getDays()) {
 						moreNew = pos;
 					}
 					
@@ -85,7 +85,6 @@ public class ProductDto {
 		
 	}
 	
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(note);
