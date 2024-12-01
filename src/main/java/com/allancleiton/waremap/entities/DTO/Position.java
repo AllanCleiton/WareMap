@@ -108,6 +108,10 @@ public class Position implements Comparable<Position>{
 		this.note = note;
 	}
 	
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+	
 	public void setMoreNew(int sobra) {
 		this.moreNew = true;
 		this.sobra = sobra;

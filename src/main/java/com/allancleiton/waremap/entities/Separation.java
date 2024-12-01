@@ -25,7 +25,7 @@ public class Separation {
 		Set<RoadDto> roads = new HashSet<>();
 		Set<ChamberDto> chams = new HashSet<>();
 		ProductDto productDto = null;
-		
+		Position auxPosition = null;
 		for (Order lp : order.getOrders()) {
 			for (Product product : partialProducts.get(lp.note())) {
 				
@@ -36,8 +36,10 @@ public class Separation {
 
 					chams.add(new ChamberDto(product.getChamber(), productDto.getEspecialNote()));
 					roads.add(new RoadDto(product.getRoad(), product.getChamber(), productDto.getEspecialNote()));
-					positions.add(new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), productDto.getEspecialNote(), product.getChamber(), product.getDays() , product.getBoxes()));
-
+					auxPosition = new Position(product.getHeight(), product.getCharDeoth(), product.getRoad(), productDto.getEspecialNote(), product.getChamber(), product.getDays() , product.getBoxes());
+					auxPosition.setProduct(product);
+					positions.add(auxPosition);
+					
 				}else if(!(product.activePackeg)){
 					finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
 					chams.add(new ChamberDto(product.getChamber(), product.getNote()));
