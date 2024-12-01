@@ -538,6 +538,9 @@ public class SeparationFactory{
 			acumulation = 0;
 		}
 		
+ 		for(Integer p : partialProducts.keySet()) {
+ 			partialProducts.get(p).stream().map(x -> x.visited = true).collect(Collectors.toList());
+ 		}
  		
 		return new Separation(partialProducts, order);
 	}

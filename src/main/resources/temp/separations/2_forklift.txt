@@ -6,9 +6,9 @@
 
 		  Rua 11= { 3A } 
 
-		  Rua 5= { 6B 1C } 
+		  Rua 5= { 1C 3C } 
 
-		  Rua 18= { 3C 6C } 
+		  Rua 18= { 6C 3C } 
 
 		  Rua 2= { 4C ->29 } 
 

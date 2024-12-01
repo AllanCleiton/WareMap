@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.allancleiton.waremap.entities.DTO.ChamberDto;
 import com.allancleiton.waremap.entities.DTO.Position;
 import com.allancleiton.waremap.entities.DTO.ProductDto;
@@ -26,6 +25,7 @@ public class Separation {
 		Set<ChamberDto> chams = new HashSet<>();
 		ProductDto productDto = null;
 		Position auxPosition = null;
+		
 		for (Order lp : order.getOrders()) {
 			for (Product product : partialProducts.get(lp.note())) {
 				
@@ -47,7 +47,6 @@ public class Separation {
 					positions.add(new Position(product));
 				}
 				
-
 			}
 		}
 		for (ProductDto product : finalListOfProducts) {
@@ -85,7 +84,18 @@ public class Separation {
 			System.out.println(product);
 		}
 		System.out.println();*/
-		
+		boolean exist = false;
+		for (Order lp : order.getOrders()) {
+			for(ProductDto p : finalListOfProducts) {
+				if(p.getNote() == lp.getNote()) {
+					exist = true;
+				}
+			}
+			if(!exist) {
+				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+			}
+			exist = false;
+		}
 		this.products = new ArrayList<>(finalListOfProducts);
 	}
 	

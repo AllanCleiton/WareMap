@@ -35,7 +35,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);		
-		String path = "src/main/resources/temp"; //src/main/resources/temp
+		String path = "temp"; //src/main/resources/temp
 		SeparationFactory factory = null;
 		Properties log = new Properties();
 		
@@ -79,7 +79,7 @@ public class WareMapApplication {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		//factory.getAllProducts().forEach(System.out::println);
 		clearScreen();
 		
 		do {

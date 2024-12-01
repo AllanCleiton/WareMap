@@ -1,0 +1,32 @@
+5009 200  Cam: 5 Rua 8= { 4A 2A 5A ->4 3A 1A } 
+
+11092 50   Cam: 3 Rua 19= { 2A ->21 3A } 
+
+		  Rua 13= { 5A } 
+
+11076 50   Cam: 3 Rua 15= { 3C } 
+
+		  Rua 10= { 1B ->-5 } 
+
+4021 412  Cam: 5 Rua 2= { 3A 5A ->32 1A 6A 4A 2A } 
+
+8005 120   Produto não encontrado!
+
+11046 300  Cam: 3 Rua 5= { 1A } 
+
+		  Rua 2= { 2A 4A 6A 3A 5A 7A ->4 } 
+
+11015 25    Produto não encontrado!
+
+11096 110  Cam: 3 Rua 15= { 2C ->-80 } 
+
+11007 80   Cam: 3 Rua 7= { 1B ->-65 } 
+
+11023 20   Cam: 3 Rua 17= { 2A ->22 7A } 
+
+5023 87   Cam: 5 Rua 1= { 7A } 
+
+		  Rua 9= { 1A ->5 } 
+
+4016 32   Cam: 5 Rua 6= { 2A ->43 } 
+
