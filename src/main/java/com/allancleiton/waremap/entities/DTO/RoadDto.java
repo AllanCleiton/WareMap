@@ -79,8 +79,7 @@ public class RoadDto {
 	@Override
 	public String toString() {
 		positions.sort(Position::compareTo);
-		
-		
+	
 		StringBuilder sb = new StringBuilder();
 		sb.append("Rua " + road + "= { ");
 			int count = 0;
@@ -88,14 +87,14 @@ public class RoadDto {
 			for (Position position : positions) {
 				if(count > 7) {
 					if(position.moreNew && position.sobra != 0) {
-						sb.append("\n\t\t\t  " + position.toString() + "->" + position.sobra + " ");
+						sb.append("\n\t\t\t  " + position.toString() + "-> " + position.getToWithdraw() + "cx ");
 					}else {	
 						sb.append("\n\t\t\t  " + position.toString());
 					}
 					count = 0;
 				}else {
 					if(position.moreNew && position.sobra != 0) {
-						sb.append(position.toString() + "->" + position.sobra + " ");
+						sb.append(position.toString() + "-> " + position.getToWithdraw() + "cx ");
 					}else {
 						sb.append(position.toString());
 					}

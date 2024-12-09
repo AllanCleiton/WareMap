@@ -2,24 +2,34 @@ package com.allancleiton.waremap.entities;
 
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.entities.DTO.ChamberDto;
 import com.allancleiton.waremap.entities.DTO.Position;
 import com.allancleiton.waremap.entities.DTO.ProductDto;
 import com.allancleiton.waremap.entities.DTO.RoadDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class Separation {
-	protected String orderCharger;
-	protected List<ProductDto> products = null;
+	protected Set<ProductDto> finalListOfProducts = new HashSet<>();
+	protected Map<Integer, List<Product>> partialProducts = null;
+	protected LoadOrder order = null;
 	
 	public Separation(Map<Integer, List<Product>> partialProducts, LoadOrder order){
-		Set<ProductDto> finalListOfProducts = new HashSet<>();
+		this.partialProducts = partialProducts;
+		this.order = order;
+		start(partialProducts, order);
+	}
+	
+	public void start(Map<Integer, List<Product>> partialProducts, LoadOrder order) {
 		Set<Position> positions = new HashSet<>();
 		Set<RoadDto> roads = new HashSet<>();
 		Set<ChamberDto> chams = new HashSet<>();
@@ -78,57 +88,52 @@ public class Separation {
 				}
 			}
 		}
-		/*
-		System.out.println("finalListOfProducts");
-		for (ProductDto product : finalListOfProducts) {
-			System.out.println(product);
-		}
-		System.out.println();*/
-		boolean exist = false;
-		for (Order lp : order.getOrders()) {
-			for(ProductDto p : finalListOfProducts) {
-				if(p.getNote() == lp.getNote()) {
-					exist = true;
-				}
-			}
-			if(!exist) {
-				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
-			}
-			exist = false;
-		}
-		this.products = new ArrayList<>(finalListOfProducts);
+		
 	}
-	
-	
-	public String getOrderChager() {
-		return this.orderCharger;
-	}
+
 	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		
-		sb.append("Ordem de carga: " + orderCharger + "\n");
-		sb.append("_________________________________________\n\n");
-		for (ProductDto p : products) {
+		for (ProductDto p : finalListOfProducts) {
 			sb.append(p.toString());
 		}
 		
 		return sb.toString();
 	}
 	
-	public List<ProductDto> getDtoProducts(){
-		return this.products;
+	public Set<ProductDto> getDtoProducts(){
+		return this.finalListOfProducts;
+	}
+	
+	public Map<Integer, List<Product>> getPartialProducts(){
+		return this.partialProducts;
+	}
+	
+	public LoadOrder getLoadOrder() {
+		return this.order;
 	}
 	
 	public boolean createArquiveWithSeparation(String path) throws Exception{
-
+    	ObjectMapper objectMapper = new ObjectMapper();
+    	Floor_separation floorSeparation = null;
+		floorSeparation = objectMapper.readValue(new File("temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
+		Set<ProductDto> aux = new HashSet<>(finalListOfProducts);
+		int floor = floorSeparation.getParameter();
+		
+    	Set<ProductDto> listFloor = aux.stream().filter(x -> x.getQuantity() <= floor).collect(Collectors.toSet());
+    	aux.removeAll(listFloor);
+    	    
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
-			for (ProductDto productDto : products) {
+			bW.write("Separação da Empilhadeira.\n");
+			for (ProductDto productDto : aux) {
+				bW.write(productDto.toString());
+			}
+			bW.write("\nSeparação do chão.\n");
+			for (ProductDto productDto : listFloor) {
 				bW.write(productDto.toString());
 			}
 			return true;
 		}
 	}
-
 }

@@ -73,7 +73,7 @@ public class Product implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + " pacotes: " + packages;
+		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + ", pacotes: " + packages + ", visitado: " + visited;
 	}
 
 	@Override

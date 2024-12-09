@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.allancleiton.waremap.WareMapApplication;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
@@ -40,7 +41,7 @@ public class SeparationFactory{
 		//allProducts.forEach(System.out::println);
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) throws IOException { //TODO Separation in state
+	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) throws IOException {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
@@ -60,7 +61,7 @@ public class SeparationFactory{
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			//TODO
+			
 		} 	
 		
 		order.getOrders().forEach(p -> {
@@ -84,6 +85,7 @@ public class SeparationFactory{
 		List<Order> auxOrder = new ArrayList<>(order.getOrders());
 				
 		for (Order lp : auxOrder) {
+			
 			//TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
 			if(lp.note() == 11046) {
 				TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
@@ -193,7 +195,7 @@ public class SeparationFactory{
 						
 						
 					}
-					if(!(coldList.isEmpty()) && !(coldIsOk)) {
+					if(!(coldList.isEmpty()) && !(coldIsOk) && !(floorIsOk)) {
 						
 						for (Product p : coldList) {
 							result = older(lp.note(), coldList);
@@ -256,7 +258,6 @@ public class SeparationFactory{
 			} while (!((frozenIsOk || coldIsOk || floorIsOk)|| !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false))) || listOnlyOneIten);	
 		}
 		
-		
 		SeparationSet<Separation, Separation, Separation> separations = new SeparationSet<Separation, Separation, Separation>(
 				new Separation(frozenProducts, order), 
 				new Separation(floorProducts, order), 
@@ -266,7 +267,7 @@ public class SeparationFactory{
 		return separations;
 	}
 	
-	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) throws IOException, NoSuchElement { //TODO Separation out of state
+	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) throws IOException, NoSuchElement {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
 		GeneralParameter frozen = null;
@@ -286,7 +287,6 @@ public class SeparationFactory{
 		try {
 			floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 		} catch (NoSuchElement e) {
-			//TODO
 		} 		
 		
 		//PREENCHE A LISTA partialProducts COM TODOS OS  DE CADA PRODUTO DA ORDEM DE CARGA.
@@ -424,7 +424,7 @@ public class SeparationFactory{
 						
 						
 					}
-					if(!(coldList.isEmpty()) && !(coldIsOk)) {
+					if(!(coldList.isEmpty()) && !(coldIsOk) && !(floorIsOk)) {
 						
 						for (@SuppressWarnings("unused") Product p : coldList) {
 							result = older(lp.note(), coldList);
@@ -486,7 +486,6 @@ public class SeparationFactory{
 			} while (!((frozenIsOk || coldIsOk || floorIsOk)|| !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false))) || listOnlyOneIten);	
 		}
 		
-		
 		SeparationSet<Separation, Separation, Separation> separations = new SeparationSet<Separation, Separation, Separation>(
 				new Separation(frozenProducts, order), 
 				new Separation(floorProducts, order), 
@@ -508,7 +507,23 @@ public class SeparationFactory{
 		Entry<Integer, Product> result = null;
  		int acumulation = 0;
 		Product actual = null;
- 		for (Order lp : order.getOrders()) {
+		
+		//ESTA LISTA É UMA COPIA DA LISTA DE ORDEM PRINCIPAL DESTA CLASSE
+		List<Order> auxOrder = new ArrayList<>(order.getOrders());
+ 		for (Order lp : auxOrder) {
+ 			//TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
+			if(lp.note() == 11046) {
+				
+				try{ 
+					aux.addAll(exclusive11046Separation2(listActual, lp, partialProducts, sc));
+					partialProducts.replace(lp.note(), new ArrayList<>(aux));
+					aux.clear();
+					continue;
+				}catch(NullPointerException e) {
+				
+				}
+			}
+ 			
  			listActual = partialProducts.get(lp.note());
  			
 			for(int i = 0; i <= listActual.size(); i++) {	
@@ -556,22 +571,25 @@ public class SeparationFactory{
 			exists = false;
 			
 			for (Product p : products) {
-				aux = p.getHeight() + p.getDeoth();
-				
-				if (p.getDeoth() == 0) {
-					return new SimpleEntry<>(products.indexOf(p), p);
+				if(p.visited == false) {
+					if (p.getDeoth() == 0) {
+						return new SimpleEntry<>(products.indexOf(p), p);
+					}
+					aux = p.getHeight() + p.getDeoth();
+					if(aux < max ) {
+						max = aux;
+						product = p;
+						exists = true;
+						index = products.indexOf(p);
+						
+					}
 				}
 				
-				if(aux < max ) {
-					max = aux;
-					product = p;
-					exists = true;
-					index = products.indexOf(p);
-					
-				}
 			}
 		}while(exists);  
-
+		if(index != -1) {
+			products.get(index).visited = true;
+		}
 		return new SimpleEntry<>(index, product);
 	}
 	
@@ -609,9 +627,17 @@ public class SeparationFactory{
 		List<Product> products = new ArrayList<>();
 		for (Product product : allProducts) {
 			if(product.getNote().equals(code)) {
-				products.add(product);
-				
-				
+				products.add(product);	
+			}
+		}
+		return products;
+	}
+	
+	private List<Product> filterProducts(Integer code, List<Product> allProducts, Predicate<Product> criteria){
+		List<Product> products = new ArrayList<>();
+		for (Product product : allProducts) {
+			if(product.getNote().equals(code) && criteria.test(product) ) {
+				products.add(product);	
 			}
 		}
 		return products;
@@ -685,7 +711,7 @@ public class SeparationFactory{
 				else if(choice_ == 1) {
 					Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
 					
-					for(int i =0; i < 4; i++) {
+					for(int i =0; i < 5; i++) {
 						if (list[i] > 0) {
 							actual = new Order(11046, i+7, list[i]);
 							order.setOrder(actual);
@@ -702,18 +728,22 @@ public class SeparationFactory{
 			try {
 				floorOrder = new LoadOrder(orders11046.stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
 			} catch (NoSuchElement e) {
-				// TODO Auto-generated catch block
+				
 			} 				
 			
 			orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
 			orders11046.forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
 
-			
-			Order lpFlor = null;
+			List<Product> specificProducts = null; 
+			Order orderFloor = null;
 			for (Order order : orders11046) {
+				specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
+				if(specificProducts.isEmpty()) continue;
+				
 				if(floorOrder != null) {
-					lpFlor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
+					orderFloor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
 				}
+				
 				boolean executed = false;
 				boolean frozenIsOk = false;
 				boolean floorIsOk = false;
@@ -727,20 +757,19 @@ public class SeparationFactory{
 				do {
 					if(!(executed)) {
 						//PEGA TODOS OS PRODUTOS COM CODIGO LP.note E ATRIBUE ÀS LISTAS -------------------
-						for (Product product : partialProducts.get(order.note())) {
-							boolean ok = false;
-							
+						for (Product product :specificProducts) {
+						
 							if(product.getPackages() == order.packeges && product.isFrozen && !(product.visited)) {
-								if( product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && lpFlor != null){
-									ok = floorList.add(product);
+								if( product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && orderFloor != null){
+									floorList.add(product);
 								}
-								if(!(ok)){ frozenList.add(product);}
+								frozenList.add(product);
 							}
 							
 						}//FIM LAÇO FOR-------------------------------------------------
 						
 						//ATUALIZANDO OS MAP'S frozenProducts e coldProducts
-						if(!(floorList.isEmpty()) && !(floorIsOk) && lpFlor != null) {
+						if(!(floorList.isEmpty()) && !(floorIsOk) && orderFloor != null) {
 							for (int i = 0; i < floorList.size(); i++) {
 								
 								result = older(order.note(), floorList);
@@ -781,10 +810,12 @@ public class SeparationFactory{
 									}
 									
 									
-									if(sumfloor > lpFlor.qtdeBoxes() ) {
+									if(sumfloor >= orderFloor.qtdeBoxes() ) {
 										floorIsOk = true;
 										break;
 									}
+								}else {
+									temporary.visited = false;
 								}
 							}
 						}
@@ -837,7 +868,7 @@ public class SeparationFactory{
 					
 					//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
 					if(executed) {
-						result = older(order.note(), partialProducts.get(order.note())); //O METODO OLDER RETORNA O PRODUTO MAIS VELHO, E MARCA ELE COMO VISITADO.
+						result = older(order.note(), specificProducts); //O METODO OLDER RETORNA O PRODUTO MAIS VELHO, E MARCA ELE COMO VISITADO.
 						temporary = result.getValue(); // VARIAVEL TEMPORARY, RECEBE O VALOR DO RETORNO DE OLDER.
 						
 						//SE A CONDICIONAL ABAIXO NAO FOR EXECUTADA, É PRECISO ALTERAR O CONTEUDO DE TEMPORARY, EM VISITED PARA FALSE.
@@ -884,17 +915,221 @@ public class SeparationFactory{
 					}
 					
 					
-				} while (!((frozenIsOk || floorIsOk)|| !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false)) ));	
+				} while (!((frozenIsOk || floorIsOk)|| !(specificProducts.stream().anyMatch(x -> x.visited == false)) ));	
 			}
 			return new TupleListProducts(floorProducts.get(lp.note()), frozenProducts.get(lp.note())); 
-		}	
-		return null;
+		}else {
+			WareMapApplication.clearScreen();
+			return null;
+		}
+		
 
 	}
+	
+	
+	public List<Product> exclusive11046Separation2(List<Product> frozenList, Order lp, Map<Integer, List<Product>> partialProducts, Scanner scan){
+		Entry<Integer, Product> result = null;
+		Product temporary = null;
+		
+		int _11046_7;
+		int _11046_8;
+		int _11046_9;
+		int _11046_10;
+		int _11046_11;
+		String choice;
+		System.out.println("----------------------------------------");
+		System.out.println("* (O sistema detectou o cóodigo 11046) *");
+		System.out.println("----------------------------------------");
+
+		System.out.println(" Deseja especificar a quantidade individual?");
+		System.out.print(" S/N -> ");
+		choice = scan.nextLine().toUpperCase().trim();
+		WareMapApplication.clearScreen();
+		if(choice.equals("S")) {
+			List<Order> orders11046 = new ArrayList<>();
+			Map<Integer, List<Product>> frozenProducts = new HashMap<>();
+
+			Order actual = null;
+			int choice_ = 2;
+			do {
+				
+				//fazer debug aqui para verificar erro de illegalargumentexception the kist are empty.
+				System.out.println(" Informe as quantidades para cada tipo de 11046:");
+				System.out.print(" \n Para 11046 c/ 7 caixas: "); _11046_7 = scan.nextInt();
+				System.out.print(" \n Para 11046 c/ 8 caixas: "); _11046_8 = scan.nextInt();
+				System.out.print(" \n Para 11046 c/ 9 caixas: "); _11046_9 = scan.nextInt();
+				System.out.print(" \n Para 11046 c/ 10 caixas: "); _11046_10 = scan.nextInt();
+				System.out.print(" \n Para 11046 c/ 11 caixas: "); _11046_11 = scan.nextInt();
+				WareMapApplication.clearScreen();
+				
+				System.out.println(" Verifique os dados ");
+				System.out.println(" 11046 c/ 7 caixas = " + _11046_7);
+				System.out.println(" 11046 c/ 8 caixas = " + _11046_8);
+				System.out.println(" 11046 c/ 9 caixas = " + _11046_9); 
+				System.out.println(" 11046 c/ 10 caixas = " + _11046_10); 
+				System.out.println(" 11046 c/ 11 caixas = " + _11046_11); 
+				System.out.println(" Confirmar:....................(1)");
+				System.out.println(" Alterar:......................(2)");
+				System.out.println(" Cancelar:.....................(0)");
+				System.out.print(" -> ");
+				choice_ = scan.nextInt();
+				scan.nextLine();
+				WareMapApplication.clearScreen();
+
+				if(choice_ == 0) {
+					return null;
+				}
+				else if(choice_ == 1) {
+					Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
+					
+					for(int i =0; i < 4; i++) {
+						if (list[i] > 0) {
+							actual = new Order(11046, i+7, list[i]);
+							order.setOrder(actual);
+							orders11046.add(actual);
+							order.remeveOrder(lp);
+						}
+					}
+					
+					break;
+				}
+				
+			}while(choice_ == 2);				
+			
+			orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
+			List<Product> specificProducts = null; 
+			
+			for (Order order : orders11046) {
+				specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
+				boolean executed = false;
+				boolean frozenIsOk = false;
+				int sumFrozen = 0;
+				
+				
+				frozenList.clear();
+				externo:
+				do {
+					if(!(executed)) {
+						//PEGA TODOS OS PRODUTOS COM CODIGO LP.note E ATRIBUE ÀS LISTAS -------------------
+						for (Product product : specificProducts) {
+							if(product.isFrozen && !(product.visited)) {
+								frozenList.add(product);
+							}
+						}//FIM LAÇO FOR-------------------------------------------------
+						
+						//ATUALIZANDO OS MAP'S frozenProducts e coldProducts
+						if(!(frozenList.isEmpty()) && !(frozenIsOk)) {
+							
+							for (@SuppressWarnings("unused") Product p : frozenList) {
+								result = easier(order.note(), frozenList);
+								temporary = result.getValue();
+								if(temporary != null && !(frozenIsOk)) {
+									
+									sumFrozen += temporary.getBoxes();
+									frozenProducts.get(order.note()).add(temporary);
+									
+									switch(temporary.getPackages()) {
+										case 7:{
+											temporary.activePackeg = true;
+											break;
+										}
+										case 8:{
+											temporary.activePackeg = true;
+											break;
+										}
+										case 9:{
+											temporary.activePackeg = true;
+											break;
+										}
+										case 10:{
+											temporary.activePackeg = true;
+											break;
+										}
+										case 11:{
+											temporary.activePackeg = true;
+											break;
+										}
+										
+									}
+									if(sumFrozen >= order.qtdeBoxes()) {
+										frozenIsOk = true;
+										break;
+									}
+								}else {
+									temporary.visited = false;
+								}
+							}
+							
+							
+						}
+						
+					}
+					
+					//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
+					if(executed) {
+						result = easier(order.note(), specificProducts); //O METODO OLDER RETORNA O PRODUTO MAIS VELHO, E MARCA ELE COMO VISITADO.
+						temporary = result.getValue(); // VARIAVEL TEMPORARY, RECEBE O VALOR DO RETORNO DE OLDER.
+						
+						//SE A CONDICIONAL ABAIXO NAO FOR EXECUTADA, É PRECISO ALTERAR O CONTEUDO DE TEMPORARY, EM VISITED PARA FALSE.
+						if(temporary.getPackages() == order.packeges && temporary != null && temporary.isFrozen && !(frozenIsOk)) {
+							sumFrozen += temporary.getBoxes();
+							frozenProducts.get(order.note()).add(temporary);
+							
+							switch(temporary.getPackages()) {
+								case 7:{
+									temporary.activePackeg = true;
+									break;
+								}
+								case 8:{
+									temporary.activePackeg = true;
+									break;
+								}
+								case 9:{
+									temporary.activePackeg = true;
+									break;
+								}
+								case 10:{
+									temporary.activePackeg = true;
+									break;
+								}
+								case 11:{
+									temporary.activePackeg = true;
+									break;
+								}
+								
+							}
+							
+							
+							if(sumFrozen > order.qtdeBoxes()) {
+								frozenIsOk = true;
+							}
+						}		
+
+					}
+					executed = true;
+					
+					if(sumFrozen >= order.qtdeBoxes()) {
+						frozenIsOk = true;
+						break externo;
+					}
+					
+					
+				} while (!((frozenIsOk)|| !(specificProducts.stream().anyMatch(x -> x.visited == false)) ));	
+			}
+			return frozenProducts.get(lp.note()); 
+		}else {
+			WareMapApplication.clearScreen();
+			return null;
+		}
+		
+
+	}
+	
 	
 	public Repository getRepository() {
 		return this.repository;
 	}
+	
 	
 	public List<Product> getAllProducts(){
 		return this.allProducts;

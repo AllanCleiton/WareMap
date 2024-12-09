@@ -87,6 +87,7 @@ public class WareMapApplication {
 			System.out.println(" Gerar Separação:..................(1).");
 			System.out.println(" Configurações:....................(2).");
 			System.out.println(" Sair:.............................(3).");
+
 			System.out.print(" -> "); 
 			choice = sc.nextInt();
 			clearScreen();
@@ -113,6 +114,10 @@ public class WareMapApplication {
 				factory.getRepository().shutDownDb(path);
 				break;
 			}
+			/*case 4: {
+				factory.getAllProducts().stream().filter(x -> x.getChamber() == 1).forEach(System.out::println);
+				break;
+			}*/
 			default:
 				System.out.println(" Opção inválida! " + choice);
 			}
@@ -228,11 +233,14 @@ public class WareMapApplication {
 				}
 
 				separations = factory.stateSeparation(defaultPath); 			  
-
-				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_forklift") + ".txt");
-				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_floor") + ".txt");
-				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_cold") + ".txt");
 				
+				p = separations.createArquiveWithSeparation(finalPath.replace(".txt", "_dentroDoEstado") + ".txt");
+
+				/*
+				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_congelados") + ".txt");
+				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_chão") + ".txt");
+				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_resfriados") + ".txt");
+				*/
 				if(p || q || r) {
 					System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Separação de carga.                         "+ Color.ANSI_RESET);
 
@@ -284,11 +292,14 @@ public class WareMapApplication {
 				}
 
 				separations = factory.outOfStateSeparation(defaultPath); 			  
-
-				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_forklift") + ".txt");
-				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_floor") + ".txt");
-				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_cold") + ".txt");
 				
+				p = separations.createArquiveWithSeparation(finalPath.replace(".txt", "_foraDoEstado") + ".txt");
+
+				/*
+				p = separations.getForklift().createArquiveWithSeparation(finalPath.replace(".txt", "_congelados") + ".txt");
+				q = separations.getFloor().createArquiveWithSeparation(finalPath.replace(".txt", "_chão") + ".txt");
+				r = separations.getCold().createArquiveWithSeparation(finalPath.replace(".txt", "_resfriados") + ".txt");
+				*/
 				if(p || q || r) {
 					System.out.println(Color.ANSI_PURPLE_BACKGROUND + " Separação de carga.                         "+ Color.ANSI_RESET);
 
@@ -296,6 +307,7 @@ public class WareMapApplication {
 					System.out.println(" Disponivel em:\n " + finalPath);
 					System.out.println(" Pressione Enter para continuar...");
 				    sc.nextLine();
+				    clearScreen();
 				}
 				
 				//SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
@@ -391,7 +403,6 @@ public class WareMapApplication {
 					case 4: {
 						System.out.println(Color.ANSI_CYAN_BACKGROUND + " QUANTIDADE MÁXIMA P/ SEPARAÇÃO DO CHÃO      " + Color.ANSI_RESET);
 						int valor;
-						System.out.println("Padrão do parametro: f(x) -> (x <= V)");
 						System.out.print(" Informe o valor do divisor: ");
 						valor = sc.nextInt();
 						sc.nextLine();

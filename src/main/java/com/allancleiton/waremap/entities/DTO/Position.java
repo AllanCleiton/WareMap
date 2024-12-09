@@ -17,7 +17,9 @@ public class Position implements Comparable<Position>{
 	int days;
 	int boxes;
 	boolean moreNew = false;
+	public boolean visited = false;
 	int sobra;	
+	private int toWithdraw;
 	
 	public Position(int heigth, char deoth, int road, int note, int chamber, int days, int boxes) {
 		this.heigth = heigth;
@@ -112,9 +114,18 @@ public class Position implements Comparable<Position>{
 		this.product = product;
 	}
 	
+	public int getToWithdraw() {
+		return toWithdraw;
+	}
+	
+	public void setToWithdraw(int value) {
+		this.toWithdraw = value;
+	}
 	public void setMoreNew(int sobra) {
+		
 		this.moreNew = true;
 		this.sobra = sobra;
+	
 		if(product.getBoxes() > sobra && sobra > 0) {
 			this.product.setBoxes(sobra);
 			this.product.visited = false;
