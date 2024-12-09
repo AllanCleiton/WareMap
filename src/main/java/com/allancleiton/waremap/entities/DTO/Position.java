@@ -2,33 +2,46 @@ package com.allancleiton.waremap.entities.DTO;
 
 import java.util.Objects;
 
+import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.enums.Deoth;
 
 
 
 public class Position implements Comparable<Position>{
-	int chamber;
-	int product; 
+	private Product product;
+	private int chamber;
+	int note; 
 	int road;
 	int heigth; 
 	char deoth; 
 	int days;
 	int boxes;
 	boolean moreNew = false;
-	int sobra;
+	public boolean visited = false;
+	int sobra;	
+	private int toWithdraw;
 	
-	
-	
-	public Position(int heigth, char deoth, int road, int product, int chamber, int days, int boxes) {
+	public Position(int heigth, char deoth, int road, int note, int chamber, int days, int boxes) {
 		this.heigth = heigth;
 		this.deoth = deoth;
 		this.road = road;
-		this.product = product;
+		this.note = note;
 		this.chamber = chamber;
 		this.days = days;
 		this.boxes = boxes;
 	}
-
+	
+	public Position(Product product) {
+		this.product = product;
+		this.heigth = product.getHeight();
+		this.deoth = product.getCharDeoth();
+		this.road = product.getRoad();
+		this.note = product.getNote();
+		this.chamber = product.getChamber();
+		this.days = product.getDays();
+		this.boxes = product.getBoxes();
+	}
+	
 	
 	@Override
 	public int hashCode() {
@@ -48,8 +61,7 @@ public class Position implements Comparable<Position>{
 		return chamber == other.chamber && deoth == other.deoth && heigth == other.heigth && product == other.product
 				&& road == other.road;
 	}
-
-
+	
 	public int getChamber() {
 		return chamber;
 	}
@@ -91,26 +103,43 @@ public class Position implements Comparable<Position>{
 	}
 	
 	public int getProduct() {
-		return product;
+		return note;
 	}
 
-	public void setProduct(int product) {
+	public void setProduct(int note) {
+		this.note = note;
+	}
+	
+	public void setProduct(Product product) {
 		this.product = product;
 	}
 	
+	public int getToWithdraw() {
+		return toWithdraw;
+	}
+	
+	public void setToWithdraw(int value) {
+		this.toWithdraw = value;
+	}
 	public void setMoreNew(int sobra) {
+		
 		this.moreNew = true;
 		this.sobra = sobra;
+	
+		if(product.getBoxes() > sobra && sobra > 0) {
+			this.product.setBoxes(sobra);
+			this.product.visited = false;
+		}
 	}
 	
 	public int getBoxes() {
 		return this.boxes;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%d%c ", heigth,deoth) );
+		sb.append(String.format("%d%c ", product.getHeight(),product.getCharDeoth()) );
 		return sb.toString();
 	}
 

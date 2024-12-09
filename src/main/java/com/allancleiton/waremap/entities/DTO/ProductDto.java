@@ -6,15 +6,19 @@ import java.util.Objects;
 
 
 
-public class ProductDto {
-	int note; 
+public class ProductDto implements Comparable<ProductDto>{
+	Integer note; 
 	int quantity;
-	int somatorio;
-
+	public Integer tam = null;
 	List<ChamberDto> chambers = new ArrayList<>();
 	
 	public ProductDto(int note, int quantity) {
 		this.note = note;
+		this.quantity = quantity;
+	}
+	
+	public ProductDto(int note, int quantity, int qtdeBoxes) {
+		this.note = Integer.parseInt(String.valueOf(note).concat(String.valueOf(qtdeBoxes)));;
 		this.quantity = quantity;
 	}
 	
@@ -28,18 +32,25 @@ public class ProductDto {
 		this.chambers = chambers;
 	}
 	
-	public int getNote() {
+	public Integer getNote() {
+		if(tam != null) {
+			return Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), ""));
+		}
 		return note;
 	}
-
+	
+	public Integer getQuantity() {
+		return this.quantity;
+	}
+	
+	public int getEspecialNote() {
+		return note;
+	}
+	
 	public void setNote(int note) {
 		this.note = note;
 	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
+	
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
@@ -48,38 +59,62 @@ public class ProductDto {
 		return chambers;
 	}
 	
-	public int getSomatorio() {
-		return this.somatorio;
-	}
-	
 	private void somatorioEndMoreNew() {
-		int sum = 0;
+		int sum = 0, sobra = 0;
 		boolean verified = false;
 		Position moreNew = null;
-		for (ChamberDto chamberDto : chambers) {
-			for (RoadDto roadDto : chamberDto.getRoads()) {
-				for (Position pos : roadDto.getPositions()) {
-					sum += pos.getBoxes();
-					if(!verified) {
-						moreNew = pos;
-						verified = true;
+		
+		boolean exit = false, executed = false;
+		if(!(this.chambers.isEmpty())) {
+			while(!exit) {
+				for (ChamberDto chamberDto : chambers) {
+					for (RoadDto roadDto : chamberDto.getRoads()) {
+						for (Position pos : roadDto.getPositions()) {
+							if(!(pos.visited)) {	
+								sum += pos.getBoxes();
+								if(!verified) {
+									moreNew = pos;
+									verified = true;
+								}
+								if(executed) {
+									if(pos.getDays() >= moreNew.getDays() && moreNew.getBoxes() >= sobra) {
+										moreNew = pos;
+									}
+								}else {
+									if(pos.getDays() >= moreNew.getDays()) {
+										moreNew = pos;
+									}
+								}
+							}else {
+								sum += pos.getBoxes();;
+							}
+						}
 					}
-					if(pos.getDays() > moreNew.getDays()) {
-						moreNew = pos;
-					}
-					
+				}
+				sobra = sum-quantity;
+				if(moreNew.getBoxes() >= sobra) {
+					exit = true;
+				}else {
+					moreNew.visited = true;
+					executed = true;
+					verified = false;
+					sum = 0;
 				}
 			}
 		}
-		this.somatorio = sum;
-		if(moreNew != null) moreNew.setMoreNew(somatorio-quantity);	
+		
+		if(moreNew != null) {
+			moreNew.setToWithdraw(moreNew.getBoxes() - sobra);
+			
+			moreNew.setMoreNew(sobra);	
+		}
 		
 	}
 	
-
+	
 	@Override
 	public int hashCode() {
-		return Objects.hash(note);
+		return Objects.hash(chambers, note, quantity, tam);
 	}
 
 	@Override
@@ -91,7 +126,8 @@ public class ProductDto {
 		if (getClass() != obj.getClass())
 			return false;
 		ProductDto other = (ProductDto) obj;
-		return note == other.note;
+		return Objects.equals(chambers, other.chambers) && Objects.equals(note, other.note)
+				&& quantity == other.quantity && Objects.equals(tam, other.tam);
 	}
 
 	@Override
@@ -99,7 +135,17 @@ public class ProductDto {
 		somatorioEndMoreNew();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append(note +" " + quantity);
+		if(tam != null ) {
+			if(String.valueOf(note).length() == 7) {
+				//sb.append(Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), "")) +" " + String.valueOf(note).substring(5) + " " + quantity);
+				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 2)) +"[" + String.valueOf(note).substring(5) + "] " + quantity);
+			}else if(String.valueOf(note).length() == 6) {
+				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 1)) +"[" + String.valueOf(note).substring(5) + "] " + quantity);
+
+			}
+		}else {
+			sb.append(note +" "+ quantity);
+		}
 		
 		if(quantity < 10) {
 			sb.append("    ");
@@ -114,7 +160,7 @@ public class ProductDto {
 		if(!chambers.isEmpty()) {
 			sb.append(chambers.get(0).toString());
 		}else {
-			sb.append(" Produto não encontrado!\n\n");
+			sb.append(" Produto não encontrado!\n");
 		}
 		if(chambers.size() > 0) {
 			for(int i = 1; i < chambers.size(); i++) {
@@ -125,4 +171,11 @@ public class ProductDto {
 		
 		return sb.toString();
 	}
+
+	@Override
+	public int compareTo(ProductDto o) {
+		return this.getNote().compareTo(o.getNote());
+	}
+
+	
 }

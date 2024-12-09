@@ -1,20 +1,21 @@
 package com.allancleiton.waremap.entities;
 
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import com.allancleiton.waremap.entities.enums.Deoth;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public class Product implements Serializable{
 
-
-
-
-public class Product {
+	private static final long serialVersionUID = 1L;
 	private Integer note, days, boxes, chamber, road, height, packages;
 	private Deoth deoth;
 	public boolean visited;
 	public boolean isFrozen;
-	
+	public Integer validity;
+	public boolean activePackeg = false;
 	
 	public Product(Integer note, Integer days, Integer boxes, Integer chamber, Integer road, Integer height, String deoth, Integer packages) {
 		this.note = note;
@@ -41,6 +42,10 @@ public class Product {
 		return boxes;
 	}
 
+	public void setBoxes(Integer boxes) {
+		this.boxes = boxes;
+	}
+	
 	public Integer getChamber() {
 		return chamber;
 	}
@@ -57,17 +62,18 @@ public class Product {
 		return deoth.getValue();
 	}
 	
-	protected Character getCharDeoth() {
+	@JsonIgnore
+	public Character getCharDeoth() {
 		return deoth.getValue(this.getDeoth());
 	}
 	
 	public Integer getPackages() {
 		return packages;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + " pacotes: " + packages;
+		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + ", pacotes: " + packages + ", visitado: " + visited;
 	}
 
 	@Override
