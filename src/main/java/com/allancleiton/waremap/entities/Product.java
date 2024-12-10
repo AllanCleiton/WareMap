@@ -4,6 +4,7 @@ package com.allancleiton.waremap.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.allancleiton.waremap.Color;
 import com.allancleiton.waremap.entities.enums.Deoth;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -73,7 +74,27 @@ public class Product implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "codigo: " + note + " dias: " + days + " caixas: " + boxes + ", cam: " + chamber + ", rua: " + road + ", andar: " + height + ", posicão: "+ deoth + ", pacotes: " + packages + ", visitado: " + visited;
+		StringBuilder sb = new StringBuilder();
+		sb.append(Color.ANSI_BLACK);
+		sb.append("  " + note + (note > 10000 ? "  " : "   "));
+		
+		if(days > 100) {sb.append(days + "    "); }else if((days < 100) && (days >= 10)) {sb.append(days + "     "); }else{sb.append(days + "      "); }
+		
+		sb.append(boxes + (boxes < 10 ? "        " : "       "));
+		
+		sb.append("Cam" + chamber + (chamber < 10 ? "     " : "      "));
+		
+		sb.append("Rua" + road + (road < 10 ? "    " : "   "));
+		
+		sb.append(height + "      ");
+
+		sb.append(deoth + "        ");
+		
+		sb.append(packages + (packages >= 10 ?"       " : "        " ));
+		
+		sb.append(visited?Color.ANSI_RED + "Sim    " + Color.ANSI_RESET: "NÂO    ");
+		sb.append(Color.ANSI_RESET);
+		return 	sb.toString();
 	}
 
 	@Override

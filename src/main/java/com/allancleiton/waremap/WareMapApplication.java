@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.Properties;
 import java.util.Scanner;
 import org.springframework.boot.SpringApplication;
@@ -23,6 +25,7 @@ import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.config.parameters.Frozen;
 import com.allancleiton.waremap.config.parameters.GeneralParameter;
 import com.allancleiton.waremap.entities.Category;
+import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.DTO.EntryProduct;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
@@ -79,14 +82,15 @@ public class WareMapApplication {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//factory.getAllProducts().forEach(System.out::println);
+		
 		clearScreen();
 		
 		do {
 			System.out.println(Color.ANSI_PURPLE_BACKGROUND + " WELCOME TO THE WAREMAPE APLICATION          "+ Color.ANSI_RESET);
 			System.out.println(" Gerar Separação:..................(1).");
 			System.out.println(" Configurações:....................(2).");
-			System.out.println(" Sair:.............................(3).");
+			System.out.println(" Lista de produtos:................(3).");
+			System.out.println(" Sair:.............................(0).");
 
 			System.out.print(" -> "); 
 			choice = sc.nextInt();
@@ -100,7 +104,7 @@ public class WareMapApplication {
 				configuracao(path ,sc);
 				break;
 			}
-			case 3: {
+			case 0: {
 				System.out.println(" Saindo.");
 				log.setProperty("exit", "true"); 
 				try (OutputStream output = new FileOutputStream(path + "/config/logs/log.properties")) {
@@ -114,14 +118,20 @@ public class WareMapApplication {
 				factory.getRepository().shutDownDb(path);
 				break;
 			}
-			/*case 4: {
+			case 3: {
+				try {
+					ListaDeProdutos(factory, sc);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					System.out.println("Ocorreu um erro ao tentar entrar na opção Lista de produtos: \n "+ e.getMessage());
+				}
 				factory.getAllProducts().stream().filter(x -> x.getChamber() == 1).forEach(System.out::println);
 				break;
-			}*/
+			}
 			default:
 				System.out.println(" Opção inválida! " + choice);
 			}
-		} while (choice != 3);
+		} while (choice != 0);
 
 		sc.close();
 
@@ -853,4 +863,96 @@ public class WareMapApplication {
 		
 	}
 	
+	public static void ListaDeProdutos(SeparationFactory factory, Scanner sc) throws InterruptedException {
+		int choice = -1;
+		do {
+			System.out.println(Color.ANSI_BLUE_BACKGROUND + " LISTA DE PRODUTOS                           "+ Color.ANSI_RESET);
+			System.out.println(" Filtrar por Câmara:...............(1).");
+			System.out.println(" Filtrar por produto:..............(2).");
+			System.out.println(" Sair:.............................(0).");
+
+			System.out.print(" -> "); 
+			choice = sc.nextInt();
+			clearScreen();
+			
+			switch (choice) {
+			case 1: {
+				int num;
+				System.out.println(Color.ANSI_BLUE_BACKGROUND + " FILTRAR POR CÂMARA                          "+ Color.ANSI_RESET);
+				System.out.print(" Informe o número da câmara: ");
+				num = sc.nextInt(); sc.nextLine();
+				clearScreen();
+				System.out.println(Color.ANSI_CYAN_BACKGROUND+ " CODIGO  DIAS  CAIXAS   CAMÂRA    RUA   ANDAR   POSIÇÃO  PACOTES  VISITADO"+ Color.ANSI_RESET);
+				
+				List<Product> filter = factory.getAllProducts().stream().filter(x -> x.getChamber() == num).sorted((p1, p2) -> p1.getRoad().compareTo(p2.getRoad())).collect(Collectors.toList());
+				boolean t = true;
+				for(Product p : filter) {
+					if(t) { 
+						System.out.println("\u001B[48;2;255;255;255m" + p + Color.ANSI_RESET);
+						t=false;
+					}else {
+						System.out.println("\u001B[48;2;200;221;247m" + p + Color.ANSI_RESET);
+										   	
+						t=true;
+					}
+				}
+				System.out.println(" Pressione Enter para continuar...");
+			    sc.nextLine();
+			    clearScreen();
+				break;
+			}case 2: {
+				int cod;
+				System.out.println(Color.ANSI_BLUE_BACKGROUND + " FILTRAR POR PRODUTO                         "+ Color.ANSI_RESET);
+				System.out.print(" Informe o código do produto: ");
+				cod = sc.nextInt(); sc.nextLine();
+				clearScreen();
+				System.out.println(Color.ANSI_CYAN_BACKGROUND+ " CODIGO  DIAS  CAIXAS   CAMÂRA    RUA   ANDAR   POSIÇÃO  PACOTES  VISITADO"+ Color.ANSI_RESET);
+				
+				List<Product> filter = factory.getAllProducts().stream().filter(x -> x.getNote() == cod).sorted((p1, p2) -> p1.getRoad().compareTo(p2.getRoad())).collect(Collectors.toList());
+				boolean t = true;
+				for(Product p : filter) {
+					if(t) { 
+						System.out.println("\u001B[48;2;255;255;255m" + p + Color.ANSI_RESET);
+						t=false;
+					}else {
+						System.out.println("\u001B[48;2;200;221;247m" + p + Color.ANSI_RESET);
+										   	
+						t=true;
+					}
+				}
+				String s;
+				System.out.println(" Ordenar Por dias a Vencer? s/n");
+				s = sc.nextLine().toUpperCase();
+				clearScreen();
+				if(s.equals("S")) {
+					System.out.println(Color.ANSI_CYAN_BACKGROUND+ " CODIGO  DIAS  CAIXAS   CAMÂRA    RUA   ANDAR   POSIÇÃO  PACOTES  VISITADO"+ Color.ANSI_RESET);
+					List<Product> perDays = filter.stream().sorted((p1, p2) -> p1.getDays().compareTo(p2.getDays())).collect(Collectors.toList());;
+					
+					for(Product p : perDays) {
+						if(t) { 
+							System.out.println("\u001B[48;2;255;255;255m" + p + Color.ANSI_RESET);
+							t=false;
+						}else {
+							System.out.println("\u001B[48;2;200;221;247m" + p + Color.ANSI_RESET);
+											   	
+							t=true;
+						}
+					}
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
+				}else {
+					System.out.println(" Pressione Enter para continuar...");
+				    sc.nextLine();
+				    clearScreen();
+				}
+			    break;
+			
+			}
+			default:
+				System.out.println("Opção inválida! ");
+				TimeUnit.SECONDS.sleep(2);
+			}
+		} while (choice != 0);
+	}
 }
