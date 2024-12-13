@@ -28,6 +28,12 @@ public class ProductDto implements Comparable<ProductDto>{
 		chambers.add(chamber);
 	}
 	
+	public void addChamber(List<ChamberDto> chambers) {	
+		for(ChamberDto c : chambers) {
+			this.chambers.add(c);
+		}
+	}
+	
 	public void setChambers(List<ChamberDto> chambers) {
 		this.chambers = chambers;
 	}
@@ -59,10 +65,18 @@ public class ProductDto implements Comparable<ProductDto>{
 		return chambers;
 	}
 	
-	private void somatorioEndMoreNew() {
+	public void somatorioEndMoreNew(List<ProductDto> finalListOfProducts) {
 		int sum = 0, sobra = 0;
 		boolean verified = false;
 		Position moreNew = null;
+		
+		ProductDto product = new ProductDto(this.note, this.quantity);
+		
+		for(ProductDto p : finalListOfProducts) {
+			if(p.getNote().equals(product.getNote())) {
+				product.addChamber(p.getChambers());
+			}
+		}
 		
 		boolean exit = false, executed = false;
 		if(!(this.chambers.isEmpty())) {
@@ -129,10 +143,8 @@ public class ProductDto implements Comparable<ProductDto>{
 		return Objects.equals(chambers, other.chambers) && Objects.equals(note, other.note)
 				&& quantity == other.quantity && Objects.equals(tam, other.tam);
 	}
-
 	@Override
 	public String toString() {
-		somatorioEndMoreNew();
 		
 		StringBuilder sb = new StringBuilder();
 		if(tam != null ) {

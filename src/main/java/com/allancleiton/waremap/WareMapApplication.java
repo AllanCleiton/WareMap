@@ -38,7 +38,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);		
-		String path = "temp"; //src/main/resources/temp
+		String path = "src/main/resources/temp"; //src/main/resources/temp
 		SeparationFactory factory = null;
 		Properties log = new Properties();
 		
@@ -125,7 +125,6 @@ public class WareMapApplication {
 					// TODO Auto-generated catch block
 					System.out.println("Ocorreu um erro ao tentar entrar na opção Lista de produtos: \n "+ e.getMessage());
 				}
-				factory.getAllProducts().stream().filter(x -> x.getChamber() == 1).forEach(System.out::println);
 				break;
 			}
 			default:
@@ -155,7 +154,7 @@ public class WareMapApplication {
      }
 
 	public static void tipycalSeparation(Scanner sc, String defaultPath, SeparationFactory factory) {
-		Separation separation = null;
+		SeparationSet<Separation, Separation, Separation> separation = null;
 		//SeparationFactory factory = null;
 		String orderCharger;
 		String prefix;
@@ -188,7 +187,7 @@ public class WareMapApplication {
 				
 				//factory = new SeparationFactory(new IntegrationService(defaultPath), sc);
 								
-				separation = factory.simpleSeparation();		 	
+				separation = factory.simpleSeparation(defaultPath);		 	
 				
 				verify = separation.createArquiveWithSeparation(finalPath);
 				
@@ -413,7 +412,7 @@ public class WareMapApplication {
 					case 4: {
 						System.out.println(Color.ANSI_CYAN_BACKGROUND + " QUANTIDADE MÁXIMA P/ SEPARAÇÃO DO CHÃO      " + Color.ANSI_RESET);
 						int valor;
-						System.out.print(" Informe o valor do divisor: ");
+						System.out.print(" Informe o valor: ");
 						valor = sc.nextInt();
 						sc.nextLine();
 
@@ -948,6 +947,8 @@ public class WareMapApplication {
 				}
 			    break;
 			
+			}case 0:{
+				break;
 			}
 			default:
 				System.out.println("Opção inválida! ");

@@ -1,24 +1,23 @@
 package com.allancleiton.waremap.entities.enums;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
-import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.entities.Order;
 import com.allancleiton.waremap.entities.Separation;
 import com.allancleiton.waremap.entities.DTO.ProductDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SeparationSet<T extends Separation, U extends Separation, V extends Separation>{
 	private T forklift;
     private U floor;
     private V cold;
-    protected Set<ProductDto> finalListOfProducts = new TreeSet<>();
-    
+    protected List<ProductDto> finalListOfProducts = new ArrayList<>();
+    protected Set<ProductDto> productsNotFound = new TreeSet<>();
+
     
     public SeparationSet(T forklift, U floor, V cold) {
         this.forklift = forklift;
@@ -29,17 +28,12 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
         finalListOfProducts.addAll(floor.getDtoProducts());
         finalListOfProducts.addAll(cold.getDtoProducts());
         
-		boolean exist = false;
 		for (Order lp : forklift.getLoadOrder().getOrders()) {
-			for(ProductDto p : finalListOfProducts) {
-				if(p.getNote() == lp.getNote()) {
-					exist = true;
-				}
+			
+			if(!(finalListOfProducts.stream().anyMatch(p -> p.getNote().equals(lp.getNote())))) {
+				productsNotFound.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+
 			}
-			if(!exist) {
-				finalListOfProducts.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
-			}
-			exist = false;
 		}
     }
       
@@ -49,27 +43,33 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
     public U getFloor() { return floor; }
     public V getCold() { return cold; }
     
-    public boolean createArquiveWithSeparation(String path) throws Exception{
-    	ObjectMapper objectMapper = new ObjectMapper();
-    	Floor_separation floorSeparation = null;
-		floorSeparation = objectMapper.readValue(new File("temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
-
-		int floor = floorSeparation.getParameter();
-		
-		
-    	Set<ProductDto> listFloor = finalListOfProducts.stream().filter(x -> x.getQuantity() <= floor).collect(Collectors.toSet());
-    	finalListOfProducts.removeAll(listFloor);
-    	
+    public boolean createArquiveWithSeparation(String path) throws Exception{    	
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
-			bW.write("Separação da Empilhadeira.\n");
-			for (ProductDto productDto : finalListOfProducts) {
+			bW.write("Separação da Empilhadeira. [Congelados]\n");
+			for (ProductDto productDto : getForklift().getDtoProducts()) {
+				productDto.somatorioEndMoreNew(finalListOfProducts);
 				bW.write(productDto.toString());
 			}
+			
+			if(getFloor().getDtoProducts().isEmpty()) {
+				bW.write("\nSeparação da Empilhadeira. [Resfriados]\n");
+				for (ProductDto productDto : getCold().getDtoProducts()) {
+					productDto.somatorioEndMoreNew(finalListOfProducts);
+					bW.write(productDto.toString());
+				}
+			}
+			
 			bW.write("\nSeparação do chão.\n");
-			for (ProductDto productDto : listFloor) {
+			for (ProductDto productDto : getFloor().getDtoProducts()) {
+				bW.write(productDto.toString());
+			}
+			
+			bW.write("\nProdutos não encontrados.\n");
+			for (ProductDto productDto : productsNotFound) {
 				bW.write(productDto.toString());
 			}
 			return true;
 		}
 	}
+
 }

@@ -103,7 +103,7 @@ public class RoadDto {
 		
 				count++;
 			}
-			sb.append("} \n");
+			sb.append("}");
 		
 		return sb.toString();
 	}

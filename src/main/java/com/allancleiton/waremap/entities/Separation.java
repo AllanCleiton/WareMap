@@ -117,21 +117,43 @@ public class Separation {
 	public boolean createArquiveWithSeparation(String path) throws Exception{
     	ObjectMapper objectMapper = new ObjectMapper();
     	Floor_separation floorSeparation = null;
-		floorSeparation = objectMapper.readValue(new File("temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
+		floorSeparation = objectMapper.readValue(new File("src/main/resources/temp/config/geralParameters/floor_separation.json"), Floor_separation.class);
 		Set<ProductDto> aux = new HashSet<>(finalListOfProducts);
+		Set<ProductDto> productsNotFound = new HashSet<>();
 		int floor = floorSeparation.getParameter();
 		
-    	Set<ProductDto> listFloor = aux.stream().filter(x -> x.getQuantity() <= floor).collect(Collectors.toSet());
+		
+    	Set<ProductDto> listFloor = aux.stream().filter(
+    												x -> (x.getQuantity() <= floor)
+    											).collect(Collectors.toSet());
+    	
     	aux.removeAll(listFloor);
+    	
+    	
+    	for (Order lp : getLoadOrder().getOrders()) {
+			if(!(finalListOfProducts.stream().anyMatch(p -> p.getNote().equals(lp.getNote())))) {
+				productsNotFound.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
+
+			}
+		}
     	    
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
 			bW.write("Separação da Empilhadeira.\n");
 			for (ProductDto productDto : aux) {
 				bW.write(productDto.toString());
 			}
-			bW.write("\nSeparação do chão.\n");
-			for (ProductDto productDto : listFloor) {
-				bW.write(productDto.toString());
+			if(!(listFloor.isEmpty())) {
+				bW.write("\nSeparação do chão.\n");
+				for (ProductDto productDto : listFloor) {
+					bW.write(productDto.toString());
+				}
+			}
+			
+			if (!(productsNotFound.isEmpty())) {
+				bW.write("\nProdutos não encontrados.\n");
+				for (ProductDto productDto : productsNotFound) {
+					bW.write(productDto.toString());
+				}
 			}
 			return true;
 		}
