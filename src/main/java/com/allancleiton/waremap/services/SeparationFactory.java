@@ -140,7 +140,7 @@ public class SeparationFactory{
 					
 					//ATUALIZANDO OS MAP'S frozenProducts e coldProducts
 					if(!(floorList.isEmpty()) && !(floorIsOk) && lpFlor != null) {
-						for (Product p : floorList) {
+						for (int i = 0; i < floorList.size(); i++) {
 							result = older(lp.note(), floorList);
 							temporary = result.getValue();
 							if(temporary.isFrozen) {
@@ -148,7 +148,7 @@ public class SeparationFactory{
 									
 									boolean x = floorProducts.get(lp.note()).add(temporary);  
 									
-									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									if(x) {sumfloor += temporary.getBoxes(); temporary.visited = true;}
 									
 									
 									if(sumfloor >= lpFlor.qtdeBoxes() ) {
@@ -159,24 +159,28 @@ public class SeparationFactory{
 									temporary.visited = false;
 								}
 							}else {
-								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+								if(cold_in.test(temporary) && floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
 									
 									boolean x = floorProducts.get(lp.note()).add(temporary);  
 									
-									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									if(x) {sumfloor += temporary.getBoxes(); temporary.visited = true;}
 									
 									
 									if(sumfloor >= lpFlor.qtdeBoxes() ) {
 										floorIsOk = true;
 										break;
 									}
+								}else {
+									temporary.visited = false;
+									floorList.remove(temporary);
+									i--;
 								}
 							}
 						}
 					}
 					if(!(frozenList.isEmpty()) && !(frozenIsOk) && !(floorIsOk)) {
 						
-						for (@SuppressWarnings("unused") Product p : frozenList) {
+						for (int i = 0; i < frozenList.size(); i++) {
 							result = older(lp.note(), frozenList);
 							temporary = result.getValue();
 							if(frozen.test(temporary) && temporary != null && !(frozenIsOk)) {
@@ -190,6 +194,8 @@ public class SeparationFactory{
 								}
 							}else {
 								temporary.visited = false;
+								frozenList.remove(temporary);
+								i--;
 							}
 						}
 						
@@ -197,18 +203,22 @@ public class SeparationFactory{
 					}
 					if(!(coldList.isEmpty()) && !(coldIsOk) && !(floorIsOk)) {
 						
-						for (Product p : coldList) {
+						for (int i = 0; i < coldList.size(); i++) {
 							result = older(lp.note(), coldList);
 							temporary = result.getValue();
 							if(cold_in.test(temporary) && temporary != null && !(coldIsOk)) {
 								
-								sumCold += p.getBoxes() + sumfloor;
+								sumCold += temporary.getBoxes() + sumfloor;
 								coldProducts.get(lp.note()).add(temporary);
 								
 								if(sumCold >= lp.qtdeBoxes()) {
 									coldIsOk = true;
 									break;
 								}
+							}else {
+								temporary.visited = false;
+								coldList.remove(temporary);
+								i--;
 							}
 							
 						}
@@ -216,22 +226,31 @@ public class SeparationFactory{
 					
 				}
 				
-				//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
+				//PEGA O PRODUTO MAIS FACIL E QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
 				if(executed) {
-					result = older(lp.note(), partialProducts.get(lp.note()));
+					boolean fist_if = false;
+					result = easier(lp.note(), partialProducts.get(lp.note()));
 					temporary = result.getValue();
 					
+					//fist_if.
 					if(temporary != null && temporary.isFrozen && !(frozenIsOk)) {
 						sumFrozen += temporary.getBoxes();
 						frozenProducts.get(lp.note()).add(temporary);
 						if(sumFrozen >= lp.qtdeBoxes()) {
 							frozenIsOk = true;
 						}
-					}if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
-						sumCold += temporary.getBoxes();
-						coldProducts.get(lp.note()).add(temporary);
-						if(sumCold >= lp.qtdeBoxes()) {
-							coldIsOk = true;
+						fist_if = true;
+					}
+					if(!(fist_if)) {
+						if(cold_in.test(temporary) && temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
+							sumCold += temporary.getBoxes();
+							coldProducts.get(lp.note()).add(temporary);
+							if(sumCold >= lp.qtdeBoxes()) {
+								coldIsOk = true;
+							}
+						}else{
+							temporary.visited = false;
+							partialProducts.get(lp.note()).remove(temporary);
 						}
 					}
 				}
@@ -360,7 +379,7 @@ public class SeparationFactory{
 							if(!(ok)){ frozenList.add(product);}
 						}
 						if(!(product.isFrozen) && !(product.visited)){
-							if(!(product.visited) && product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2)) {
+							if(!(product.visited) && product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && lpFlor != null) {
 								ok = floorList.add(product);
 							}
 							if(!(ok)){ coldList.add(product);}
@@ -369,7 +388,7 @@ public class SeparationFactory{
 					
 					//ATUALIZANDO OS MAP'S frozenProducts e coldProducts
 					if(!(floorList.isEmpty()) && !(floorIsOk) && lpFlor != null) {
-						for (Product p : floorList) {
+						for (int i = 0; i < floorList.size(); i++) {
 							result = older(lp.note(), floorList);
 							temporary = result.getValue();
 							if(temporary.isFrozen) {
@@ -377,7 +396,7 @@ public class SeparationFactory{
 									
 									boolean x = floorProducts.get(lp.note()).add(temporary);  
 									
-									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									if(x) {sumfloor += temporary.getBoxes(); temporary.visited = true;}
 									
 									
 									if(sumfloor >= lpFlor.qtdeBoxes() ) {
@@ -388,24 +407,28 @@ public class SeparationFactory{
 									temporary.visited = false;
 								}
 							}else {
-								if(floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
+								if(cold_out.test(temporary) && floorSeparation.test(lp) && temporary != null && !(floorIsOk)) {
 									
 									boolean x = floorProducts.get(lp.note()).add(temporary);  
 									
-									if(x) {sumfloor += p.getBoxes(); temporary.visited = true;}
+									if(x) {sumfloor += temporary.getBoxes(); temporary.visited = true;}
 									
 									
 									if(sumfloor >= lpFlor.qtdeBoxes() ) {
 										floorIsOk = true;
 										break;
 									}
+								}else {
+									temporary.visited = false;
+									floorList.remove(temporary);
+									i--;
 								}
 							}
 						}
 					}
 					if(!(frozenList.isEmpty()) && !(frozenIsOk) && !(floorIsOk)) {
 						
-						for (@SuppressWarnings("unused") Product p : frozenList) {
+						for (int i = 0; i < frozenList.size(); i++) {
 							result = older(lp.note(), frozenList);
 							temporary = result.getValue();
 							if(frozen.test(temporary) && temporary != null && !(frozenIsOk)) {
@@ -419,6 +442,8 @@ public class SeparationFactory{
 								}
 							}else {
 								temporary.visited = false;
+								frozenList.remove(temporary);
+								i--;
 							}
 						}
 						
@@ -426,7 +451,7 @@ public class SeparationFactory{
 					}
 					if(!(coldList.isEmpty()) && !(coldIsOk) && !(floorIsOk)) {
 						
-						for (@SuppressWarnings("unused") Product p : coldList) {
+						for (int i = 0; i < coldList.size(); i++) {
 							result = older(lp.note(), coldList);
 							temporary = result.getValue();
 							if(cold_out.test(temporary) && temporary != null && !(coldIsOk)) {
@@ -438,6 +463,10 @@ public class SeparationFactory{
 									coldIsOk = true;
 									break;
 								}
+							}else {
+								temporary.visited = false;
+								coldList.remove(temporary);
+								i--;
 							}
 						}
 					}
@@ -446,7 +475,7 @@ public class SeparationFactory{
 				
 				//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
 				if(executed) {
-					result = older(lp.note(), partialProducts.get(lp.note()));
+					result = easier(lp.note(), partialProducts.get(lp.note()));
 					temporary = result.getValue();
 					
 					if(temporary != null && temporary.isFrozen && !(frozenIsOk)) {
@@ -455,13 +484,17 @@ public class SeparationFactory{
 						if(sumFrozen >= lp.qtdeBoxes()) {
 							frozenIsOk = true;
 						}
-					}if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
+					}else {
+						temporary.visited = false;
+						partialProducts.get(lp.note()).remove(temporary);
+					}
+					/*if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
 						sumCold += temporary.getBoxes();
 						coldProducts.get(lp.note()).add(temporary);
 						if(sumCold >= lp.qtdeBoxes()) {
 							coldIsOk = true;
 						}
-					}
+					}*/
 				}
 				
 				executed = true;
@@ -668,6 +701,7 @@ public class SeparationFactory{
 				
 				//PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
 				if(executed) {
+					boolean fist_if = false;
 					result = easier(lp.note(), partialProducts.get(lp.note()));
 					temporary = result.getValue();
 					
@@ -677,11 +711,19 @@ public class SeparationFactory{
 						if(sumFrozen >= lp.qtdeBoxes()) {
 							frozenIsOk = true;
 						}
-					}if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
-						sumCold += temporary.getBoxes();
-						coldProducts.get(lp.note()).add(temporary);
-						if(sumCold >= lp.qtdeBoxes()) {
-							coldIsOk = true;
+						fist_if = true;
+					}
+					if(!(fist_if)) {
+						if(temporary != null && !(temporary.isFrozen) && !(coldIsOk)) {
+							sumCold += temporary.getBoxes();
+							coldProducts.get(lp.note()).add(temporary);
+							
+							if(sumCold >= lp.qtdeBoxes()) {
+								coldIsOk = true;
+							}
+						}else{
+							temporary.visited = false;
+							partialProducts.get(lp.note()).remove(temporary);
 						}
 					}
 				}
@@ -1450,8 +1492,7 @@ public class SeparationFactory{
 		
 
 	}
-
-	
+		
 	public List<Product> exclusive11046Separation2(List<Product> frozenList, Order lp, Map<Integer, List<Product>> partialProducts, Scanner scan){
 		Entry<Integer, Product> result = null;
 		Product temporary = null;
@@ -1651,7 +1692,7 @@ public class SeparationFactory{
 		
 
 	}
-	
+		
 	public Repository getRepository() {
 		return this.repository;
 	}

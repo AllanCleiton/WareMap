@@ -470,7 +470,7 @@ public class WareMapApplication {
 			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                          " + Color.ANSI_RESET);
 			System.out.println(" Parametros Gerais:.................(1).");
 			System.out.println(" Parametros de Categorias:..........(2).");
-			System.out.println(" Voltar:............................(3).");
+			System.out.println(" Voltar:............................(0).");
 			System.out.print(" -> ");
 			choiceConfig = sc.nextInt();
 			sc.nextLine();
@@ -483,14 +483,14 @@ public class WareMapApplication {
 				configCategories(defaultPath, sc);
 				break;
 			}
-			case 3: {
+			case 0: {
 				break;
 			}
 			default:
 				System.out.println(" Opção inválida! " + choiceConfig);
 			}
 			
-		} while (choiceConfig != 3);
+		} while (choiceConfig != 0);
 	}
 	
 	public static void gerarSeparacao(Scanner sc, String defaultPath, SeparationFactory factory) {
@@ -500,7 +500,7 @@ public class WareMapApplication {
 			System.out.println(" Dentro do estado:.................(1).");
 			System.out.println(" Fora do estado:...................(2).");
 			System.out.println(" Simples:..........................(3).");
-			System.out.println(" Voltar:...........................(4).");
+			System.out.println(" Voltar:...........................(0).");
 			System.out.print(" -> ");
 			choiceSeparation = sc.nextInt();
 			sc.nextLine();
@@ -517,14 +517,14 @@ public class WareMapApplication {
 			}case 3: {
 				tipycalSeparation(sc, defaultPath, factory);
 				break;
-			}case 4:{
+			}case 0:{
 				break;
 			}
 			default:
 				System.out.println(" Opção inválida! " + choiceSeparation);
 			}
 			
-		} while (choiceSeparation != 4);
+		} while (choiceSeparation != 0);
 	}
 	
 	public static void configCategories(String defaultPath, Scanner sc) {
@@ -540,7 +540,7 @@ public class WareMapApplication {
 				System.out.println(" Editar Categoria:..................(2).");
 				System.out.println(" Adicionar Categoria:...............(3).");
 				System.out.println(" Remover Categoria:.................(4).");
-				System.out.println(" Voltar:............................(5).");
+				System.out.println(" Voltar:............................(0).");
 				System.out.print(" -> ");
 				choiceConfig = sc.nextInt();
 				sc.nextLine();
@@ -847,14 +847,14 @@ public class WareMapApplication {
 					}
 					break;
 				}
-				case 5:{
+				case 0:{
 					break;
 				}
 				default:
 					System.out.println(" Opção inválida! " + choiceConfig);
 				}
 				
-			} while (choiceConfig != 5);
+			} while (choiceConfig != 0);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

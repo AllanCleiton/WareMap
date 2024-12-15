@@ -23,13 +23,18 @@ public class Cold_in_state extends GeneralParameter implements Predicate<Product
 	
 	@Override
 	public boolean test(Product product) {
-		int validity = product.validity;
-		int days = product.getDays();
-		boolean test = days >= ((validity / divisor) * multiplicador);
-		if(test) {
-			product.visited = true;
+		if(product != null) {
+			int validity = product.validity;
+			int days = product.getDays();
+			boolean test = days >= ((validity / divisor) * multiplicador);
+			if(test) {
+				product.visited = true;
+			}
+			return test;
 		}
-		return test;
+		else {
+			return false;
+		}
 	}
 	
 	@Override

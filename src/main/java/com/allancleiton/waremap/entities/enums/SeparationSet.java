@@ -45,28 +45,33 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
     
     public boolean createArquiveWithSeparation(String path) throws Exception{    	
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
-			bW.write("Separação da Empilhadeira. [Congelados]\n");
-			for (ProductDto productDto : getForklift().getDtoProducts()) {
-				productDto.somatorioEndMoreNew(finalListOfProducts);
-				bW.write(productDto.toString());
-			}
-			
-			if(getFloor().getDtoProducts().isEmpty()) {
-				bW.write("\nSeparação da Empilhadeira. [Resfriados]\n");
-				for (ProductDto productDto : getCold().getDtoProducts()) {
-					productDto.somatorioEndMoreNew(finalListOfProducts);
-					bW.write(productDto.toString());
+			if(!(getForklift().getDtoProducts().isEmpty())) {
+				bW.write("Separação da Empilhadeira. [Congelados]\n");
+				for (ProductDto productDto : getForklift().getDtoProducts()) {
+					bW.write(productDto.print(finalListOfProducts));
 				}
 			}
 			
-			bW.write("\nSeparação do chão.\n");
-			for (ProductDto productDto : getFloor().getDtoProducts()) {
-				bW.write(productDto.toString());
+			if(!(getCold().getDtoProducts().isEmpty())) {
+				bW.write("\nSeparação da Empilhadeira. [Resfriados]\n");
+				for (ProductDto productDto : getCold().getDtoProducts()) {
+					bW.write(productDto.print(finalListOfProducts));
+				}
 			}
 			
-			bW.write("\nProdutos não encontrados.\n");
-			for (ProductDto productDto : productsNotFound) {
-				bW.write(productDto.toString());
+			
+			if(!(getFloor().getDtoProducts().isEmpty())) {
+				bW.write("\nSeparação do chão.\n");
+				for (ProductDto productDto : getFloor().getDtoProducts()) {
+					bW.write(productDto.print(finalListOfProducts));
+				}
+			}
+			
+			if(!(productsNotFound.isEmpty())) {
+				bW.write("\nProdutos não encontrados.\n");
+				for (ProductDto productDto : productsNotFound) {
+					bW.write(productDto.toString());
+				}
 			}
 			return true;
 		}
