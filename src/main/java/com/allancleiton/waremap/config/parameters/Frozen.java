@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.allancleiton.waremap.config.ParameterProduct;
+import com.allancleiton.waremap.config.parameters.enums.TypeSeparetion;
+import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Product;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -11,9 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Frozen  extends GeneralParameter{
 	final String name = "frozen";
+	private TypeSeparetion type;
 
-	public Frozen(int divisor, int multiplicador) {
-		super(divisor, multiplicador);
+	public Frozen(ParameterProduct categories,TypeSeparetion type) {
+		super(categories);
+		this.type = type;
 	}
 	
 	public Frozen() {
@@ -39,9 +44,27 @@ public class Frozen  extends GeneralParameter{
 
 	@Override
 	public boolean test(Product product) {
-		int validity = product.validity;
+		//Traz a categorya de acordo com a categoria do produto a ser testado.
+		Category category = categories.getCategory(product.validity);
 		int days = product.getDays();
-		boolean test = days <= ((validity / divisor) * multiplicador);
+		boolean test = false;
+		
+		switch (type.getType()) {
+			case "InState":{
+				test = days <= category.getInTheState();
+				break;
+			}
+			case "outState":{
+				test = days <= category.getOutOfState();
+				break;
+			}
+			case "default":{
+				test = true;
+				break;
+			}
+		}
+		
+		
 		if(test) {
 			product.visited = true;
 		}

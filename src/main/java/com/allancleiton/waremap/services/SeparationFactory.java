@@ -12,11 +12,13 @@ import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import com.allancleiton.waremap.WareMapApplication;
+import com.allancleiton.waremap.config.ParameterProduct;
 import com.allancleiton.waremap.config.parameters.Cold_in_state;
 import com.allancleiton.waremap.config.parameters.Cold_out_state;
 import com.allancleiton.waremap.config.parameters.Floor_separation;
 import com.allancleiton.waremap.config.parameters.Frozen;
 import com.allancleiton.waremap.config.parameters.GeneralParameter;
+import com.allancleiton.waremap.config.parameters.enums.TypeSeparetion;
 import com.allancleiton.waremap.entities.LoadOrder;
 import com.allancleiton.waremap.entities.Order;
 import com.allancleiton.waremap.entities.Product;
@@ -44,8 +46,8 @@ public class SeparationFactory{
 	public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) throws IOException {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
-		GeneralParameter frozen = null;
-		GeneralParameter cold_in = null;
+		GeneralParameter frozen = new Frozen(new ParameterProduct(path), TypeSeparetion.IN_STATE);
+		GeneralParameter cold_in = new Cold_in_state(new ParameterProduct(path), TypeSeparetion.IN_STATE);
 		Floor_separation floorSeparation = null;
 		LoadOrder floorOrder = null;
 		
@@ -54,8 +56,6 @@ public class SeparationFactory{
 		}
 		
 		ObjectMapper objectMapper = new ObjectMapper();
-		frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
-		cold_in = objectMapper.readValue(new File(path + "/config/geralParameters/cold_in_state.json"), Cold_in_state.class);
 		floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
 				
 		try {
@@ -289,8 +289,8 @@ public class SeparationFactory{
 	public SeparationSet<Separation, Separation, Separation> outOfStateSeparation(String path ) throws IOException, NoSuchElement {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
-		GeneralParameter frozen = null;
-		GeneralParameter cold_out = null;
+		GeneralParameter frozen = new Frozen(new ParameterProduct(path), TypeSeparetion.OUT_STATE);
+		GeneralParameter cold_out = new Cold_out_state(new ParameterProduct(path), TypeSeparetion.OUT_STATE);
 		Floor_separation floorSeparation = null;
 		LoadOrder floorOrder = null;
 		
@@ -298,9 +298,7 @@ public class SeparationFactory{
 			partialProducts.put(p.note(), filterProducts(p.note(), allProducts));
 		}
 		
-		ObjectMapper objectMapper = new ObjectMapper();
-		frozen = objectMapper.readValue(new File(path + "/config/geralParameters/frozen.json"), Frozen.class);
-		cold_out = objectMapper.readValue(new File(path + "/config/geralParameters/cold_out_state.json"), Cold_out_state.class);
+		ObjectMapper objectMapper = new ObjectMapper();	
 		floorSeparation = objectMapper.readValue(new File(path + "/config/geralParameters/floor_separation.json"), Floor_separation.class);
 
 		try {

@@ -8,10 +8,14 @@ import com.allancleiton.waremap.entities.DTO.EntryProduct;
 
 public class Category {
 	private Integer validity;
+	private Integer inTheState;
+	private Integer	outOfState;
 	private Set<EntryProduct> entries = new HashSet<>();
 	
-	public Category(Integer validity, Set<EntryProduct> entries) {
+	public Category(Integer validity, Integer inTheState, Integer	outOfState, Set<EntryProduct> entries) {
 		this.validity = validity;
+		this.inTheState = inTheState;
+		this.outOfState = outOfState;
 		this.entries = entries;
 	}
 	
@@ -51,16 +55,32 @@ public class Category {
 		return entries.remove(p);
 	}
 	
+	public Integer getInTheState() {
+		return inTheState;
+	}
+
+	public void setInTheState(Integer inTheState) {
+		this.inTheState = inTheState;
+	}
+
+	public Integer getOutOfState() {
+		return outOfState;
+	}
+
+	public void setOutOfState(Integer outOfState) {
+		this.outOfState = outOfState;
+	}
+
 	@Override
 	public String toString() {
-		return "Category [validity=" + validity + ", entries=" + entries + "]";
+		return "Category [validity=" + validity + ", inTheState=" + inTheState + ", outOfState=" + outOfState + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(validity);
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

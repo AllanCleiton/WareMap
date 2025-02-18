@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import com.allancleiton.waremap.config.ParameterProduct;
+import com.allancleiton.waremap.config.parameters.enums.TypeSeparetion;
+import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Product;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -12,9 +15,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Cold_out_state extends GeneralParameter implements Predicate<Product>{
 	final String name = "cold_out_state";
+	private TypeSeparetion type;
 	
-	public Cold_out_state(int divisor, int multiplicador) {
-		super(divisor, multiplicador);
+	public Cold_out_state(ParameterProduct categories,TypeSeparetion type) {
+		super(categories);
+		this.type = type;
 	}
 	
 	public Cold_out_state() {
@@ -23,9 +28,27 @@ public class Cold_out_state extends GeneralParameter implements Predicate<Produc
 	
 	@Override
 	public boolean test(Product product) {
-		int validity = product.validity;
+		//Traz a categorya de acordo com a categoria do produto a ser testado.
+		Category category = categories.getCategory(product.validity);
 		int days = product.getDays();
-		boolean test = days >= ((validity / divisor) * multiplicador) + 4;
+		boolean test = false;
+		
+		switch (type.getType()) {
+			case "InState":{
+				test = days <= category.getInTheState();
+				break;
+			}
+			case "outState":{
+				test = days <= category.getOutOfState();
+				break;
+			}
+			case "default":{
+				test = true;
+				break;
+			}
+		}
+		
+		
 		if(test) {
 			product.visited = true;
 		}

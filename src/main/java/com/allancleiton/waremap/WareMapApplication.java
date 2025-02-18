@@ -19,11 +19,6 @@ import java.util.Scanner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.allancleiton.waremap.config.ParameterProduct;
-import com.allancleiton.waremap.config.parameters.Cold_in_state;
-import com.allancleiton.waremap.config.parameters.Cold_out_state;
-import com.allancleiton.waremap.config.parameters.Floor_separation;
-import com.allancleiton.waremap.config.parameters.Frozen;
-import com.allancleiton.waremap.config.parameters.GeneralParameter;
 import com.allancleiton.waremap.entities.Category;
 import com.allancleiton.waremap.entities.Product;
 import com.allancleiton.waremap.entities.Separation;
@@ -31,7 +26,6 @@ import com.allancleiton.waremap.entities.DTO.EntryProduct;
 import com.allancleiton.waremap.entities.enums.SeparationSet;
 import com.allancleiton.waremap.services.IntegrationService;
 import com.allancleiton.waremap.services.SeparationFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootApplication
 public class WareMapApplication {
@@ -328,7 +322,7 @@ public class WareMapApplication {
 		} 
 	}
 	
-	public static void parametrosGerais(String defaultPath ,Scanner sc) {
+	/*public static void parametrosGerais(String defaultPath ,Scanner sc) {
 		int choiceGeralConfig = 0; 
 		GeneralParameter cold_out = null;
 		GeneralParameter frozen = null;
@@ -462,24 +456,24 @@ public class WareMapApplication {
 			e.printStackTrace();
 		}
 
-	}
+	}*/
 
 	public static void configuracao(String defaultPath, Scanner sc) {
 		int choiceConfig = 0;
 		do {
 			System.out.println(Color.ANSI_CYAN_BACKGROUND + " ESCOLHA UMA OPÇÃO.                          " + Color.ANSI_RESET);
-			System.out.println(" Parametros Gerais:.................(1).");
-			System.out.println(" Parametros de Categorias:..........(2).");
+			//System.out.println(" Parametros Gerais:.................(1).");
+			System.out.println(" Parametros de Categorias:..........(1).");
 			System.out.println(" Voltar:............................(0).");
 			System.out.print(" -> ");
 			choiceConfig = sc.nextInt();
 			sc.nextLine();
 			clearScreen();
 			switch (choiceConfig) {
-			case 1: {
+			/*case 1: {
 				parametrosGerais(defaultPath ,sc);
 				break;
-			}case 2: {
+			}*/case 1: {
 				configCategories(defaultPath, sc);
 				break;
 			}
@@ -768,17 +762,29 @@ public class WareMapApplication {
 					break;
 				}
 				case 3: {
-					int validity;
+					int cancelar=1;
 					System.out.println(Color.ANSI_CYAN_BACKGROUND + " ADICIONAR CATEGORIA.                        " + Color.ANSI_RESET);
-					System.out.println(" Informe o Valor da validade da Categoria.");
-					System.out.println(" Ou digite 0 para cancelar. ");
+					System.out.println(" Preencha os campos abaixo solicitados.");
+					
+					System.out.print(" Validade da Categoria: ");
+					int validity = sc.nextInt();
+					
+					System.out.print(" Valor para S/ fora do estado: ");
+					int outOfState = sc.nextInt();
+					
+					System.out.print(" Valor para S/ dentro do estado: ");
+					int inTheState = sc.nextInt();
+					
+					System.out.println(" Continuar:....................(1) . ");
+					System.out.println(" Cancelar:.....................(1) . ");
 					System.out.print(" -> ");
-					validity = sc.nextInt();
+					cancelar = sc.nextInt();
+					
 					sc.nextLine();
 					
-					if(validity == 0)break;
+					if(cancelar == 0)break;
 					clearScreen();
-					parameterProduct.createdCategory(new Category(validity, new HashSet<EntryProduct>()));
+					parameterProduct.createdCategory(new Category(validity, inTheState, outOfState, new HashSet<EntryProduct>()));
 					parameterProduct.salveParameters(defaultPath);
 					System.out.println(" Categoria "+validity+ " dias Criada.");
 					System.out.println(" Pressione Enter para continuar...");
