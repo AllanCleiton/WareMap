@@ -1,5 +1,0 @@
-Separação da Empilhadeira. [Congelados]
-11015 32   Cam: 3 Rua 11= { 1C }
-11085 20   Cam: 2 Rua 15= { 1A -> 20cx }
-11068 32   Cam: 3 Rua 1= { 1A 3A -> 10cx }
-11007 46   Cam: 3 Rua 2= { 1A }

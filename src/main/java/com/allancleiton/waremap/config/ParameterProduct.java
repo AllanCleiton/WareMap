@@ -40,7 +40,7 @@ public class ParameterProduct {
 	
 	public Category getCategory (Integer validity){
 		for (Category category : categories) {
-			if(category.getValidity() == validity) {
+			if(category.getValidity().equals(validity)) {
 				return category;
 			};
 		}

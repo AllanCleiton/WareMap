@@ -6,14 +6,14 @@ public enum TypeSeparetion {
 	OUT_STATE("outState"),
 	DEFAULT("default");
 	
-	private String value;
+	private String type;
 	
 	private TypeSeparetion(String value) {
-		this.value = value;
+		this.type = value;
 	}
 	
 	public String getType() {
-		return value;
+		return this.type;
 	}
 
 }

@@ -1,3 +1,0 @@
-Separação da Empilhadeira. [Congelados]
-11085 200  Cam: 2 Rua 15= { 1A 2A 1B 1C }
-		  Rua 8= { 1C -> -4cx }

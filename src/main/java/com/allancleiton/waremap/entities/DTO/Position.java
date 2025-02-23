@@ -122,14 +122,16 @@ public class Position implements Comparable<Position>{
 		this.toWithdraw = value;
 	}
 	public void setMoreNew(int sobra) {		
+		boolean test = false;
 		this.moreNew = true;
 		this.sobra = sobra;
-	
+		
 		if(product.getBoxes() > sobra && sobra > 0) {
 			this.product.setBoxes(sobra);
 			this.product.visited = false;
+			test = true;
 		}
-		if(this.toWithdraw > product.getBoxes()) {
+		if(this.toWithdraw > product.getBoxes() && test == false) {
 			setToWithdraw((this.toWithdraw - product.getBoxes()) * (0-1));
 		}
 	}

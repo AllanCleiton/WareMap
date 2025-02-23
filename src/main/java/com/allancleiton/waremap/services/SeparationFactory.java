@@ -248,7 +248,7 @@ public class SeparationFactory{
 							if(sumCold >= lp.qtdeBoxes()) {
 								coldIsOk = true;
 							}
-						}else{
+						}else if(temporary != null){
 							temporary.visited = false;
 							partialProducts.get(lp.note()).remove(temporary);
 						}

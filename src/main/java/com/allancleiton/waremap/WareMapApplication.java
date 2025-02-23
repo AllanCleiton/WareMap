@@ -32,7 +32,7 @@ public class WareMapApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WareMapApplication.class, args);
 		Scanner sc = new Scanner(System.in);		
-		String path = "src/main/resources/temp"; //src/main/resources/temp
+		String path = "temp"; //src/main/resources/temp
 		SeparationFactory factory = null;
 		Properties log = new Properties();
 		
@@ -601,7 +601,8 @@ public class WareMapApplication {
 							System.out.println(" Pesquisar produto:.................(2).");
 							System.out.println(" Listar produtos:...................(3).");
 							System.out.println(" Remover produto:...................(4).");
-							System.out.println(" Voltar:............................(5).");
+							System.out.println(" Parametro de FIFO:.................(5).");
+							System.out.println(" Voltar:............................(6).");
 							System.out.print(" -> ");
 							choice = sc.nextInt();
 							sc.nextLine();
@@ -749,6 +750,28 @@ public class WareMapApplication {
 									break;
 								}
 								case 5:{
+									int valorOutTheState;
+									int valorInTheState;
+									System.out.println(Color.ANSI_YELLOW_BACKGROUND + " Parametro de FIFO.                           " + Color.ANSI_RESET);
+									System.out.printf(" Validade da categoria: %d \n", cat.getValidity());
+									
+									System.out.print(" Informe o valor para S/ dentro do Estado: ");
+									valorInTheState = sc.nextInt();
+									System.out.print(" Informe o valor para S/ Fora do Estado: ");
+									valorOutTheState = sc.nextInt();
+									
+									sc.nextLine();
+									
+									cat.setInTheState(valorInTheState);
+									cat.setOutOfState(valorOutTheState);
+									parameterProduct.salveParameters(defaultPath);
+									System.out.println(" Parametros alterados com sucesso! ");
+									System.out.println(" Digite ENTER para continuar...");
+									sc.nextLine();
+									clearScreen();
+									break;
+								}
+								case 6:{
 									break;
 								}
 								default:{
@@ -874,7 +897,7 @@ public class WareMapApplication {
 			System.out.println(Color.ANSI_BLUE_BACKGROUND + " LISTA DE PRODUTOS                           "+ Color.ANSI_RESET);
 			System.out.println(" Filtrar por Câmara:...............(1).");
 			System.out.println(" Filtrar por produto:..............(2).");
-			System.out.println(" Sair:.............................(0).");
+			System.out.println(" Voltar:...........................(0).");
 
 			System.out.print(" -> "); 
 			choice = sc.nextInt();

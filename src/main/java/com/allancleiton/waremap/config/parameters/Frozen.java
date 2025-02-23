@@ -50,12 +50,12 @@ public class Frozen  extends GeneralParameter{
 		boolean test = false;
 		
 		switch (type.getType()) {
-			case "InState":{
-				test = days <= category.getInTheState();
+			case "inState":{
+				test = days >= category.getInTheState();
 				break;
 			}
 			case "outState":{
-				test = days <= category.getOutOfState();
+				test = days >= category.getOutOfState();
 				break;
 			}
 			case "default":{

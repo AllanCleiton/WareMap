@@ -1,5 +1,7 @@
 [ {
   "validity" : 30,
+  "inTheState" : 10,
+  "outOfState" : 24,
   "entries" : [ {
     "code" : 2501,
     "isFrozen" : false
@@ -9,6 +11,8 @@
   } ]
 }, {
   "validity" : 90,
+  "inTheState" : 30,
+  "outOfState" : 64,
   "entries" : [ {
     "code" : 3905,
     "isFrozen" : false
@@ -39,6 +43,8 @@
   } ]
 }, {
   "validity" : 120,
+  "inTheState" : 40,
+  "outOfState" : 84,
   "entries" : [ {
     "code" : 4021,
     "isFrozen" : false
@@ -69,6 +75,8 @@
   } ]
 }, {
   "validity" : 180,
+  "inTheState" : 60,
+  "outOfState" : 124,
   "entries" : [ {
     "code" : 3006,
     "isFrozen" : true
@@ -90,6 +98,8 @@
   } ]
 }, {
   "validity" : 240,
+  "inTheState" : 80,
+  "outOfState" : 164,
   "entries" : [ {
     "code" : 2703,
     "isFrozen" : true
@@ -99,6 +109,8 @@
   } ]
 }, {
   "validity" : 365,
+  "inTheState" : 121,
+  "outOfState" : 243,
   "entries" : [ {
     "code" : 1040,
     "isFrozen" : true
