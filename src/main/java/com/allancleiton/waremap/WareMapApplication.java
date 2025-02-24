@@ -602,7 +602,7 @@ public class WareMapApplication {
 							System.out.println(" Listar produtos:...................(3).");
 							System.out.println(" Remover produto:...................(4).");
 							System.out.println(" Parametro de FIFO:.................(5).");
-							System.out.println(" Voltar:............................(6).");
+							System.out.println(" Voltar:............................(0).");
 							System.out.print(" -> ");
 							choice = sc.nextInt();
 							sc.nextLine();
@@ -771,15 +771,17 @@ public class WareMapApplication {
 									clearScreen();
 									break;
 								}
-								case 6:{
+								case 0:{
 									break;
 								}
 								default:{
 									System.out.println("Opção inválida! ");
+									System.out.println(" Digite ENTER para continuar...");
+									sc.nextLine();
 									break;
 								}
 							}
-						}while(choice != 5);
+						}while(choice != 0);
 						
 					}
 					break;
