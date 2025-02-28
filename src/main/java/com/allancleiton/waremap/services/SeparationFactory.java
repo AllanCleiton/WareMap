@@ -482,7 +482,7 @@ public class SeparationFactory{
 						if(sumFrozen >= lp.qtdeBoxes()) {
 							frozenIsOk = true;
 						}
-					}else {
+					}else if(temporary != null){
 						temporary.visited = false;
 						partialProducts.get(lp.note()).remove(temporary);
 					}
@@ -719,9 +719,11 @@ public class SeparationFactory{
 							if(sumCold >= lp.qtdeBoxes()) {
 								coldIsOk = true;
 							}
-						}else{
-							temporary.visited = false;
-							partialProducts.get(lp.note()).remove(temporary);
+						}else {
+							if(temporary != null) {
+								temporary.visited = false;
+								partialProducts.get(lp.note()).remove(temporary);
+							}
 						}
 					}
 				}
@@ -1028,7 +1030,7 @@ public class SeparationFactory{
 				if(specificProducts.isEmpty()) continue;
 				
 				if(floorOrder != null) {
-					orderFloor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
+					orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
 				}
 				
 				boolean executed = false;
@@ -1306,7 +1308,7 @@ public class SeparationFactory{
 				if(specificProducts.isEmpty()) continue;
 				
 				if(floorOrder != null) {
-					orderFloor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);      
+					orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
 				}
 				
 				boolean executed = false;

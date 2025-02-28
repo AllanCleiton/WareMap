@@ -12,6 +12,8 @@ public class ProductDto implements Comparable<ProductDto>{
 	public Integer tam = null;
 	List<ChamberDto> chambers = new ArrayList<>();
 	
+	
+	//___________________________________________CONSTRUTORES________________________________________//
 	public ProductDto(int note, int quantity) {
 		this.note = note;
 		this.quantity = quantity;
@@ -23,6 +25,8 @@ public class ProductDto implements Comparable<ProductDto>{
 	}
 	
 	public ProductDto() {}
+	//________________________________________________________________________________________________//
+	
 	
 	public void setChamber(ChamberDto chamber) {
 		chambers.add(chamber);
@@ -49,7 +53,7 @@ public class ProductDto implements Comparable<ProductDto>{
 		return this.quantity;
 	}
 	
-	public int getEspecialNote() {
+	public Integer getEspecialNote() {
 		return note;
 	}
 	
@@ -69,14 +73,26 @@ public class ProductDto implements Comparable<ProductDto>{
 		int sum = 0, sobra = 0;
 		boolean verified = false;
 		Position moreNew = null;
+		ProductDto product = null;
 		
-		ProductDto product = new ProductDto(this.note, this.quantity);
-		
-		for(ProductDto p : finalListOfProducts) {
-			if(p.getNote().equals(product.getNote())) {
-				product.addChamber(p.getChambers());
+		if(this.tam != null) {
+			product = new ProductDto(this.note, this.quantity);
+			product.tam = this.tam;
+			
+			for(ProductDto p : finalListOfProducts) {
+				if(p.getEspecialNote().equals(product.getEspecialNote())) {
+					product.addChamber(p.getChambers());
+				}
+			}
+		}else{
+			product = new ProductDto(this.note, this.quantity);
+			for(ProductDto p : finalListOfProducts) {
+				if(p.getNote().equals(product.getNote())) {
+					product.addChamber(p.getChambers());
+				}
 			}
 		}
+		
 		
 		boolean exit = false, executed = false;
 		if(!(this.chambers.isEmpty())) {
@@ -107,6 +123,27 @@ public class ProductDto implements Comparable<ProductDto>{
 				}
 				sobra = sum-quantity;
 				if(moreNew.getBoxes() >= sobra) {
+					/*SE A QUANTIDADE DE CAIXAS DO PRODUTO MAIS NOVO ENCONTRADO FOR IGUAL AO VALOR DE SOBRA ENTAO ESSE TREXO
+						ESSE TREXO DO CODIGO RETIRA O MORENEW DA LISTA DE PRODUTOS ENCONTRADOS. E MARCA O MORENEW COMO NULO.
+					*/
+					//--------------------------------------------------------------------------------------------------//
+					if(moreNew.getBoxes() == sobra) {
+						externo:
+						for (ChamberDto chamberDto : product.getChambers()) {
+							for (RoadDto roadDto : chamberDto.getRoads()) {
+								for (Position pos : roadDto.getPositions()) {
+									if(pos.equals(moreNew)) {
+										roadDto.getPositions().remove(moreNew);
+										break externo;
+									}
+								}
+							}
+						}
+						
+						moreNew = null;
+					}
+					
+					//--------------------------------------------------------------------------------------------------//
 					exit = true;
 				}else {
 					moreNew.visited = true;

@@ -28,30 +28,36 @@ public class Cold_in_state extends GeneralParameter implements Predicate<Product
 	
 	@Override
 	public boolean test(Product product) {
-		if(product != null) {
-			//Traz a categorya de acordo com a categoria do produto a ser testado.
-			Category category = categories.getCategory(product.validity);
-			
-			boolean test = false;
-			
-			if(type.getType().equals("inState")) {
-				test = product.getDays() >= category.getInTheState();
+		
+		boolean test = false;
+		try {
+			if(product != null) {
+				//Traz a categorya de acordo com a categoria do produto a ser testado.
+				Category category = categories.getCategory(product.validity);
+				
+				
+				
+				if(type.getType().equals("inState")) {
+					test = product.getDays() >= category.getInTheState();
+				}
+				if(type.getType().equals("outState")) {
+					test = product.getDays() >= category.getOutOfState();
+				}
+				if(type.getType().equals("default")) {
+					test = true;
+				} 
+				
+				if(test) {
+					product.visited = true;
+				}
+				return test;
 			}
-			if(type.getType().equals("outState")) {
-				test = product.getDays() >= category.getOutOfState();
-			}
-			if(type.getType().equals("default")) {
-				test = true;
-			} 
 			
-			if(test) {
-				product.visited = true;
-			}
-			return test;
+		}catch(RuntimeException e) {
+			System.out.printf(" Desculpe, ouve um erro ao tentar carregar a categoria.", e.getMessage());
 		}
-		else {
-			return false;
-		}
+		
+		return test;
 	}
 	
 	@Override

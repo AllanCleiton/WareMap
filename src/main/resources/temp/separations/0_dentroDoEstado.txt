@@ -1,0 +1,6 @@
+
+Separação do chão.
+11046[10] 5    Cam: 1 Rua 19= { 1B -> 5cx }
+
+Produtos não encontrados.
+11046 5     Produto não encontrado!
