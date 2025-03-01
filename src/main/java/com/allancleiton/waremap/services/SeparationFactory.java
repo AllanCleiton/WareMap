@@ -759,7 +759,6 @@ public class SeparationFactory{
 		return separations;
 	}
 	
-	
 	@Deprecated
 	public Separation separation() throws IOException {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
