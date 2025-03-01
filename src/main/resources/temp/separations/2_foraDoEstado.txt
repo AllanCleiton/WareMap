@@ -1,0 +1,23 @@
+Separação da Empilhadeira. [Congelados]
+11023 12   Cam: 2 Rua 12= { 7B -> 12cx }
+11074 400  Cam: 3 Rua 9= { 6B 7B 1B 7C 6C -> -190cx }
+11015 32   Cam: 3 Rua 11= { 1C }
+11068 32   Cam: 3 Rua 1= { 7B -> 32cx }
+11007 46   Cam: 3 Rua 2= { 1A }
+2003 800  Cam: 1 Rua 12= { 4B 3B -> 16cx 7C 3C 4C 5C 6C 2C }
+		  Rua 16= { 7C 6C }
+		  Rua 17= { 6B 7B }
+
+Separação da Empilhadeira. [Resfriados]
+11085 20   Cam: 2 Rua 8= { 3C -> 20cx }
+
+Separação do chão.
+11076 3    Cam: 3 Rua 7= { 1C -> 3cx }
+11046[10] 5    Cam: 1 Rua 19= { 1B -> 5cx }
+11084 5    Cam: 3 Rua 13= { 1C -> 5cx }
+11016 1    Cam: 3 Rua 17= { 1C -> 1cx }
+
+Produtos não encontrados.
+5015 56    Produto não encontrado!
+5023 30    Produto não encontrado!
+11072 1     Produto não encontrado!

@@ -759,6 +759,8 @@ public class SeparationFactory{
 		return separations;
 	}
 	
+	
+	@Deprecated
 	public Separation separation() throws IOException {
 		order = repository.jsonToLoadOrder(repository.LoadOrder());
 		Map<Integer, List<Product>> partialProducts = new HashMap<>();
@@ -1029,8 +1031,12 @@ public class SeparationFactory{
 				specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
 				if(specificProducts.isEmpty()) continue;
 				
-				if(floorOrder != null) {
-					orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
+				if(floorOrder != null && order.getPackeges() != null) {	
+					try {
+						orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
+					}catch(NullPointerException e) {
+						orderFloor = floorOrder.getOrders().stream().filter(x -> x.getNote().equals(order.getNote())) .findFirst().orElse(null);      
+					}
 				}
 				
 				boolean executed = false;
@@ -1307,8 +1313,12 @@ public class SeparationFactory{
 				specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
 				if(specificProducts.isEmpty()) continue;
 				
-				if(floorOrder != null) {
-					orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
+				if(floorOrder != null && order.getPackeges() != null) {	
+					try {
+						orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);      
+					}catch(NullPointerException e) {
+						orderFloor = floorOrder.getOrders().stream().filter(x -> x.getNote().equals(order.getNote())) .findFirst().orElse(null);      
+					}
 				}
 				
 				boolean executed = false;
@@ -1492,7 +1502,8 @@ public class SeparationFactory{
 		
 
 	}
-		
+	
+	@Deprecated
 	public List<Product> exclusive11046Separation2(List<Product> frozenList, Order lp, Map<Integer, List<Product>> partialProducts, Scanner scan){
 		Entry<Integer, Product> result = null;
 		Product temporary = null;

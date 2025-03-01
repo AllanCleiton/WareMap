@@ -44,8 +44,19 @@ public class ProductDto implements Comparable<ProductDto>{
 	
 	public Integer getNote() {
 		if(tam != null) {
-			return Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), ""));
+			// if the  variable tam is equals 10 or 11 execute this code part.
+			if(this.tam == 10 || this.tam == 11) {
+				Integer _10or11 = Integer.parseInt(
+								String.valueOf(note)
+								.substring(0, 5)
+							);
+				return _10or11;
+			}else {
+				return  Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), ""));
+			}
+			
 		}
+		
 		return note;
 	}
 	
@@ -247,7 +258,7 @@ public class ProductDto implements Comparable<ProductDto>{
 		
 		if(!chambers.isEmpty()) {
 			sb.append(chambers.get(0).toString());
-		}else {
+		}else{
 			sb.append(" Produto não encontrado!\n");
 		}
 		if(chambers.size() > 0) {
