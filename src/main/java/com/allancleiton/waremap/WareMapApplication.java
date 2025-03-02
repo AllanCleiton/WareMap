@@ -662,7 +662,6 @@ public class WareMapApplication {
 									
 									if(op == 2) {break;}
 									
-									System.out.println(cat.toString());
 									
 									if(op == 1) {
 										if(cat.setEntryProduct(new EntryProduct(code, isFrozen))) {

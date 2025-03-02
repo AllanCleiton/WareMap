@@ -71,7 +71,7 @@ public class Frozen  extends GeneralParameter{
 				product.visited = true;
 			}
 		}catch(RuntimeException e) {
-			System.out.printf(" Desculpe, ouve um erro ao tentar carregar a categoria.", e.getMessage());
+			System.out.printf(" Erro ao tentar carregar a categoria. Produto: %d \n", product.getNote());
 		}
 		return test;
 	}
