@@ -1,0 +1,9 @@
+Separação da Empilhadeira. [Congelados]
+11046 800  Cam: 3 Rua 5= { 2C 3C 5C }
+		  Rua 2= { 2C 3C 4C -> 27cx }
+		  Rua 13= { 4C }
+	   Cam: 2 Rua 12= { 6C }
+		  Rua 4= { 1C 2C }
+		  Rua 13= { 1C 2C 4C 5C }
+	   Cam: 1 Rua 19= { 1B 6C 1C 2C 4C 5C }
+		  Rua 20= { 5C }

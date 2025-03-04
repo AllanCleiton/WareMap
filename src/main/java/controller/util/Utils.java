@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 
 public class Utils {
+
     public static Stage currenteStage(ActionEvent event){
         return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }

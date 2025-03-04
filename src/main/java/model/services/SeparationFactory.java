@@ -9,11 +9,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import application.WareMapApplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import controller.InStateController;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import model.config.*;
 import model.entities.LoadOrder;
 import model.entities.Order;
@@ -28,17 +33,29 @@ public class SeparationFactory{
     private List<Product> allProducts = null;
     public Repository repository = null;
     private LoadOrder order = null;
-    private final Scanner sc;
+    public final Scanner sc = new Scanner(System.in);
 
-    public SeparationFactory(@NotNull Repository repository, Scanner sc) throws IOException{
+    @FXML
+    TextField textField_7;
+    @FXML
+    TextField textField_8;
+    @FXML
+    TextField textField_9;
+    @FXML
+    TextField textField_10;
+    @FXML
+    TextField textField_11;
+
+
+
+    public SeparationFactory(@NotNull Repository repository) throws IOException{
         this.repository = repository;
-        this.sc = sc;
         this.allProducts = repository.jsonToList(repository.LoadProducts());
-
-        //allProducts.forEach(System.out::println);
     }
 
-    public SeparationSet<Separation, Separation, Separation> stateSeparation(String path ) throws IOException {
+    public SeparationFactory(){}
+
+    public SeparationSet<Separation, Separation, Separation> stateSeparation(String path, InStateController controller,  String absolutName, Stage parentStage) throws IOException {
         order = repository.jsonToLoadOrder(repository.LoadOrder());
         Map<Integer, List<Product>> partialProducts = new HashMap<>();
         GeneralParameter frozen = new Frozen(new ParameterProduct(path), TypeSeparation.IN_STATE);
@@ -83,7 +100,7 @@ public class SeparationFactory{
 
             //TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
             if(lp.note() == 11046) {
-                TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
+                TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, null,  controller,   absolutName,  parentStage);
                 if (tuple != null) {
                     frozenProducts.get(lp.note()).addAll(tuple.frozenProducts);
                     floorProducts.get(lp.note()).addAll(tuple.floorProducts);
@@ -330,14 +347,14 @@ public class SeparationFactory{
 
         for (Order lp : auxOrder) {
             //TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
-            if(lp.note() == 11046) {
+           /* if(lp.note() == 11046) {
                 TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, sc);
                 if (tuple != null) {
                     frozenProducts.get(lp.note()).addAll(tuple.frozenProducts);
                     floorProducts.get(lp.note()).addAll(tuple.floorProducts);
                     continue;
                 }
-            }
+            }*/
 
             if(floorOrder != null) {
                 lpFlor = floorOrder.getOrders().stream().filter(x -> x.note().equals(lp.note())) .findFirst().orElse(null);
@@ -932,79 +949,50 @@ public class SeparationFactory{
         return this.order;
     }
 
-    private TupleListProducts exclusive11046Separation(List<Product> frozenList, List<Product> floorList, LoadOrder floorOrder, Order lp, Map<Integer, List<Product>> partialProducts, Floor_separation floorSeparation, GeneralParameter frozen, Scanner scan){
-        Entry<Integer, Product> result = null;
-        Product temporary = null;
+    private TupleListProducts exclusive11046Separation(List<Product> frozenList, List<Product> floorList, LoadOrder floorOrder, Order lp, Map<Integer, List<Product>> partialProducts, Floor_separation floorSeparation, GeneralParameter frozen, Scanner scan, InStateController controller,  String absolutName, Stage parentStage){
+        Entry<Integer, Product> result;
+        Product temporary;
+        Order actual;
 
         int _11046_7;
         int _11046_8;
         int _11046_9;
         int _11046_10;
         int _11046_11;
-        String choice;
-        System.out.println("----------------------------------------");
-        System.out.println("* (O sistema detectou o cóodigo 11046) *");
-        System.out.println("----------------------------------------");
 
-        System.out.println(" Deseja especificar a quantidade individual?");
-        System.out.print(" S/N -> ");
-        choice = scan.nextLine().toUpperCase().trim();
+        controller.createDialogForm(absolutName, parentStage);  //Aqui o codigo deve esperar a execução deste form.
 
-        if(choice.equals("S")) {
+        AtomicBoolean press = new AtomicBoolean(false);
+
+
+        if(press.get()) {
             List<Order> orders11046 = new ArrayList<>();
             Map<Integer, List<Product>> frozenProducts = new HashMap<>();
             Map<Integer, List<Product>> floorProducts = new HashMap<>();
 
-            Order actual = null;
-            int choice_ = 2;
-            do {
 
-                //fazer debug aqui para verificar erro de illegalargumentexception the kist are empty.
-                System.out.println(" Informe as quantidades para cada tipo de 11046:");
-                System.out.print(" \nPara 11046 c/ 7 caixas: "); _11046_7 = scan.nextInt();
-                System.out.print(" \nPara 11046 c/ 8 caixas: "); _11046_8 = scan.nextInt();
-                System.out.print(" \nPara 11046 c/ 9 caixas: "); _11046_9 = scan.nextInt();
-                System.out.print(" \nPara 11046 c/ 10 caixas: "); _11046_10 = scan.nextInt();
-                System.out.print(" \nPara 11046 c/ 11 caixas: "); _11046_11 = scan.nextInt();
-                WareMapApplication.clearScreen();
 
-                System.out.println(" Verifique os dados ");
-                System.out.println(" 11046 c/ 7 caixas = " + _11046_7);
-                System.out.println(" 11046 c/ 8 caixas = " + _11046_8);
-                System.out.println(" 11046 c/ 9 caixas = " + _11046_9);
-                System.out.println(" 11046 c/ 10 caixas = " + _11046_10);
-                System.out.println(" 11046 c/ 11 caixas = " + _11046_11);
-                System.out.println(" Confirmar:....................(1)");
-                System.out.println(" Alterar:......................(2)");
-                System.out.println(" Cancelar:.....................(0)");
-                System.out.print(" -> ");
-                choice_ = scan.nextInt();
-                scan.nextLine();
-                WareMapApplication.clearScreen();
+            _11046_7 = Integer.parseInt(textField_7.getText());
+            _11046_8 = Integer.parseInt(textField_8.getText());
+            _11046_9 = Integer.parseInt(textField_9.getText());
+            _11046_10 = Integer.parseInt(textField_10.getText());
+            _11046_11 = Integer.parseInt(textField_11.getText());
 
-                if(choice_ == 0) {
-                    return null;
+            Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
+
+            for(int i =0; i < 5; i++) {
+                if (list[i] > 0) {
+                    actual = new Order(11046, i+7, list[i]);
+                    order.setOrder(actual);
+                    orders11046.add(actual);
+                    order.remeveOrder(lp);
                 }
-                else if(choice_ == 1) {
-                    Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
+            }
 
-                    for(int i =0; i < 5; i++) {
-                        if (list[i] > 0) {
-                            actual = new Order(11046, i+7, list[i]);
-                            order.setOrder(actual);
-                            orders11046.add(actual);
-                            order.remeveOrder(lp);
-                        }
-                    }
-
-                    break;
-                }
-
-            }while(choice_ == 2);
 
             try {
                 floorOrder = new LoadOrder(orders11046.stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
-            } catch (NoSuchElement e) {
+            } catch (NoSuchElement ignored) {
 
             }
 
@@ -1200,7 +1188,6 @@ public class SeparationFactory{
             }
             return new TupleListProducts(floorProducts.get(lp.note()), frozenProducts.get(lp.note()));
         }else {
-            WareMapApplication.clearScreen();
             return null;
         }
 
