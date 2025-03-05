@@ -1,4 +1,0 @@
-Separação do chão.
-11046[10] 5    Cam: 1 Rua 19= { 1B -> 5cx }
-11046[8] 5    Cam: 2 Rua 4= { 1C -> 5cx }
-11046[9] 10   Cam: 2 Rua 13= { 1C -> 10cx }

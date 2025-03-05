@@ -234,9 +234,7 @@ public class InStateController implements Initializable {
             dialogState.initModality(Modality.WINDOW_MODAL);
             dialogState.showAndWait();
 
-
         }catch(IOException e){
-            e.printStackTrace();
             Alerts.showAlert("IO Exception", "Error Loading View", e.getMessage(), Alert.AlertType.ERROR);
         }
     }

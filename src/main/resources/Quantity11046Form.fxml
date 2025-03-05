@@ -72,7 +72,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <Label prefHeight="36.0" prefWidth="392.0" text=" Defina os valores para cada tamanho, ou clique em continuar!">
+            <Label prefHeight="36.0" prefWidth="392.0" text=" Defina os valores para cada tamanho, ou clique em cancelar!">
                <font>
                   <Font size="14.0" />
                </font>
@@ -81,8 +81,8 @@
       </VBox>
       <HBox alignment="TOP_CENTER" layoutX="14.0" layoutY="250.0" prefHeight="56.0" prefWidth="418.0" spacing="20.0">
          <children>
-            <Button mnemonicParsing="false" prefHeight="38.0" prefWidth="107.0" text="Confirmar" />
-            <Button mnemonicParsing="false" prefHeight="38.0" prefWidth="107.0" text="Continuar" />
+            <Button fx:id="btConfirm" mnemonicParsing="false" onAction="#onBtConfirmAction" prefHeight="38.0" prefWidth="107.0" text="Confirmar" />
+            <Button fx:id="btCancel" mnemonicParsing="false" onAction="#BtCancelAction" prefHeight="38.0" prefWidth="107.0" text="Cancelar" />
          </children>
          <padding>
             <Insets top="10.0" />

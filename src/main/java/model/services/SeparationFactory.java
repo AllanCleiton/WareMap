@@ -16,7 +16,11 @@ import java.util.stream.Collectors;
 import application.WareMapApplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controller.InStateController;
+import controller.util.Utils;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import model.config.*;
@@ -31,20 +35,25 @@ import org.jetbrains.annotations.NotNull;
 
 public class SeparationFactory{
     private List<Product> allProducts = null;
-    public Repository repository = null;
+    private Repository repository = null;
     private LoadOrder order = null;
     public final Scanner sc = new Scanner(System.in);
+    private boolean CONFIRMATION = false;
 
     @FXML
-    TextField textField_7;
+    private TextField textField_7;
     @FXML
-    TextField textField_8;
+    private TextField textField_8;
     @FXML
-    TextField textField_9;
+    private TextField textField_9;
     @FXML
-    TextField textField_10;
+    private TextField textField_10;
     @FXML
-    TextField textField_11;
+    private TextField textField_11;
+    @FXML
+    private Button btConfirm;
+    @FXML
+    private Button btCancel;
 
 
 
@@ -54,6 +63,16 @@ public class SeparationFactory{
     }
 
     public SeparationFactory(){}
+
+    @FXML
+    public void onBtConfirmAction(ActionEvent event){
+        CONFIRMATION = true;
+        Utils.currenteStage(event).close();
+    }
+    @FXML
+    public void BtCancelAction(ActionEvent event){
+        Utils.currenteStage(event).close();
+    }
 
     public SeparationSet<Separation, Separation, Separation> stateSeparation(String path, InStateController controller,  String absolutName, Stage parentStage) throws IOException {
         order = repository.jsonToLoadOrder(repository.LoadOrder());
@@ -100,7 +119,13 @@ public class SeparationFactory{
 
             //TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
             if(lp.note() == 11046) {
-                TupleListProducts tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen, null,  controller,   absolutName,  parentStage);
+                controller.createDialogForm(absolutName, parentStage);  //Aqui o codigo deve esperar a execução deste form.
+
+                TupleListProducts tuple = null;
+                if(CONFIRMATION) {
+                    tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen);
+                }
+
                 if (tuple != null) {
                     frozenProducts.get(lp.note()).addAll(tuple.frozenProducts);
                     floorProducts.get(lp.note()).addAll(tuple.floorProducts);
@@ -949,249 +974,187 @@ public class SeparationFactory{
         return this.order;
     }
 
-    private TupleListProducts exclusive11046Separation(List<Product> frozenList, List<Product> floorList, LoadOrder floorOrder, Order lp, Map<Integer, List<Product>> partialProducts, Floor_separation floorSeparation, GeneralParameter frozen, Scanner scan, InStateController controller,  String absolutName, Stage parentStage){
+    private TupleListProducts exclusive11046Separation(List<Product> frozenList, List<Product> floorList, LoadOrder floorOrder, Order lp, Map<Integer, List<Product>> partialProducts, Floor_separation floorSeparation, GeneralParameter frozen){
         Entry<Integer, Product> result;
         Product temporary;
         Order actual;
-
-        int _11046_7;
-        int _11046_8;
-        int _11046_9;
-        int _11046_10;
-        int _11046_11;
-
-        controller.createDialogForm(absolutName, parentStage);  //Aqui o codigo deve esperar a execução deste form.
-
         AtomicBoolean press = new AtomicBoolean(false);
 
+        int _11046_7 = Integer.parseInt(textField_7.getText());
+        int _11046_8 = Integer.parseInt(textField_8.getText());
+        int _11046_9 = Integer.parseInt(textField_9.getText());
+        int _11046_10 = Integer.parseInt(textField_10.getText());
+        int _11046_11 = Integer.parseInt(textField_11.getText());
 
-        if(press.get()) {
-            List<Order> orders11046 = new ArrayList<>();
-            Map<Integer, List<Product>> frozenProducts = new HashMap<>();
-            Map<Integer, List<Product>> floorProducts = new HashMap<>();
+
+        List<Order> orders11046 = new ArrayList<>();
+        Map<Integer, List<Product>> frozenProducts = new HashMap<>();
+        Map<Integer, List<Product>> floorProducts = new HashMap<>();
 
 
+        Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
 
-            _11046_7 = Integer.parseInt(textField_7.getText());
-            _11046_8 = Integer.parseInt(textField_8.getText());
-            _11046_9 = Integer.parseInt(textField_9.getText());
-            _11046_10 = Integer.parseInt(textField_10.getText());
-            _11046_11 = Integer.parseInt(textField_11.getText());
-
-            Integer[] list = {_11046_7,_11046_8,_11046_9,_11046_10,_11046_11};
-
-            for(int i =0; i < 5; i++) {
-                if (list[i] > 0) {
-                    actual = new Order(11046, i+7, list[i]);
-                    order.setOrder(actual);
-                    orders11046.add(actual);
-                    order.remeveOrder(lp);
-                }
+        for(int i =0; i < 5; i++) {
+            if (list[i] > 0) {
+                actual = new Order(11046, i+7, list[i]);
+                order.setOrder(actual);
+                orders11046.add(actual);
+                order.remeveOrder(lp);
             }
-
-
-            try {
-                floorOrder = new LoadOrder(orders11046.stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
-            } catch (NoSuchElement ignored) {
-
-            }
-
-            orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
-            orders11046.forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
-
-            List<Product> specificProducts = null;
-            Order orderFloor = null;
-            for (Order order : orders11046) {
-                specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
-                if(specificProducts.isEmpty()) continue;
-
-                if(floorOrder != null && order.getPackeges() != null) {
-                    try {
-                        orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);
-                    }catch(NullPointerException e) {
-                        orderFloor = floorOrder.getOrders().stream().filter(x -> x.getNote().equals(order.getNote())) .findFirst().orElse(null);
-                    }
-                }
-
-                boolean executed = false;
-                boolean frozenIsOk = false;
-                boolean floorIsOk = false;
-                int sumfloor = 0;
-                int sumFrozen = 0;
-
-
-                frozenList.clear();
-                floorList.clear();
-                externo:
-                do {
-                    if(!(executed)) {
-                        //PEGA TODOS OS PRODUTOS COM CODIGO LP.note E ATRIBUE ÀS LISTAS -------------------
-                        for (Product product :specificProducts) {
-
-                            if(product.getPackages() == order.packeges && product.isFrozen && !(product.visited)) {
-                                if( product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && orderFloor != null){
-                                    floorList.add(product);
-                                }
-                                frozenList.add(product);
-                            }
-
-                        }//FIM LAÇO FOR-------------------------------------------------
-
-                        //ATUALIZANDO OS MAP'S frozenProducts e coldProducts
-                        if(!(floorList.isEmpty()) && !(floorIsOk) && orderFloor != null) {
-                            for (int i = 0; i < floorList.size(); i++) {
-
-                                result = older(order.note(), floorList);
-                                temporary = result.getValue();
-
-                                if(floorSeparation.test(order) && temporary != null && !(floorIsOk)) {
-
-                                    boolean x = floorProducts.get(order.note()).add(temporary);
-
-                                    if(x) {
-                                        sumfloor += temporary.getBoxes();
-                                        temporary.visited = true;
-
-                                        switch(temporary.getPackages()) {
-                                            case 7:{
-                                                temporary.activePackeg = true;
-                                                break;
-                                            }
-                                            case 8:{
-                                                temporary.activePackeg = true;
-                                                break;
-                                            }
-                                            case 9:{
-                                                temporary.activePackeg = true;
-                                                break;
-                                            }
-                                            case 10:{
-                                                temporary.activePackeg = true;
-                                                break;
-                                            }
-                                            case 11:{
-                                                temporary.activePackeg = true;
-                                                break;
-                                            }
-
-                                        }
-
-                                    }
-
-
-                                    if(sumfloor >= orderFloor.qtdeBoxes() ) {
-                                        floorIsOk = true;
-                                        break;
-                                    }
-                                }else {
-                                    temporary.visited = false;
-                                }
-                            }
-                        }
-                        if(!(frozenList.isEmpty()) && !(frozenIsOk) && !(floorIsOk)) {
-
-                            for (@SuppressWarnings("unused") Product p : frozenList) {
-                                result = older(order.note(), frozenList);
-                                temporary = result.getValue();
-                                if(frozen.test(temporary) && temporary != null && !(frozenIsOk)) {
-
-                                    sumFrozen += temporary.getBoxes() + sumfloor;
-                                    frozenProducts.get(order.note()).add(temporary);
-
-                                    switch(temporary.getPackages()) {
-                                        case 7:{
-                                            temporary.activePackeg = true;
-                                            break;
-                                        }
-                                        case 8:{
-                                            temporary.activePackeg = true;
-                                            break;
-                                        }
-                                        case 9:{
-                                            temporary.activePackeg = true;
-                                            break;
-                                        }
-                                        case 10:{
-                                            temporary.activePackeg = true;
-                                            break;
-                                        }
-                                        case 11:{
-                                            temporary.activePackeg = true;
-                                            break;
-                                        }
-
-                                    }
-                                    if(sumFrozen >= order.qtdeBoxes()) {
-                                        frozenIsOk = true;
-                                        break;
-                                    }
-                                }else {
-                                    temporary.visited = false;
-                                }
-                            }
-
-
-                        }
-
-                    }
-
-                    //PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
-                    if(executed) {
-                        result = older(order.note(), specificProducts); //O METODO OLDER RETORNA O PRODUTO MAIS VELHO, E MARCA ELE COMO VISITADO.
-                        temporary = result.getValue(); // VARIAVEL TEMPORARY, RECEBE O VALOR DO RETORNO DE OLDER.
-
-                        //SE A CONDICIONAL ABAIXO NAO FOR EXECUTADA, É PRECISO ALTERAR O CONTEUDO DE TEMPORARY, EM VISITED PARA FALSE.
-                        if(temporary.getPackages() == order.packeges && temporary != null && temporary.isFrozen && !(frozenIsOk)) {
-                            sumFrozen += temporary.getBoxes();
-                            frozenProducts.get(order.note()).add(temporary);
-
-                            switch(temporary.getPackages()) {
-                                case 7:{
-                                    temporary.activePackeg = true;
-                                    break;
-                                }
-                                case 8:{
-                                    temporary.activePackeg = true;
-                                    break;
-                                }
-                                case 9:{
-                                    temporary.activePackeg = true;
-                                    break;
-                                }
-                                case 10:{
-                                    temporary.activePackeg = true;
-                                    break;
-                                }
-                                case 11:{
-                                    temporary.activePackeg = true;
-                                    break;
-                                }
-
-                            }
-
-
-                            if(sumFrozen >= order.qtdeBoxes()) {
-                                frozenIsOk = true;
-                            }
-                        }
-
-                    }
-                    executed = true;
-
-                    if(sumFrozen >= order.qtdeBoxes()) {
-                        frozenIsOk = true;
-                        break externo;
-                    }
-
-
-                } while (!((frozenIsOk || floorIsOk)|| !(specificProducts.stream().anyMatch(x -> x.visited == false)) ));
-            }
-            return new TupleListProducts(floorProducts.get(lp.note()), frozenProducts.get(lp.note()));
-        }else {
-            return null;
         }
 
 
+        try {
+            floorOrder = new LoadOrder(orders11046.stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
+        } catch (NoSuchElement ignored) {
+
+        }
+
+        orders11046.forEach(x -> {frozenProducts.put(x.note(), new ArrayList<>());});
+        orders11046.forEach(x -> {floorProducts.put(x.note(), new ArrayList<>());});
+
+        List<Product> specificProducts = null;
+        Order orderFloor = null;
+        for (Order order : orders11046) {
+            specificProducts = filterProducts(order.getNote(), partialProducts.get(order.note()), x -> x.getPackages().equals(order.getPackeges()));
+            if(specificProducts.isEmpty()) continue;
+
+            if(floorOrder != null && order.getPackeges() != null) {
+                try {
+                    orderFloor = floorOrder.getOrders().stream().filter(x -> x.getPackeges().equals(order.getPackeges())) .findFirst().orElse(null);
+                }catch(NullPointerException e) {
+                    orderFloor = floorOrder.getOrders().stream().filter(x -> x.getNote().equals(order.getNote())) .findFirst().orElse(null);
+                }
+            }
+
+            boolean executed = false;
+            boolean frozenIsOk = false;
+            boolean floorIsOk = false;
+            int sumfloor = 0;
+            int sumFrozen = 0;
+
+
+            frozenList.clear();
+            floorList.clear();
+            externo:
+            do {
+                if(!(executed)) {
+                    //PEGA TODOS OS PRODUTOS COM CODIGO LP.note E ATRIBUE ÀS LISTAS -------------------
+                    for (Product product :specificProducts) {
+
+                        if(product.getPackages() == order.packeges && product.isFrozen && !(product.visited)) {
+                            if( product.getHeight() == 1 && (product.getDeoth() == 0 || product.getDeoth() == 1 || product.getDeoth() == 2) && orderFloor != null){
+                                floorList.add(product);
+                            }
+                            frozenList.add(product);
+                        }
+
+                    }//FIM LAÇO FOR-------------------------------------------------
+
+                    //ATUALIZANDO OS MAP'S frozenProducts e coldProducts
+                    if(!(floorList.isEmpty()) && !(floorIsOk) && orderFloor != null) {
+                        for (int i = 0; i < floorList.size(); i++) {
+
+                            result = older(order.note(), floorList);
+                            temporary = result.getValue();
+
+                            if(floorSeparation.test(order) && temporary != null && !(floorIsOk)) {
+
+                                boolean x = floorProducts.get(order.note()).add(temporary);
+
+                                if(x) {
+                                    sumfloor += temporary.getBoxes();
+                                    temporary.visited = true;
+
+                                    switch(temporary.getPackages()) {
+                                        case 7, 8, 9, 10, 11:{
+                                            temporary.activePackeg = true;
+                                            break;
+                                        }
+
+                                    }
+
+                                }
+
+
+                                if(sumfloor >= orderFloor.qtdeBoxes() ) {
+                                    floorIsOk = true;
+                                    break;
+                                }
+                            }else {
+                                temporary.visited = false;
+                            }
+                        }
+                    }
+                    if(!(frozenList.isEmpty()) && !(frozenIsOk) && !(floorIsOk)) {
+
+                        for (@SuppressWarnings("unused") Product p : frozenList) {
+                            result = older(order.note(), frozenList);
+                            temporary = result.getValue();
+                            if(frozen.test(temporary) && temporary != null && !(frozenIsOk)) {
+
+                                sumFrozen += temporary.getBoxes() + sumfloor;
+                                frozenProducts.get(order.note()).add(temporary);
+
+                                switch(temporary.getPackages()) {
+                                    case 7, 8, 9, 10, 11:{
+                                        temporary.activePackeg = true;
+                                        break;
+                                    }
+
+                                }
+                                if(sumFrozen >= order.qtdeBoxes()) {
+                                    frozenIsOk = true;
+                                    break;
+                                }
+                            }else {
+                                if (temporary != null) {
+                                    temporary.visited = false;
+                                }
+                            }
+                        }
+
+
+                    }
+
+                }
+
+                //PEGA O PRODUTO MAIS VELHO QUE NAO FOI CONTEMPLADO NO PASSO ANTERIOR.
+                if(executed) {
+                    result = older(order.note(), specificProducts); //O METODO OLDER RETORNA O PRODUTO MAIS VELHO, E MARCA ELE COMO VISITADO.
+                    temporary = result.getValue(); // VARIAVEL TEMPORARY, RECEBE O VALOR DO RETORNO DE OLDER.
+
+                    //SE A CONDICIONAL ABAIXO NAO FOR EXECUTADA, É PRECISO ALTERAR O CONTEUDO DE TEMPORARY, EM VISITED PARA FALSE.
+                    if(temporary.getPackages() == order.packeges && temporary != null && temporary.isFrozen && !(frozenIsOk)) {
+                        sumFrozen += temporary.getBoxes();
+                        frozenProducts.get(order.note()).add(temporary);
+
+                        switch(temporary.getPackages()) {
+                            case 7, 8, 9, 10, 11:{
+                                temporary.activePackeg = true;
+                                break;
+                            }
+
+                        }
+
+
+                        if(sumFrozen >= order.qtdeBoxes()) {
+                            frozenIsOk = true;
+                        }
+                    }
+
+                }
+                executed = true;
+
+                if(sumFrozen >= order.qtdeBoxes()) {
+                    frozenIsOk = true;
+                    break externo;
+                }
+
+
+            } while (!((frozenIsOk || floorIsOk)|| !(specificProducts.stream().anyMatch(x -> x.visited == false)) ));
+        }
+        return new TupleListProducts(floorProducts.get(lp.note()), frozenProducts.get(lp.note()));
     }
 
     private TupleListProducts exclusive11046SimpleSeparation(List<Product> frozenList, List<Product> floorList, LoadOrder floorOrder, Order lp, Map<Integer, List<Product>> partialProducts, Floor_separation floorSeparation, Scanner scan){
