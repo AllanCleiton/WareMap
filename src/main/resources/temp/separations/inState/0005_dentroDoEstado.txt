@@ -1,0 +1,4 @@
+Separação da Empilhadeira. [Congelados]
+11046[7] 100 Cam: 3 Rua 2= { 3C }
+		  Rua 13= { 4C }
+11046[8] 50   Cam: 2 Rua 4= { 1C 2C -> 10cx }

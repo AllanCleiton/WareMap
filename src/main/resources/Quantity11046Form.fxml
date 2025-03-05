@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="335.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/21.0.5" xmlns:fx="http://javafx.com/fxml/1" fx:controller="model.services.SeparationFactory">
+<AnchorPane prefHeight="335.0" prefWidth="446.0" xmlns="http://javafx.com/javafx/21.0.5" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Quantity11046Controller">
    <children>
       <GridPane layoutX="21.0" layoutY="98.0" prefHeight="152.0" prefWidth="385.0" AnchorPane.bottomAnchor="85.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="98.0">
         <columnConstraints>
@@ -82,7 +82,7 @@
       <HBox alignment="TOP_CENTER" layoutX="14.0" layoutY="250.0" prefHeight="56.0" prefWidth="418.0" spacing="20.0">
          <children>
             <Button fx:id="btConfirm" mnemonicParsing="false" onAction="#onBtConfirmAction" prefHeight="38.0" prefWidth="107.0" text="Confirmar" />
-            <Button fx:id="btCancel" mnemonicParsing="false" onAction="#BtCancelAction" prefHeight="38.0" prefWidth="107.0" text="Cancelar" />
+            <Button fx:id="btCancel" mnemonicParsing="false" onAction="#onBtCancelAction" prefHeight="38.0" prefWidth="107.0" text="Cancelar" />
          </children>
          <padding>
             <Insets top="10.0" />

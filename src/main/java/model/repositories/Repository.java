@@ -188,7 +188,7 @@ public interface Repository {
         return new LoadOrder(orders);
     }
 
-    default LoadOrder getloadOrder(String path, String orederCharger) throws IOException, NoSuchElement {
+    default LoadOrder getloadOrder(String path, String orderCharger) throws IOException, NoSuchElement {
         final String defaultPath = "//ordercharger.xlsx";
 
         List<Order> orders = new ArrayList<>();
@@ -223,7 +223,7 @@ public interface Repository {
             }
         }
 
-        return new LoadOrder(orders, orederCharger);
+        return new LoadOrder(orders, orderCharger);
     }
 
     default LoadOrder jsonToLoadOrder(String json) throws IOException{

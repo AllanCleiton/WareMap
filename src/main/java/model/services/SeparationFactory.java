@@ -1,28 +1,12 @@
 package model.services;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import application.WareMapApplication;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import controller.InStateController;
 import controller.util.Utils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import model.config.*;
 import model.entities.LoadOrder;
 import model.entities.Order;
@@ -33,28 +17,27 @@ import model.exceptions.NoSuchElement;
 import model.repositories.Repository;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 public class SeparationFactory{
     private List<Product> allProducts = null;
     private Repository repository = null;
     private LoadOrder order = null;
     public final Scanner sc = new Scanner(System.in);
-    private boolean CONFIRMATION = false;
+    private boolean has11046 = false;
 
-    @FXML
-    private TextField textField_7;
-    @FXML
-    private TextField textField_8;
-    @FXML
-    private TextField textField_9;
-    @FXML
-    private TextField textField_10;
-    @FXML
-    private TextField textField_11;
-    @FXML
-    private Button btConfirm;
-    @FXML
-    private Button btCancel;
-
+    private Integer _11046_7;
+    private Integer _11046_8;
+    private Integer _11046_9;
+    private Integer _11046_10;
+    private Integer _11046_11;
 
 
     public SeparationFactory(@NotNull Repository repository) throws IOException{
@@ -64,17 +47,7 @@ public class SeparationFactory{
 
     public SeparationFactory(){}
 
-    @FXML
-    public void onBtConfirmAction(ActionEvent event){
-        CONFIRMATION = true;
-        Utils.currenteStage(event).close();
-    }
-    @FXML
-    public void BtCancelAction(ActionEvent event){
-        Utils.currenteStage(event).close();
-    }
-
-    public SeparationSet<Separation, Separation, Separation> stateSeparation(String path, InStateController controller,  String absolutName, Stage parentStage) throws IOException {
+    public SeparationSet<Separation, Separation, Separation> stateSeparation(String path) throws IOException {
         order = repository.jsonToLoadOrder(repository.LoadOrder());
         Map<Integer, List<Product>> partialProducts = new HashMap<>();
         GeneralParameter frozen = new Frozen(new ParameterProduct(path), TypeSeparation.IN_STATE);
@@ -119,11 +92,12 @@ public class SeparationFactory{
 
             //TRECHO EXCLUSIVO PARA PROCEDIMENTO COM O PRODUTO 11046.
             if(lp.note() == 11046) {
-                controller.createDialogForm(absolutName, parentStage);  //Aqui o codigo deve esperar a execução deste form.
+
 
                 TupleListProducts tuple = null;
-                if(CONFIRMATION) {
+                if(has11046) {
                     tuple = exclusive11046Separation(frozenList, floorList, floorOrder, lp, partialProducts, floorSeparation, frozen);
+                    has11046 = false; //has11046 recebe false apos realizar a separação exclusiva, para na proxima separação o controller InStateController poder setar novamente ou não.
                 }
 
                 if (tuple != null) {
@@ -980,13 +954,6 @@ public class SeparationFactory{
         Order actual;
         AtomicBoolean press = new AtomicBoolean(false);
 
-        int _11046_7 = Integer.parseInt(textField_7.getText());
-        int _11046_8 = Integer.parseInt(textField_8.getText());
-        int _11046_9 = Integer.parseInt(textField_9.getText());
-        int _11046_10 = Integer.parseInt(textField_10.getText());
-        int _11046_11 = Integer.parseInt(textField_11.getText());
-
-
         List<Order> orders11046 = new ArrayList<>();
         Map<Integer, List<Product>> frozenProducts = new HashMap<>();
         Map<Integer, List<Product>> floorProducts = new HashMap<>();
@@ -1642,4 +1609,16 @@ public class SeparationFactory{
     }
 
     private record TupleListProducts(List<Product> floorProducts, List<Product> frozenProducts) {}
+
+    public void setHas11046(){
+        this.has11046 = true;
+    }
+
+    public void setSpecific11046Quantity(Integer v7, Integer v8, Integer v9, Integer v10, Integer v11){
+        this._11046_7 = v7;
+        this._11046_8 = v8;
+        this._11046_9 = v9;
+        this._11046_10 = v10;
+        this._11046_11 = v11;
+    }
 }

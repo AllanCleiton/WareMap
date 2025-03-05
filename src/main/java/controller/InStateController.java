@@ -2,6 +2,7 @@ package controller;
 
 import application.WareMapApplication;
 import controller.util.Alerts;
+import controller.util.Constraints;
 import controller.util.Utils;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -18,6 +19,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.entities.LoadOrder;
+import model.entities.Order;
 import model.entities.Separation;
 import model.entities.enums.SeparationSet;
 
@@ -52,53 +55,65 @@ public class InStateController implements Initializable {
 
     @FXML
     public void onBtGenerate(ActionEvent event) {
-        Stage parentStage = Utils.currenteStage(event);
+        System.out.println(lbOrder.getText());
+        if(!(lbOrder.getText().isEmpty())) {
+            Stage parentStage = Utils.currenteStage(event);
+            SeparationSet<Separation, Separation, Separation> separations = null;
+            String orderCharger;
+            String prefix;
+            String finalPath;
+            String defaultPath = WareMapApplication.path;
+            boolean success;
+            boolean p = false;
 
-        SeparationSet<Separation, Separation, Separation> separations = null;
-        String orderCharger;
-        String prefix;
-        String finalPath;
-        String defaultPath = WareMapApplication.path;
-        boolean success;
-        boolean p = false;
+            while (!(p)) {
+                try {
+                    success = new File(defaultPath + "/separations/inState").mkdir();
 
-        while (!(p)) {
-            try {
-                success = new File(defaultPath + "/separations/inState").mkdir();
+                    if (success) {
+                        prefix = defaultPath + "/separations/inState/";
 
-                if(success) {
-                    prefix = defaultPath + "/separations/inState/";
-
-                    orderCharger = lbOrder.getText();
-
-
-                    String oc = orderCharger.concat(".txt");
-                    finalPath = prefix + oc;
-
-                }else {
-
-                    orderCharger = lbOrder.getText();
+                        orderCharger = lbOrder.getText();
 
 
-                    String oc = orderCharger.concat(".txt");
-                    finalPath = defaultPath + "/separations/inState/" + oc;
+                        String oc = orderCharger.concat(".txt");
+                        finalPath = prefix + oc;
+
+                    } else {
+
+                        orderCharger = lbOrder.getText();
+
+
+                        String oc = orderCharger.concat(".txt");
+                        finalPath = defaultPath + "/separations/inState/" + oc;
+                    }
+
+
+                    for (Order order : WareMapApplication.factory.getRepository().getloadOrder(defaultPath).getOrders()) {
+                        if (order.getNote().equals(11046)) {
+                            createDialogForm("/Quantity11046Form.fxml", parentStage);  //Aqui o codigo deve esperar a execução deste form.
+                            break;
+                        }
+                    }
+
+                    separations = WareMapApplication.factory.stateSeparation(defaultPath);
+
+                    p = separations.createArquiveWithSeparation(finalPath.replace(".txt", "_dentroDoEstado") + ".txt");
+
+
+                    if (p) {
+                        Alerts.showAlert("Sucesso!", "Ordem de carga: " + lbOrder.getText(), null, Alert.AlertType.INFORMATION);
+                    }
+
+                    //SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
+                    WareMapApplication.factory.getRepository().saveChanges(WareMapApplication.factory.getAllProducts(), defaultPath);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Alerts.showAlert("Erro!", "Ordem de carga: " + lbOrder.getText(), "Ouve um erro ao gerar a separação.", Alert.AlertType.ERROR);
                 }
-
-                separations = WareMapApplication.factory.stateSeparation(defaultPath, this, "/Quantity11046Form.fxml", parentStage);
-
-                p = separations.createArquiveWithSeparation(finalPath.replace(".txt", "_dentroDoEstado") + ".txt");
-
-
-                if(p) {
-                    Alerts.showAlert("Sucesso!", "Ordem de carga: " + lbOrder.getText(), null, Alert.AlertType.INFORMATION);
-                }
-
-                //SALVA NO BANCO DE DADOS cache.db AS ALTERAÇÕES FEITAS APOS A SEPARAÇÃO DE CARGA.
-                WareMapApplication.factory.getRepository().saveChanges(WareMapApplication.factory.getAllProducts(), defaultPath);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Alerts.showAlert("Erro!", "Ordem de carga: " + lbOrder.getText(), "Ouve um erro ao gerar a separação.", Alert.AlertType.ERROR);
             }
+        }else {
+            Alerts.showAlert("Atenção!", "Informe a ordem de carga!", null, Alert.AlertType.INFORMATION);
         }
     }
 
