@@ -34,7 +34,7 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
 				productsNotFound.add(new ProductDto(lp.note(), lp.qtdeBoxes()));
 
 			}
-		}
+		}		
     }
       
     
@@ -44,6 +44,7 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
     public V getCold() { return cold; }
     
     public boolean createArquiveWithSeparation(String path) throws Exception{    	
+    	
 		try(BufferedWriter bW = new BufferedWriter(new FileWriter(path))) {
 			if(!(getForklift().getDtoProducts().isEmpty())) {
 				bW.write("Separação da Empilhadeira. [Congelados]\n");
@@ -61,7 +62,7 @@ public class SeparationSet<T extends Separation, U extends Separation, V extends
 			
 			
 			if(!(getFloor().getDtoProducts().isEmpty())) {
-				bW.write("\nSeparação do chão.\n");
+				bW.write("\nSeparação do chão.\n");				
 				for (ProductDto productDto : getFloor().getDtoProducts()) {
 					bW.write(productDto.print(finalListOfProducts));
 				}

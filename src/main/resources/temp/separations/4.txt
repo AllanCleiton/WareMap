@@ -1,0 +1,47 @@
+Separação da Empilhadeira. [Congelados]
+11007 110  Cam: 3 Rua 3= { 1B 1C -> 32cx }
+		  Rua 5= { 1B }
+11040 78   Cam: 2 Rua 4= { 1B 3B -> 9cx 2C 1C }
+3004  900  Cam: 1 Rua 8= { 2B 3B -> -278cx 6C 4C 2C 7C 5C 3C 
+			  1C }
+11046 206  Cam: 3 Rua 11= { 2B 1B -> 21cx 1C }
+		  Rua 5= { 2B 1C 2C }
+1013  1    Cam: 1 Rua 9= { 2C -> 1cx }
+11310 16   Cam: 3 Rua 6= { 1B -> 16cx }
+3006  40   Cam: 1 Rua 7= { 1C -> 40cx }
+11042 4    Cam: 3 Rua 18= { 2C -> 4cx }
+1026  15   Cam: 2 Rua 7= { 1C -> 15cx }
+1044  38   Cam: 2 Rua 2= { 1B 1C -> 4cx }
+11309 43   Cam: 3 Rua 6= { 1A 2C -> 12cx }
+2002  2    Cam: 2 Rua 3= { 3B -> 2cx }
+1004  73   Cam: 1 Rua 6= { 1B 2B -> 14cx 1C }
+1007  12   Cam: 2 Rua 12= { 1C -> 12cx }
+
+Separação da Empilhadeira. [Resfriados]
+3902  15   Cam: 4 Rua 1= { 2A -> 15cx }
+4016  29   Cam: 4 Rua 16= { 2C -> 29cx }
+
+Separação do chão.
+2703  4    Cam: 3 Rua 4= { 1B -> 4cx }
+11097 3    Cam: 3 Rua 7= { 1B -> 3cx }
+11074 2    Cam: 3 Rua 14= { 1B -> 2cx }
+5021  3    Cam: 4 Rua 15= { 1A -> 3cx }
+6005  4    Cam: 1 Rua 15= { 1B -> 4cx }
+5007  1    Cam: 4 Rua 9= { 1A -> 1cx }
+11023 7    Cam: 3 Rua 17= { 1B -> 7cx }
+11068 4    Cam: 3 Rua 9= { 1B -> 4cx }
+1005  9    Cam: 2 Rua 3= { 1C -> 9cx }
+5009  6    Cam: 4 Rua 4= { 1A -> 6cx }
+11085 10   Cam: 1 Rua 5= { 1B -> 10cx }
+1001  1    Cam: 1 Rua 1= { 1B -> 1cx }
+1009  1    Cam: 2 Rua 6= { 1C -> 1cx }
+11024 6    Cam: 3 Rua 16= { 1C -> 6cx }
+5015  6    Cam: 4 Rua 2= { 1B -> 6cx }
+11112 1    Cam: 3 Rua 13= { 1B -> 1cx }
+1040  3    Cam: 2 Rua 13= { 1A -> 3cx }
+11075 7    Cam: 3 Rua 3= { 1A }
+6007  3    Cam: 1 Rua 17= { 1B -> 3cx }
+1030  3    Cam: 2 Rua 3= { 1B -> 3cx }
+
+Produtos não encontrados.
+11409 30    Produto não encontrado!

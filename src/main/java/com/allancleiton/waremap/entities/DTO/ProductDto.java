@@ -194,6 +194,7 @@ public class ProductDto implements Comparable<ProductDto>{
 	public String print(List<ProductDto> finalListOfProducts) {
 		somatorioEndMoreNew(finalListOfProducts);
 		StringBuilder sb = new StringBuilder();
+				
 		if(tam != null ) {
 			if(String.valueOf(note).length() == 7) {
 				//sb.append(Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), "")) +" " + String.valueOf(note).substring(5) + " " + quantity);
@@ -203,7 +204,11 @@ public class ProductDto implements Comparable<ProductDto>{
 
 			}
 		}else {
-			sb.append(note +" "+ quantity);
+			if(String.valueOf(note).length() > 4) {
+				sb.append(note +" "+ quantity);
+			}else {
+				sb.append(note +"  "+ quantity);
+			}
 		}
 		
 		if(quantity < 10) {
@@ -273,7 +278,7 @@ public class ProductDto implements Comparable<ProductDto>{
 
 	@Override
 	public int compareTo(ProductDto o) {
-		return this.getNote().compareTo(o.getNote());
+		return this.note.compareTo(o.getEspecialNote());
 	}
 
 	

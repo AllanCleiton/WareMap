@@ -35,8 +35,8 @@ public class Separation {
 		Set<ChamberDto> chams = new HashSet<>();
 		ProductDto productDto = null;
 		Position auxPosition = null;
-		
 		for (Order lp : order.getOrders()) {
+			
 			for (Product product : partialProducts.get(lp.note())) {
 				
 				if(product.activePackeg && product.getPackages() == lp.packeges) {
@@ -102,8 +102,10 @@ public class Separation {
 		return sb.toString();
 	}
 	
-	public Set<ProductDto> getDtoProducts(){
-		return this.finalListOfProducts;
+	public List<ProductDto> getDtoProducts(){
+
+		return finalListOfProducts.stream().sorted().collect(Collectors.toList());
+
 	}
 	
 	public Map<Integer, List<Product>> getPartialProducts(){

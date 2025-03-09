@@ -750,6 +750,7 @@ public class SeparationFactory{
 			} while (!((frozenIsOk || coldIsOk || floorIsOk)|| !(partialProducts.get(lp.note()).stream().anyMatch(x -> x.visited == false))) || listOnlyOneIten);	
 		}
 		
+		
 		SeparationSet<Separation, Separation, Separation> separations = new SeparationSet<Separation, Separation, Separation>(
 				new Separation(frozenProducts, order), 
 				new Separation(floorProducts, order), 
