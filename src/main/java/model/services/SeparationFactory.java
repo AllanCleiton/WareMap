@@ -64,7 +64,7 @@ public class SeparationFactory{
 
         try {
             floorOrder = new LoadOrder(order.getOrders().stream().filter(floorSeparation).collect(Collectors.toList()), order.getOrderCharger());
-        } catch (NoSuchElement e) {
+        } catch (NoSuchElement ignored) {
 
         }
 
@@ -126,7 +126,8 @@ public class SeparationFactory{
             floorList.clear();
             externo:
             do {
-                if(!(executed)) {
+                if(!(executed)) { //this part of the code should be executed only once.
+
                     //INICIO LAÇO FOR-----------------------------------------------
                     for (Product product : partialProducts.get(lp.note())) {
                         boolean ok = false;
@@ -848,7 +849,7 @@ public class SeparationFactory{
             exists = false;
 
             for (Product p : products) {
-                if(p.visited == false) {
+                if(!p.visited) {
                     if (p.getHeight() == 1 && p.getDeoth() == 0) {
                         p.visited = true;
                         return new SimpleEntry<>(products.indexOf(p), p);
@@ -905,7 +906,7 @@ public class SeparationFactory{
             exists = false;
 
             for (Product p : products) {
-                if(p.visited == false) {
+                if(!p.visited) {
                     aux = p.getDays();
 
                     if(aux < max) {

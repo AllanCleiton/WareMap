@@ -2,14 +2,21 @@ package controller;
 
 import application.WareMapApplication;
 import controller.util.Alerts;
+import controller.util.Utils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import model.services.SeparationFactory;
+
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +30,34 @@ public class ViewController implements Initializable {
     Properties log = new Properties();
 
     @FXML
+    private MenuItem btOpenFile;
+
+    @FXML
     private MenuItem btInState;
+
+    @FXML
+    public void onMenuItemOpenAction(ActionEvent event){
+        Stage stage = (Stage) ((MenuItem) event.getSource()).getParentPopup().getOwnerWindow();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/OpenFileForm.fxml"));
+        Pane pane = null;
+        try {
+            pane = loader.load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Stage dialogState = new Stage();
+        dialogState.setTitle("Abrir Arquivo");
+        dialogState.setScene(new Scene(pane));
+        dialogState.setResizable(false); //fala se a janela pode ser redimencionada.
+        dialogState.initOwner(stage);
+        dialogState.initModality(Modality.APPLICATION_MODAL); //fala que a janela vai ser modal, que deixa ela travada na frente da outra.
+        dialogState.initModality(Modality.WINDOW_MODAL);
+        dialogState.showAndWait();
+    }
+
+
 
     @FXML
     public void onMenuItemInStateAction(){
@@ -35,6 +69,7 @@ public class ViewController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(absolutName));
             VBox newVBox = loader.load();
+
             var mainScene = WareMapApplication.getMainScene(); //pega a mainScene principal
             var mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();  //Pega uma referencia para o ScrollPane da MainView
 
@@ -53,6 +88,7 @@ public class ViewController implements Initializable {
 
         }
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
