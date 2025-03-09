@@ -198,16 +198,16 @@ public class ProductDto implements Comparable<ProductDto>{
 		if(tam != null ) {
 			if(String.valueOf(note).length() == 7) {
 				//sb.append(Integer.parseInt(String.valueOf(note).replace(String.valueOf(tam), "")) +" " + String.valueOf(note).substring(5) + " " + quantity);
-				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 2)) +"[" + String.valueOf(note).substring(5) + "] " + quantity);
+				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 2)) +"[" + String.valueOf(note).substring(5) + "] " + quantity+"cx");
 			}else if(String.valueOf(note).length() == 6) {
-				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 1)) +"[" + String.valueOf(note).substring(5) + "] " + quantity);
+				sb.append(Integer.parseInt(String.valueOf(note).substring(0, String.valueOf(note).length() - 1)) +"[" + String.valueOf(note).substring(5) + "] " + quantity+"cx");
 
 			}
 		}else {
 			if(String.valueOf(note).length() > 4) {
-				sb.append(note +" "+ quantity);
+				sb.append(note +" "+ quantity+"cx");
 			}else {
-				sb.append(note +"  "+ quantity);
+				sb.append(note +"  "+ quantity+"cx");
 			}
 		}
 		
@@ -221,6 +221,8 @@ public class ProductDto implements Comparable<ProductDto>{
 			sb.append(" ");
 		}
 		
+		chambers.sort((c1, c2) -> c1.getChamber().compareTo(c2.getChamber())); //Ordena as camaras em ordem crescente
+		
 		if(!chambers.isEmpty()) {
 			sb.append(chambers.get(0).toString());
 		}else {
@@ -228,7 +230,7 @@ public class ProductDto implements Comparable<ProductDto>{
 		}
 		if(chambers.size() > 0) {
 			for(int i = 1; i < chambers.size(); i++) {
-				sb.append("\t   " + chambers.get(i).toString());
+				sb.append("\t     " + chambers.get(i).toString());
 			}
 		}
 		

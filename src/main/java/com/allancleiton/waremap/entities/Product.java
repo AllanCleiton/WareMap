@@ -63,6 +63,7 @@ public class Product implements Serializable{
 		return deoth.getValue();
 	}
 	
+	
 	@JsonIgnore
 	public Character getCharDeoth() {
 		return deoth.getValue(this.getDeoth());

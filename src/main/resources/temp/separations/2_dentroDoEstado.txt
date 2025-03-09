@@ -1,0 +1,25 @@
+Separação da Empilhadeira. [Congelados]
+1001  790cx  Cam 1  Rua 1  = 2A 3A 5A 1B 2B 3B 4B 5B 
+			     6B 7B 1C 2C 3C 4C 5C 6C 
+			     7C 4A->9cx
+1019  645cx  Cam 2  Rua 20 = 3A 1B 2B 3B 4B 5B 6B 7B 
+			     1C 2C 3C 4C 5C 6C 7C 1A->20cx
+11007 110cx  Cam 3  Rua 3  = 1B 5C 6C->12cx
+11040 78cx   Cam 2  Rua 4  = 5C 6C->34cx
+11042 4cx    Cam 3  Rua 18 = 7C->4cx
+11046 1000cx Cam 3  Rua 5  = 2B 3B 4B 6B 1C 2C 3C 4C 
+			     5C 6C 7C 5B->30cx
+		    Rua 11 = 1B 2B 3B 1C 2C 3C 4C 5C 
+			     6C 7C 
+
+Separação da Empilhadeira. [Resfriados]
+3902  877cx  Cam 4  Rua 1  = 3A 4A 5A 6C 
+		    Rua 15 = 2B 4B 6B 7B 2C 3C 4C 5C 
+			     6C 7C 3B->37cx
+5009  443cx  Cam 4  Rua 4  = 3C 2C->11cx
+		    Rua 17 = 5B 6B 7B 2C 3C 4C 5C 6C 
+5017  200cx  Cam 4  Rua 9  = 2A 5B 4C 7C 6C->33cx
+
+Separação do chão.
+11023 7cx    Cam 3  Rua 17 = 1B->7cx
+11024 6cx    Cam 3  Rua 16 = 1C->6cx

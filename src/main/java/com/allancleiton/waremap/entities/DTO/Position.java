@@ -3,7 +3,6 @@ package com.allancleiton.waremap.entities.DTO;
 import java.util.Objects;
 
 import com.allancleiton.waremap.entities.Product;
-import com.allancleiton.waremap.entities.enums.Deoth;
 
 
 
@@ -102,6 +101,10 @@ public class Position implements Comparable<Position>{
 		return this.days;
 	}
 	
+	public Product getFisicProduct() {
+		return this.product;
+	}
+	
 	public int getProduct() {
 		return note;
 	}
@@ -143,18 +146,90 @@ public class Position implements Comparable<Position>{
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("%d%c ", product.getHeight(),product.getCharDeoth()) );
+		sb.append(String.format("%d%c", product.getHeight(),product.getCharDeoth()) );
 		return sb.toString();
 	}
 
+	
+	private Byte comparable() {
+		String position = String.valueOf(product.getHeight()).concat(String.valueOf(deoth));
+		
+		switch(position) {
+			case "1A":{
+				return 1;
+			}
+			case "2A":{
+				return 2;
+			}
+			case "3A":{
+				return 3;
+			}
+			case "4A":{
+				return 4;
+			}
+			case "5A":{
+				return 5;
+			}
+			case "6A":{
+				return 6;
+			}
+			case "7A":{
+				return 7;
+			}
+			
+			case "1B":{
+				return 8;
+			}
+			case "2B":{
+				return 9;
+			}
+			case "3B":{
+				return 10;
+			}
+			case "4B":{
+				return 11;
+			}
+			case "5B":{
+				return 12;
+			}
+			case "6B":{
+				return 13;
+			}
+			case "7B":{
+				return 14;
+			}
+			
+			case "1C":{
+				return 15;
+			}
+			case "2C":{
+				return 16;
+			}
+			case "3C":{
+				return 17;
+			}
+			case "4C":{
+				return 18;
+			}
+			case "5C":{
+				return 19;
+			}
+			case "6C":{
+				return 20;
+			}
+			case "7C":{
+				return 21;
+			}
+			default:{
+				return null;
+			}
+				
+		}
+
+	}
 
 	@Override
 	public int compareTo(Position other) {
-		Deoth d1 = Deoth.valueOf(String.valueOf(this.deoth));
-		Deoth d2 = Deoth.valueOf(String.valueOf(other.deoth));
-		Integer D1 = d1.getValue();
-		Integer D2 = d2.getValue();
-		
-		return D1.compareTo(D2);
+		return this.comparable().compareTo(other.comparable());
 	}
 }

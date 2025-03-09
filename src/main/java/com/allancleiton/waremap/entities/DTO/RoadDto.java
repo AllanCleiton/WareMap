@@ -18,7 +18,7 @@ public class RoadDto {
 	}
 	
 
-	public int getRoad() {
+	public Integer getRoad() {
 		return road;
 	}
 
@@ -78,33 +78,51 @@ public class RoadDto {
 
 	@Override
 	public String toString() {
-		positions.sort(Position::compareTo);
-	
 		StringBuilder sb = new StringBuilder();
-		sb.append("Rua " + road + "= { ");
-			int count = 0;
+		
+		if(road > 9) {
+			sb.append("Rua " + road + " = ");
+		}else {
+			sb.append("Rua " + road + "  = ");
+		}
+		
+		//tenta ordenar as posicoes.
+		try {
+			positions.sort(Position::compareTo);
+		}catch(Exception e){
+			System.out.println("Nao foi possivel ordenar as posições: Erro: "+ e.getMessage());
+		}
+		
+		int count = 0;
+		String moreNew="";
+		
+		for (Position position : positions) {
 			
-			for (Position position : positions) {
-				if(count > 7) {
-					if(position.moreNew && position.sobra != 0) {
-						sb.append("\n\t\t\t  " + position.toString() + "-> " + position.getToWithdraw() + "cx ");
-					}else {	
-						sb.append("\n\t\t\t  " + position.toString());
-					}
-					count = 0;
-				}else {
-					if(position.moreNew && position.sobra != 0) {
-						sb.append(position.toString() + "-> " + position.getToWithdraw() + "cx ");
-					}else {
-						sb.append(position.toString());
-					}
-
+			if(count > 7) {
+				if(position.moreNew && position.sobra != 0) {
+					moreNew = "\n\t\t\t     " + position.toString() + "->" + position.getToWithdraw() + "cx";
+					continue;
+					//sb.append("\n\t\t\t     " + position.toString() + "-> " + position.getToWithdraw() + "cx ");
+				}else {	
+					sb.append("\n\t\t\t     " + position.toString()+" ");
 				}
-		
-				count++;
+				count = 0;
+			}else {
+				if(position.moreNew && position.sobra != 0) {
+					moreNew = position.toString() + "->" + position.getToWithdraw() + "cx";
+					continue;
+					//sb.append(position.toString() + "-> " + position.getToWithdraw() + "cx ");
+				}else {
+					sb.append(position.toString()+" ");
+				}
+
 			}
-			sb.append("}");
+	
+			count++;
+		}
 		
+		sb.append(moreNew);
+	
 		return sb.toString();
 	}
 }

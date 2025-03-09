@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.Properties;
@@ -91,7 +92,11 @@ public class WareMapApplication {
 			clearScreen();
 			switch (choice) {
 			case 1: {
-				gerarSeparacao(sc, path, factory);
+				try {
+					gerarSeparacao(sc, path, factory);
+				}catch(NoSuchElementException e) {
+					System.out.println("Erro: O sistema esperava uma acão do usuario");
+				}
 				break;
 			}
 			case 2: {
@@ -487,7 +492,7 @@ public class WareMapApplication {
 		} while (choiceConfig != 0);
 	}
 	
-	public static void gerarSeparacao(Scanner sc, String defaultPath, SeparationFactory factory) {
+	public static void gerarSeparacao(Scanner sc, String defaultPath, SeparationFactory factory) throws NoSuchElementException{
 		int choiceSeparation = 0;
 		do {
 			System.out.println(Color.ANSI_GREEEN_BACKGROUND + " ESCOLHA O TIPO DE CARGA.                    "+ Color.ANSI_RESET);

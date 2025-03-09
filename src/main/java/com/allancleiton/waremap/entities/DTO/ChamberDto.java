@@ -22,7 +22,7 @@ public class ChamberDto {
 
 	
 	
-	public int getChamber() {
+	public Integer getChamber() {
 		return chamber;
 	}
 
@@ -71,10 +71,17 @@ public class ChamberDto {
 	@Override
 	public String toString() {
 		List<RoadDto> roadss = new ArrayList<>(roads);
+		roadss.sort((r1,r2) -> r1.getRoad().compareTo(r2.getRoad()));
 		
 		StringBuilder sb = new StringBuilder();
+		if(chamber > 9) {
+			sb.append("Cam " + chamber + " ");
+		}else {
+			sb.append("Cam " + chamber + "  ");
+
+		}
+	
 		
-		sb.append("Cam: " + chamber + " ");
 		if(!(roads.isEmpty())) {
 			sb.append(roadss.get(0).toString() + "\n");
 		}else {
@@ -82,7 +89,7 @@ public class ChamberDto {
 		}
 		if(roadss.size() > 0) {
 			for (int i=1; i < roadss.size(); i++) {
-				sb.append("\t\t  " + roadss.get(i).toString() + "\n");
+				sb.append("\t\t    " + roadss.get(i).toString() + "\n");
 			}
 		}
 		return sb.toString();
